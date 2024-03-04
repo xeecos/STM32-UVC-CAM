@@ -15,6 +15,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usb_lib.h"
+#include "../sys/stm32f10x.h"
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 #define ValBit(VAR,Place)    (VAR & (1 << Place))
@@ -37,7 +38,7 @@
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 u16_u8 StatusInfo;
-boolean Data_Mul_MaxPacketSize = FALSE;
+int Data_Mul_MaxPacketSize = 0;
 /* Private function prototypes -----------------------------------------------*/
 static void DataStageOut(void);
 static void DataStageIn(void);
@@ -478,12 +479,12 @@ void DataStageIn(void)
 
 	if ((save_wLength == 0) && (ControlState == LAST_IN_DATA))
 	{
-		if (Data_Mul_MaxPacketSize == TRUE)
+		if (Data_Mul_MaxPacketSize == USB_TRUE)
 		{
 			/* No more data to send and empty packet */
 			Send0LengthData();
 			ControlState = LAST_IN_DATA;
-			Data_Mul_MaxPacketSize = FALSE;
+			Data_Mul_MaxPacketSize = USB_FALSE;
 		} else
 		{
 			/* No more data to send so STALL the TX Status*/
@@ -793,10 +794,10 @@ void Data_Setup0(void)
 		{
 			if (pInformation->Ctrl_Info.Usb_wLength < pProperty->MaxPacketSize)
 			{
-				Data_Mul_MaxPacketSize = FALSE;
+				Data_Mul_MaxPacketSize = USB_FALSE;
 			} else if ((pInformation->Ctrl_Info.Usb_wLength % pProperty->MaxPacketSize) == 0)
 			{
-				Data_Mul_MaxPacketSize = TRUE;
+				Data_Mul_MaxPacketSize = USB_TRUE;
 			}
 		}
 

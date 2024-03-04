@@ -19,7 +19,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usb_conf.h"
-
+#include "../sys/stm32f10x.h"
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 #ifndef NULL
@@ -56,7 +56,7 @@ typedef enum
 {
 	FALSE = 0, TRUE = !FALSE
 }
-boolean;
+bool;
 typedef enum { RESET = 0, SET = !RESET } FlagStatus, ITStatus;
 
 typedef enum { DISABLE = 0, ENABLE = !DISABLE } FunctionalState;
