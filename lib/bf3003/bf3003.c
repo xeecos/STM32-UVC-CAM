@@ -500,7 +500,6 @@ void BF3003_Configure(void)
 {
     BF3003_WriteReg(0x12, 0x80); // 寄存器复位,所有寄存器复位为初始默认值
     delay_ms(100);
-
     BF3003_RegExample(); /* 参照其他教程的寄存器设置，具体寄存器对应的功能暂未弄清 */
 
     BF3003_WriteReg(0x11, 0x9F); /* 输入时钟32分频 */
