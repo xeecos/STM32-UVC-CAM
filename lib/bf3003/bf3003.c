@@ -3,8 +3,12 @@
 #include "delay.h"
 #include "usart.h"
 
-/* 0100 0010 --- 写地址   ***   0100 0011 ---读地址 */
-#define BF3003_ADDRESS 0x42
+/* 0xDC --- 写地址   ***   0XDD ---读地址 */
+#define BF3003_ADDRESS      0xDC
+
+#define BF3003_CHIP_VERSION			0x3000
+#define BF3003_CHIP_ID				0x2402
+
 
 /* @brief 下面几个函数主要是用于便捷读取串口电平 */
 uint8_t BF3003_VS(void)
