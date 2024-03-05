@@ -1,5 +1,7 @@
 #pragma once
 
+#define STM32F10X_MD_XL
+
 #define D0          PB8
 #define D1          PB9
 #define D2          PB10

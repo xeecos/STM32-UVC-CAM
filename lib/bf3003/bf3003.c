@@ -1,4 +1,5 @@
 #include "stm32f10x.h" // Device header
+#include "stm32f1xx_hal.h"
 #include "sccb.h"
 #include "delay.h"
 #include "usart.h"
@@ -210,15 +211,15 @@ uint8_t regs[] = {
 /* @brief 下面几个函数主要是用于便捷读取串口电平 */
 uint8_t BF3003_VS(void)
 {
-    return GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_12);
+    return GPIO_ReadInputDataBit(GPIOB, GPIO_PIN_12);
 }
 uint8_t BF3003_HREF(void)
 {
-    return GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_13);
+    return GPIO_ReadInputDataBit(GPIOB, GPIO_PIN_13);
 }
 uint8_t BF3003_PCLK(void)
 {
-    return GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_14);
+    return GPIO_ReadInputDataBit(GPIOB, GPIO_PIN_14);
 }
 /*
  * @brief    BF3003引脚初始化函数，在BF3003_Init() 里触发，不需外部调用
@@ -227,22 +228,23 @@ uint8_t BF3003_PCLK(void)
  */
 void BF3003_Pin_Init()
 {
+    
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    __HAL_RCC_GPIOB_CLK_ENABLE();
     /* VS HREF 和 PCLK IO口初始化 */
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE); /* GPIOB使能 */
-
     GPIO_InitTypeDef GPIO_InitStruct;                                   /* 结构体定义 */
-    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14; /* PB12,PB13,PB14 */
-    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IPU;                          /* 上拉输入 */
-    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;                      /*  50MHz*/
-    GPIO_Init(GPIOB, &GPIO_InitStruct);
+    GPIO_InitStruct.Pin = GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14; /* PB12,PB13,PB14 */
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;                          /* 上拉输入 */
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;                      /*  50MHz*/
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
 
     /* D0-D7 IO口初始化 */
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE); /* GPIOA使能 */
 
-    GPIO_InitStruct.GPIO_Pin = 0xFF;                   /* PA0-PA7 */
-    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN_FLOATING; /* 上拉输入 */
-    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;     /*  50MHz*/
-    GPIO_Init(GPIOA, &GPIO_InitStruct);
+    GPIO_InitStruct.Pin = 0xFF00;                     /* PB8-PB15 */
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;           /* 上拉输入 */
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;     /*  50MHz*/
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 }
 /*
  * @brief    BF3003写寄存器
@@ -496,10 +498,8 @@ void BF3003_RegExample(void)
  */
 void BF3003_Configure(void)
 {
-    OLED_ShowString(1, 1, "Init...");
     BF3003_WriteReg(0x12, 0x80); // 寄存器复位,所有寄存器复位为初始默认值
-    Delay_s(3);
-    OLED_Clear();
+    delay_ms(100);
 
     BF3003_RegExample(); /* 参照其他教程的寄存器设置，具体寄存器对应的功能暂未弄清 */
 
@@ -511,13 +511,6 @@ void BF3003_Configure(void)
     /*设置测试图案输出  这里设置的是输出八色彩条*/
     BF3003_WriteReg(0x70, 0x3A);
     BF3003_WriteReg(0x71, 0xB5);
-    /*应当是数据手册有误，数据手册里写的是：
-    (0x70[7],0x71[7])=(1,0)输出的是八色彩条        ×
-    (0x70[7],0x71[7])=(0,1)输出的是Shifting “1”    ×
-    而实际上是反过来的
-    (0x70[7],0x71[7])=(1,0)输出的是Shifting “1”    ✓
-    (0x70[7],0x71[7])=(0,1)输出的是八色彩条        ✓
-    */
 }
 /*
  * @brief    BF3003初始化
@@ -526,8 +519,8 @@ void BF3003_Configure(void)
  */
 void BF3003_Init(void)
 {
-    SCCB_Init();        // SCCB初始化
     BF3003_Pin_Init();  // 引脚初始化
+    SCCB_Init();        // SCCB初始化
     BF3003_Configure(); // 寄存器预设
 }
 /*
@@ -539,8 +532,6 @@ uint8_t frame[320 * 40];
 void BF3003_GetPic(void)
 {
     uint16_t i, j;
-    OLED_ShowString(2, 1, "GetPics...");
-
     while (BF3003_VS() == 0)
         ; /* 保证进入一个新的帧时序，而不是在帧时序的一半进入 */
     while (BF3003_VS() == 1)
@@ -565,16 +556,14 @@ void BF3003_GetPic(void)
     while (BF3003_VS() == 0)
         ;
 
-    OLED_ShowString(2, 1, "Sending... ");
-    Serial_SendByte(0x01);
-    Serial_SendByte(0xFE);
-    for (i = 0; i < 320 * 40; i++)
-    {
-        Serial_SendByte(frame[i]);
-    }
-    Serial_SendByte(0xFE);
-    Serial_SendByte(0x01);
+    // Serial_SendByte(0x01);
+    // Serial_SendByte(0xFE);
+    // for (i = 0; i < 320 * 40; i++)
+    // {
+    //     Serial_SendByte(frame[i]);
+    // }
+    // Serial_SendByte(0xFE);
+    // Serial_SendByte(0x01);
 
-    OLED_ShowString(4, 1, "SUCCESS  ");
-    Delay_ms(1000);
+    delay_ms(1000);
 }
