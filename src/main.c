@@ -8,8 +8,8 @@ int main()
 
     uart_init(36, 115200);
     delay_init(32);
-    USB_Init();
-    BF3003_Init();
+    // USB_Init();
+    // BF3003_Init();
     while(1)
     {
         printf("hello\n");
