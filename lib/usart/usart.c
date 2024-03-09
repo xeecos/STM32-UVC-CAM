@@ -107,8 +107,6 @@ void USART1_IRQHandler(void)
 // 初始化IO 串口1
 // pclk2:PCLK2时钟频率(Mhz)
 // bound:波特率
-// CHECK OK
-// 091209
 void uart_init(u32 pclk2, u32 bound)
 {
 	float temp;

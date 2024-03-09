@@ -6,7 +6,7 @@
 int main()
 {
 
-    uart_init(36, 115200);
+    uart_init(72, 115200);
     delay_init(32);
     // USB_Init();
     // BF3003_Init();
