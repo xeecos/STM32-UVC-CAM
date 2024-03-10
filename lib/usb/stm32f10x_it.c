@@ -20,7 +20,6 @@
 #include "usb_istr.h"
 #include "usb_lib.h"
 #include "usb_pwr.h"
-#include "platform_config.h"
 	   
 /*******************************************************************************
 * Function Name  : USB_HP_CAN_TX_IRQHandler
@@ -54,7 +53,8 @@ void USB_LP_CAN1_RX0_IRQHandler(void)
 *******************************************************************************/
 void USBWakeUp_IRQHandler(void)
 {
-	EXTI->PR|=1<<18;  // Çå³ýUSB»½ÐÑÖÐ¶Ï¹ÒÆðÎ»
+  printf("wake\n");
+	EXTI->PR|=1<<18;  // æ¸…é™¤USBå”¤é†’ä¸­æ–­æŒ‚èµ·ä½
 }
 			   
 /******************* (C) COPYRIGHT 2008 STMicroelectronics *****END OF FILE****/  

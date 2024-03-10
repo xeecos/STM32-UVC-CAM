@@ -1,31 +1,4 @@
 #include "sys.h" 
-//////////////////////////////////////////////////////////////////////////////////	 
-//本程序只供学习使用，未经作者许可，不得用于其它任何用途
-//ALIENTEK STM32开发板
-//系统时钟初始化		   
-//正点原子@ALIENTEK
-//技术论坛:www.openedv.com
-//修改日期:2013/11/20
-//版本：V1.8
-//版权所有，盗版必究。
-//Copyright(C) 广州市星翼电子科技有限公司 2009-2019
-//All rights reserved
-//********************************************************************************
-//V1.4修改说明
-//把NVIC KO了,没有使用任何库文件!
-//加入了JTAG_Set函数
-//V1.5 20120322
-//增加void INTX_DISABLE(void)和void INTX_ENABLE(void)两个函数
-//V1.6 20120412
-//1,增加MSR_MSP函数												    
-//2,修改VECT_TAB_RAM的默认偏移,设置为0X6000.
-//V1.7 20120818
-//1,添加ucos支持配置宏SYSTEM_SUPPORT_UCOS
-//2,修改了注释
-//3,去掉了不常用函数BKP_Write
-//V1.8 20131120
-//1,修改头文件为stm32f10x.h,不再使用stm32f10x_lib.h及其相关头文件
-////////////////////////////////////////////////////////////////////////////////// 	  
 
 //设置向量表偏移地址
 //NVIC_VectTab:基址
@@ -65,12 +38,12 @@ void MY_NVIC_Init(u8 NVIC_PreemptionPriority,u8 NVIC_SubPriority,u8 NVIC_Channel
 { 
 	u32 temp;	
 	MY_NVIC_PriorityGroupConfig(NVIC_Group);//设置分组
-	temp=NVIC_PreemptionPriority<<(4-NVIC_Group);	  
-	temp|=NVIC_SubPriority&(0x0f>>NVIC_Group);
-	temp&=0xf;//取低四位  
-	if(NVIC_Channel<32)NVIC->ISER[0]|=1<<NVIC_Channel;//使能中断位(要清除的话,相反操作就OK)
-	else NVIC->ISER[1]|=1<<(NVIC_Channel-32);    
-	NVIC->IP[NVIC_Channel]|=temp<<4;//设置响应优先级和抢断优先级   	    	  				   
+	temp = NVIC_PreemptionPriority<<(4-NVIC_Group);	  
+	temp |= NVIC_SubPriority&(0x0f>>NVIC_Group);
+	temp &= 0xf;//取低四位  
+	if(NVIC_Channel<32)NVIC->ISER[0] |= 1<<NVIC_Channel;//使能中断位(要清除的话,相反操作就OK)
+	else NVIC->ISER[1] |= 1<<(NVIC_Channel-32);    
+	NVIC->IP[NVIC_Channel] |= temp<<4;//设置响应优先级和抢断优先级   	    	  				   
 }
 
 //外部中断配置函数

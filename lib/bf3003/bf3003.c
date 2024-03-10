@@ -1,5 +1,5 @@
 #include "stm32f10x.h" // Device header
-#include "stm32f1xx_hal.h"
+// #include "stm32f1xx_hal.h"
 #include "sccb.h"
 #include "delay.h"
 #include "usart.h"
@@ -211,15 +211,15 @@ uint8_t regs[] = {
 /* @brief 下面几个函数主要是用于便捷读取串口电平 */
 uint8_t BF3003_VS(void)
 {
-    return GPIO_ReadInputDataBit(GPIOB, GPIO_PIN_12);
+    return 1;//GPIO_ReadInputDataBit(GPIOB, GPIO_PIN_12);
 }
 uint8_t BF3003_HREF(void)
 {
-    return GPIO_ReadInputDataBit(GPIOB, GPIO_PIN_13);
+    return 1;//GPIO_ReadInputDataBit(GPIOB, GPIO_PIN_13);
 }
 uint8_t BF3003_PCLK(void)
 {
-    return GPIO_ReadInputDataBit(GPIOB, GPIO_PIN_14);
+    return 1;//GPIO_ReadInputDataBit(GPIOB, GPIO_PIN_14);
 }
 /*
  * @brief    BF3003引脚初始化函数，在BF3003_Init() 里触发，不需外部调用
@@ -229,22 +229,22 @@ uint8_t BF3003_PCLK(void)
 void BF3003_Pin_Init()
 {
     
-    __HAL_RCC_GPIOA_CLK_ENABLE();
-    __HAL_RCC_GPIOB_CLK_ENABLE();
-    /* VS HREF 和 PCLK IO口初始化 */
-    GPIO_InitTypeDef GPIO_InitStruct;                                   /* 结构体定义 */
-    GPIO_InitStruct.Pin = GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14; /* PB12,PB13,PB14 */
-    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;                          /* 上拉输入 */
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;                      /*  50MHz*/
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    // __HAL_RCC_GPIOA_CLK_ENABLE();
+    // __HAL_RCC_GPIOB_CLK_ENABLE();
+    // /* VS HREF 和 PCLK IO口初始化 */
+    // GPIO_InitTypeDef GPIO_InitStruct;                                   /* 结构体定义 */
+    // GPIO_InitStruct.Pin = GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14; /* PB12,PB13,PB14 */
+    // GPIO_InitStruct.Mode = GPIO_MODE_INPUT;                          /* 上拉输入 */
+    // GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;                      /*  50MHz*/
+    // HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 
-    /* D0-D7 IO口初始化 */
+    // /* D0-D7 IO口初始化 */
 
-    GPIO_InitStruct.Pin = 0xFF00;                     /* PB8-PB15 */
-    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;           /* 上拉输入 */
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;     /*  50MHz*/
-    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+    // GPIO_InitStruct.Pin = 0xFF00;                     /* PB8-PB15 */
+    // GPIO_InitStruct.Mode = GPIO_MODE_INPUT;           /* 上拉输入 */
+    // GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;     /*  50MHz*/
+    // HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 }
 /*
  * @brief    BF3003写寄存器

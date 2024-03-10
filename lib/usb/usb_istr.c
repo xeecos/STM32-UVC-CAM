@@ -62,14 +62,14 @@ void (*pEpInt_OUT[7])(void) =
 *******************************************************************************/
 void USB_Istr (void)
 {
-
+	printf("istr\n");
 	wIstr = _GetISTR ();
 
-#if (IMR_MSK & ISTR_RESET)			// USB∏¥Œª«Î«Û÷–∂œ
+#if (IMR_MSK & ISTR_RESET)			// USBÂ§ç‰ΩçËØ∑Ê±Ç‰∏≠Êñ≠
 	if (wIstr & ISTR_RESET & wInterrupt_Mask)
 	{
-		_SetISTR ((u16)CLR_RESET);	// «Â≥˝∏¥Œª÷–∂œ±Í÷æ
-		Device_Property.Reset ();	// Ω¯»ÎµΩ∏¥Œª÷–∂œ( Joystick_Reset )
+		_SetISTR ((u16)CLR_RESET);	// Ê∏ÖÈô§Â§ç‰Ωç‰∏≠Êñ≠Ê†áÂøó
+		Device_Property.Reset ();	// ËøõÂÖ•Âà∞Â§ç‰Ωç‰∏≠Êñ≠( Joystick_Reset )
 #ifdef RESET_CALLBACK
 		RESET_Callback ();
 #endif
@@ -153,7 +153,7 @@ void USB_Istr (void)
 	}
 #endif
 	/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-#if (IMR_MSK & ISTR_CTR)			// ’˝»∑¥´ ‰÷–∂œ
+#if (IMR_MSK & ISTR_CTR)			// Ê≠£Á°Æ‰º†Ëæì‰∏≠Êñ≠
 	if (wIstr & ISTR_CTR & wInterrupt_Mask)
 	{
 		/* servicing of the endpoint correct transfer interrupt */

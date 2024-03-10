@@ -1,7 +1,5 @@
 #pragma once
-#include "stm32f1xx.h"
-
-
+#include <stm32f1xx.h>
 
 typedef signed long      s32;
 typedef signed short     s16;

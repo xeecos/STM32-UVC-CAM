@@ -30,8 +30,10 @@
 #define UP              4
 #define CURSOR_STEP     30
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* Exported functions ------------------------------------------------------- */
-void Set_System(void);
 void Set_USBClock(void);
 void GPIO_AINConfig(void);
 void Enter_LowPowerMode(void);
@@ -39,10 +41,14 @@ void Leave_LowPowerMode(void);
 void USB_Interrupts_Config(void);
 void USB_Cable_Config (FunctionalState NewState);
 //void UsbCamera_StreamStart(void);
+void USB_Port_Set(FunctionalState NewState, FunctionalState Pin_In_IPU);
 void UsbCamera_Fillbuf(void);
 u8 JoyState(void);
 void Get_SerialNum(void);
 
+#ifdef __cplusplus
+}
+#endif
 #endif  /*__HW_CONFIG_H*/
 
 /******************* (C) COPYRIGHT 2008 STMicroelectronics *****END OF FILE****/

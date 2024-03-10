@@ -19,6 +19,9 @@
 #include "usb_type.h"
 #include "usb_lib.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* Includes ------------------------------------------------------------------*/
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
@@ -46,6 +49,9 @@ extern USER_STANDARD_REQUESTS *pUser_Standard_Requests;
 extern u16	SaveState ;
 extern u16 wInterrupt_Mask;
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* __USB_INIT_H */
 
 /******************* (C) COPYRIGHT 2008 STMicroelectronics *****END OF FILE****/

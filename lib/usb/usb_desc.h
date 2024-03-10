@@ -40,17 +40,17 @@
 
 #define IMG_WIDTH								640
 #define IMG_HEIGHT								480
-#define IMG_VIDEO_SCALE         2           //MJPEG size=Img_size/scale
-//uvc-MJPEG֡��
-#define IMG_MJPG_FRAMERATE      5           //Ԥ����MJPEG��Ƶ֡��
+#define IMG_VIDEO_SCALE         1           //MJPEG size=Img_size/scale
+//uvc-MJPEG帧率
+#define IMG_MJPG_FRAMERATE      5           //预定义MJPEG视频帧率
 
 #define PACKET_SIZE                             0xB0        //176 
 #define MIN_BIT_RATE                        (20*1024*IMG_MJPG_FRAMERATE)
 #define MAX_BIT_RATE                        (400*1024*IMG_MJPG_FRAMERATE)
 
-#define MAX_FRAME_SIZE          (200*1024)      //���ÿ֡JPEG Byte������ӦHostҪ���Buffer Size
+#define MAX_FRAME_SIZE          (200*1024)      //最大每帧JPEG Byte数，对应Host要求的Buffer Size
 
-#define FRAME_INTERVEL          (10000000ul/IMG_MJPG_FRAMERATE)     //֡����ʱ�䣬��λ100ns
+#define FRAME_INTERVEL          (10000000ul/IMG_MJPG_FRAMERATE)     //帧间间隔时间，单位100ns
 
 #ifdef UVC_1_1
 #define CAMERA_SIZ_CONFIG_DESC                  144

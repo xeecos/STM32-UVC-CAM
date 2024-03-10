@@ -50,16 +50,17 @@ RESULT PowerOn(void)
 {
 	u16 wRegVal = 0;
 
-	//USB_Cable_Config(ENABLE);//Ê¹ÄÜ1.5KÉÏÀ­ 
-	/*** CNTR_PWDN = 0(ÍË³ö¶Ïµç, Ç¿ÖÆ¸´Î») ***/
+	//USB_Cable_Config(ENABLE);//ä½¿èƒ½1.5Kä¸Šæ‹‰ 
+	/*** CNTR_PWDN = 0(é€€å‡ºæ–­ç”µ, å¼ºåˆ¶å¤ä½) ***/
 	wRegVal = CNTR_FRES;
 	_SetCNTR(wRegVal);
-	/*** CNTR_FRES = 0(Çå³ı¸´Î») ***/
+	/*** CNTR_FRES = 0(æ¸…é™¤å¤ä½) ***/
 	wInterrupt_Mask = 0;
 	_SetCNTR(wInterrupt_Mask);
-	/*** Clear pending interrupts (Çå³ıÖĞ¶Ï×´Ì¬¼Ä´æÆ÷)***/
+	while((_GetISTR()&ISTR_RESET) == 1);
+	/*** Clear pending interrupts (æ¸…é™¤ä¸­æ–­çŠ¶æ€å¯„å­˜å™¨)***/
 	_SetISTR(0);
-	/*** Set interrupt mask(Ê¹ÄÜ¸´Î», ¹ÒÆğ, »½ĞÑÖĞ¶Ï) ***/
+	/*** Set interrupt mask(ä½¿èƒ½å¤ä½, æŒ‚èµ·, å”¤é†’ä¸­æ–­) ***/
 	wInterrupt_Mask = CNTR_RESETM | CNTR_SUSPM | CNTR_WKUPM;
 	_SetCNTR(wInterrupt_Mask);
 
@@ -80,7 +81,7 @@ RESULT PowerOff()
 	/* clear interrupt status register */
 	_SetISTR(0);
 	/* Disable the Pull-Up*/
-	//USB_Cable_Config(DISABLE);//½ûÖ¹1.5KÉÏÀ­
+	//USB_Cable_Config(DISABLE);//ç¦æ­¢1.5Kä¸Šæ‹‰
 	/* switch-off device */
 	_SetCNTR(CNTR_FRES + CNTR_PDWN);
 	/* sw variables reset */

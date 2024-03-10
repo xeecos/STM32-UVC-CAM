@@ -15,7 +15,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usb_lib.h"
-#include "../sys/stm32f10x.h"
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 #define ValBit(VAR,Place)    (VAR & (1 << Place))
@@ -38,7 +37,7 @@
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 u16_u8 StatusInfo;
-int Data_Mul_MaxPacketSize = 0;
+int Data_Mul_MaxPacketSize = USB_FALSE;
 /* Private function prototypes -----------------------------------------------*/
 static void DataStageOut(void);
 static void DataStageIn(void);
@@ -660,19 +659,19 @@ void Data_Setup0(void)
 	CopyRoutine = NULL;
 	wOffset = 0;
 
-	if (Request_No == GET_DESCRIPTOR)//6  GET_DEscriptOR������������ȡ�豸���ض�������
+	if (Request_No == GET_DESCRIPTOR)//6  GET_DEscriptOR：用于主机获取设备的特定描述符
 	{
-		//pInformation->USBbmRequestType����������� ��׼������豸����
+		//pInformation->USBbmRequestType是下面的两种 标准请求或设备请求
 		if (Type_Recipient == (STANDARD_REQUEST | DEVICE_RECIPIENT))
 		{
-			u8 wValue1 = pInformation->USBwValue1; //��һ�ֽڵõ����������� һ����5��
-			if (wValue1 == DEVICE_DESCRIPTOR)//�豸����
+			u8 wValue1 = pInformation->USBwValue1; //高一字节得到描述表种类 一共有5种
+			if (wValue1 == DEVICE_DESCRIPTOR)//设备描述
 			{
 				CopyRoutine = pProperty->GetDeviceDescriptor;
-			} else if (wValue1 == CONFIG_DESCRIPTOR)//��������
+			} else if (wValue1 == CONFIG_DESCRIPTOR)//配置描述
 			{
 				CopyRoutine = pProperty->GetConfigDescriptor;
-			} else if (wValue1 == STRING_DESCRIPTOR) //�ַ�������
+			} else if (wValue1 == STRING_DESCRIPTOR) //字符串描述
 			{
 				CopyRoutine = pProperty->GetStringDescriptor;
 			}  /* End of GET_DESCRIPTOR */
@@ -827,7 +826,7 @@ u8 Setup0_Process(void)
 		u16* w;
 	} pBuf;
 
-	//�õ����ܻ�������ַ�Ĵ�����ַ
+	//得到接受缓冲区地址寄存器地址
 	pBuf.b = PMAAddr + (u8 *)(_GetEPRxAddr(ENDP0) * 2); /* *2 for 32 bits addr */
 
 	if (pInformation->ControlState != PAUSE)
@@ -850,7 +849,7 @@ u8 Setup0_Process(void)
 	} else
 	{
 		/* Setup with data stage */
-		Data_Setup0();//�����������ݵĴ��䣬����Ҫ���뵽�������
+		Data_Setup0();//由于是有数据的传输，所有要进入到这个函数
 	}
 	return Post0_Process();
 }
@@ -989,7 +988,7 @@ void NOP_Process(void)
 
 /*******************************************************************************
 * Function Name  : EP1_IN_Callback
-* Description    : EP1��������ж�
+* Description    : EP1发送完成中断
 * Input          : None.
 * Output         : None.
 * Return         : None.

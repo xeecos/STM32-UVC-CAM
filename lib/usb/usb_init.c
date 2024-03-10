@@ -43,7 +43,7 @@ USER_STANDARD_REQUESTS  *pUser_Standard_Requests;
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
-//³õÊ¼»¯USB
+//åˆå§‹åŒ–USB
 void USB_Init(void)
 {
 	pInformation = &Device_Info;
@@ -60,12 +60,13 @@ void USB_Init(void)
 	//	STALLED,          /* 9 */
 	//	PAUSE             /* 10 */
 	//} CONTROL_STATE;    /* The state machine states of a control pipe */
+
 	pInformation->ControlState = IN_DATA;
+
 	pProperty = &Device_Property;
 	pUser_Standard_Requests = &User_Standard_Requests;
 	/* Initialize devices one by one */
 	pProperty->Init();
-	//Joystick_init();
 }
 
 /******************* (C) COPYRIGHT 2008 STMicroelectronics *****END OF FILE****/

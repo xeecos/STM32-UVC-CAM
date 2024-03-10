@@ -46,7 +46,7 @@ typedef struct  _VideoControl
 	u8    bMaxVersion[1];
 }   VideoControl;
 
-//VideoStreaming RequestsÓ¦´ð£¬²Î¿¼USB_Video_Class_1_1.pdf p103~
+//VideoStreaming Requestsåº”ç­”ï¼Œå‚è€ƒUSB_Video_Class_1_1.pdf p103~
 VideoControl    videoCommitControl =
 {
 	{ 0x01, 0x00 },                      // bmHint
@@ -174,6 +174,8 @@ void UsbCamera_init(void)
 	_SetCNTR(wInterrupt_Mask);
 
 	bDeviceState = UNCONNECTED;
+	
+	printf("USB INIT\n");
 }
 
 /*******************************************************************************
@@ -185,6 +187,7 @@ void UsbCamera_init(void)
 *******************************************************************************/
 void UsbCamera_Reset(void)
 {
+	printf("reset\n");
 	/* Set Usb device as not configured state */
 	pInformation->Current_Configuration = 0;
 
@@ -231,6 +234,7 @@ void UsbCamera_Reset(void)
 *******************************************************************************/
 void UsbCamera_SetConfiguration(void)
 {
+	printf("set");
 	DEVICE_INFO *pInfo = &Device_Info;
 
 	if (pInfo->Current_Configuration != 0)
@@ -249,6 +253,7 @@ void UsbCamera_SetConfiguration(void)
 *******************************************************************************/
 void UsbCamera_SetDeviceAddress(void)
 {
+	printf("addr");
 	bDeviceState = ADDRESSED;
 }
 
@@ -260,7 +265,9 @@ void UsbCamera_SetDeviceAddress(void)
 * Return         : None.
 *******************************************************************************/
 void UsbCamera_Status_In(void)
-{}
+{
+	printf("in");
+}
 
 /*******************************************************************************
 * Function Name  :
@@ -270,18 +277,22 @@ void UsbCamera_Status_In(void)
 * Return         : None.
 *******************************************************************************/
 void UsbCamera_Status_Out(void)
-{}
+{
+
+	printf("out");
+}
 
 /*******************************************************************************
 * Function Name  :
 * Description    : handle the data class specific requests
-*              ¶ÔClass-specific RequestsµÄÓ¦´ð
+*              å¯¹Class-specific Requestsçš„åº”ç­”
 * Input          : Request Nb.
 * Output         : None.
 * Return         : USB_UNSUPPORT or USB_SUCCESS.
 *******************************************************************************/
 RESULT UsbCamera_Data_Setup(u8 RequestNo)
 {
+	printf("setup");
 	u8 *(*CopyRoutine)(u16);
 	CopyRoutine = NULL;
 

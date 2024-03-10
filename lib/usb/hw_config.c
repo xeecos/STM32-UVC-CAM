@@ -18,9 +18,7 @@
 #include "hw_config.h"
 #include "usb_lib.h"
 #include "usb_desc.h"
-#include "platform_config.h"
 #include "usb_pwr.h"
-#include "lcd.h"
 #include "srcjpg.h"
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -36,8 +34,8 @@
 //配置USB时钟,USBclk=48Mhz
 void Set_USBClock(void)
 {
-	RCC->CFGR &= ~(1 << 22); //USBclk=PLLclk/1.5=48Mhz	    
-	RCC->APB1ENR |= 1 << 23; //USB时钟使能					 
+	// RCC->CFGR &= ~RCC_CFGR_USBPRE; //USBclk=PLLclk/1.5=48Mhz	    
+	RCC->APB1ENR |= RCC_APB1ENR_USBEN; //USB时钟使能					 
 }
 
 /*******************************************************************************
@@ -99,9 +97,8 @@ void myMemcpy(const u8* src, u8* dst, u32 len)
 //USB中断配置
 void USB_Interrupts_Config(void)
 {
-
-	EXTI->IMR |= 1 << 18;//  开启线18上的中断
-	EXTI->RTSR |= 1 << 18;//line 18上事件上升降沿触发	 
+	EXTI->IMR |= EXTI_RTSR_TR18;//  开启线18上的中断
+	EXTI->RTSR |= EXTI_RTSR_TR18;//line 18上事件上升降沿触发	 
 	MY_NVIC_Init(1, 0, USB_LP_CAN1_RX0_IRQn, 2);//组2，优先级次之 
 	MY_NVIC_Init(0, 0, USBWakeUp_IRQn, 2);     //组2，优先级最高	 	 
 }

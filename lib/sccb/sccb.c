@@ -1,7 +1,7 @@
 #include "stm32f10x.h"                  // Device header
 #include "delay.h"
 #include "sccb.h"
-#include "stm32f1xx_hal.h"
+// #include "stm32f1xx_hal.h"
 
 /*
   * @brief  修改SCL的电平
@@ -10,7 +10,7 @@
 */
 void SCCB_W_SCL(uint8_t BitValue)
 {
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, BitValue);
+    // //HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, BitValue);
     delay_us(10);
 }
 /*
@@ -20,7 +20,7 @@ void SCCB_W_SCL(uint8_t BitValue)
 */
 void SCCB_W_SDA(uint8_t BitValue)
 {
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_11, BitValue);
+    //HAL_GPIO_WritePin(GPIOB, GPIO_PIN_11, BitValue);
     delay_us(10);
 }
 /*
@@ -31,7 +31,7 @@ void SCCB_W_SDA(uint8_t BitValue)
 uint8_t SCCB_R_SDA(void)
 {
     uint8_t BitValue;
-    BitValue = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_11);
+    // BitValue = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_11);
     delay_us(10);
     return BitValue;
 }
@@ -43,13 +43,13 @@ uint8_t SCCB_R_SDA(void)
 void SCCB_Init(void)
 {
     
-    GPIO_InitTypeDef GPIO_InitStructure;
-    GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_OD;
-    GPIO_InitStructure.Pin = GPIO_PIN_10 | GPIO_PIN_11;
-    GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
-    HAL_GPIO_Init(GPIOB, &GPIO_InitStructure);
+    // GPIO_InitTypeDef GPIO_InitStructure;
+    // GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_OD;
+    // GPIO_InitStructure.Pin = GPIO_PIN_10 | GPIO_PIN_11;
+    // GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
+    // HAL_GPIO_Init(GPIOB, &GPIO_InitStructure);
     
-    // HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10 | GPIO_PIN_11, GPIO_PIN_SET);
+    // //HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10 | GPIO_PIN_11, GPIO_PIN_SET);
 }
 /*
   * @brief  产生SCCB开始信号

@@ -28,11 +28,11 @@
 
 #ifndef __STM32F10x_H
 
-typedef enum
-{
-	FALSE = 0, TRUE = !FALSE
-}
-bool;
+// typedef enum
+// {
+// 	FALSE = 0, TRUE = !FALSE
+// }
+// bool;
 // typedef enum { RESET = 0, SET = !RESET } FlagStatus, ITStatus;
 
 // typedef enum { DISABLE = 0, ENABLE = !DISABLE } FunctionalState;
