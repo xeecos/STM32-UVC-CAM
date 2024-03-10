@@ -78,5 +78,5 @@ void usart_init()
 	USART1->CR1 |= 1<<8;
 	USART1->CR1 |= 1<<5;   //RXNE 接收缓冲区非空中断使能	
 	USART1->CR1 |= 0X200C;  //1位停止,无校验位.
-	MY_NVIC_Init(2, 2, USART1_IRQn, 2);//组2，最低优先级 
+	MY_NVIC_Init2(2, 2, USART1_IRQn, 2);//组2，最低优先级 
 }

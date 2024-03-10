@@ -1,36 +1,6 @@
-// // #include "stm32f1xx.h"
-// // #include "config.h"
-// // #include "sys.h"
-// // #include "usb_init.h"
-// // #include "usart.h"
-// // #include "delay.h"
-// // #include "bf3003.h"
-
-// // int main()
-// // {
-// //     usart_init();
-// //     write('i');
-// //     write('\n');
-// //     delay_init(72);
-// //     // USB_Init();
-// //     // BF3003_Init();
-// //     write('i');
-// //     write('\n');
-// //     while(1)
-// //     {
-// //         printf("hi!\n");
-// //         delay_ms(500);
-// //     }
-// //     return 0;
-// // }
-// #include <Arduino.h>
-
-// #include "usbd_video.h"
-// #include "usbd_core.h"
-// #include "usb_init.h"
-// #include "serial.h"
 #include "delay.h"
 #include "usart.h"
+#include "sys.h"
 #include "stm32f1xx.h"
 #include "usb_init.h"
 #include "hw_config.h"
@@ -64,41 +34,25 @@ static void SetSysClockToHSE(void)
     #if !defined STM32F10X_LD_VL && !defined STM32F10X_MD_VL && !defined STM32F10X_HD_VL
         /* Enable Prefetch Buffer */
         FLASH->ACR |= FLASH_ACR_PRFTBE;
-
-        /* Flash 0 wait state */
         FLASH->ACR &= (uint32_t)((uint32_t)~FLASH_ACR_LATENCY);
-
-    #ifndef STM32F10X_CL
-        FLASH->ACR |= (uint32_t)FLASH_ACR_LATENCY_0;
-    #else
-        if (HSE_VALUE <= 24000000)
-        {
-        FLASH->ACR |= (uint32_t)FLASH_ACR_LATENCY_0;
-        }
-        else
-        {
         FLASH->ACR |= (uint32_t)FLASH_ACR_LATENCY_1;
-        }
-    #endif /* STM32F10X_CL */
     #endif
 
-    /* HCLK = SYSCLK */
     RCC->CFGR &= ~RCC_CFGR_PLLMULL_Msk; //Clear
-    RCC->CFGR |= (0x7UL << RCC_CFGR_PLLMULL_Pos);
 
-	RCC->CFGR &= ~RCC_CFGR_USBPRE; //USBclk=PLLclk/1.5=48Mhz
-    RCC->CFGR &= ~RCC_CFGR_HPRE;
-    //APB1 divider=2
-    RCC->CFGR &= ~RCC_CFGR_PPRE1;
-    RCC->CFGR |= RCC_CFGR_PPRE1_2;
-    //APB2 divider=1
-    RCC->CFGR &= ~RCC_CFGR_PPRE2;
-    //ADC prescalar = 12
-    RCC->CFGR &= ~RCC_CFGR_ADCPRE;
-    RCC->CFGR |= RCC_CFGR_ADCPRE_1;
+    // RCC->CFGR &= ~RCC_CFGR_USBPRE; //USBclk=PLLclk/1.5=48Mhz
+    
+    /* HCLK = SYSCLK */
+    RCC->CFGR |= (uint32_t)RCC_CFGR_HPRE_DIV1; 
+    /* PCLK2 = HCLK */
+    RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE2_DIV1; 
+    /* PCLK1 = HCLK / 2 */
+    RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE1_DIV2;
 
-    RCC->CR |= RCC_CR_HSEON;
-    RCC->CFGR |= RCC_CFGR_PLLSRC;
+    // RCC->CR |= RCC_CR_HSEON;
+    
+    RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL));
+    RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC | RCC_CFGR_PLLMULL9);
     /* Wait till PLL is ready */
     /* Enable PLL */
     RCC->CR |= RCC_CR_PLLON;
@@ -107,9 +61,9 @@ static void SetSysClockToHSE(void)
     }
 
     RCC->CFGR &= ~RCC_CFGR_SW;
-    RCC->CFGR |= RCC_CFGR_SW_1;
+    RCC->CFGR |= RCC_CFGR_SW_PLL;
     //Wait until PLL system source is active
-    while((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_1);
+    while((RCC->CFGR & RCC_CFGR_SWS) != 0x8);
   }
   else
   { /* If HSE fails to start-up, the application will have wrong clock 
@@ -120,14 +74,16 @@ static void SetSysClockToHSE(void)
 
 int main()
 {
+    MY_NVIC_PriorityGroupConfig(2);
+
     SetSysClockToHSE();
     
     delay_init();
 
     usart_init();
 	// USB配置
-	Set_USBClock();
-	USB_Init();
+    Set_USBClock();
+    USB_Init();
     USB_Interrupts_Config();
 
     // RCC->APB2ENR |= RCC_APB2ENR_IOPBEN;              // enable the clock to GPIO

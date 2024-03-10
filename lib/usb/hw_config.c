@@ -34,7 +34,7 @@
 //配置USB时钟,USBclk=48Mhz
 void Set_USBClock(void)
 {
-	// RCC->CFGR &= ~RCC_CFGR_USBPRE; //USBclk=PLLclk/1.5=48Mhz	    
+	RCC->CFGR &= ~RCC_CFGR_USBPRE; //USBclk=PLLclk/1.5=48Mhz	    
 	RCC->APB1ENR |= RCC_APB1ENR_USBEN; //USB时钟使能					 
 }
 
