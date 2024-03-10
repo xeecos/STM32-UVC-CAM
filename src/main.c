@@ -74,6 +74,10 @@ static void SetSysClockToHSE(void)
 
 int main()
 {
+
+    RCC->APB2ENR |= RCC_APB2ENR_IOPAEN | RCC_APB2ENR_AFIOEN;              // enable the clock to GPIO
+    GPIOA->CRH &= 0X0FFFFFFF;
+    GPIOA->CRH |= GPIO_CRH_MODE12_0;
     MY_NVIC_PriorityGroupConfig(2);
 
     SetSysClockToHSE();
@@ -86,7 +90,6 @@ int main()
     USB_Init();
     USB_Interrupts_Config();
 
-    // RCC->APB2ENR |= RCC_APB2ENR_IOPBEN;              // enable the clock to GPIO
     // GPIOB->CRH &= 0X0FFFFFFF;
     // GPIOB->CRH |= GPIO_CRH_MODE15_0;   // set pins to be general purpose output
 

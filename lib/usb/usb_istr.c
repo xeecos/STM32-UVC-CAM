@@ -62,7 +62,6 @@ void (*pEpInt_OUT[7])(void) =
 *******************************************************************************/
 void USB_Istr (void)
 {
-	printf("istr\n");
 	wIstr = _GetISTR ();
 
 #if (IMR_MSK & ISTR_RESET)			// USB复位请求中断
