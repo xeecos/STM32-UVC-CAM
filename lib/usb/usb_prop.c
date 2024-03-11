@@ -187,7 +187,6 @@ void UsbCamera_init(void)
 *******************************************************************************/
 void UsbCamera_Reset(void)
 {
-	printf("reset\n");
 	/* Set Usb device as not configured state */
 	pInformation->Current_Configuration = 0;
 
@@ -234,7 +233,6 @@ void UsbCamera_Reset(void)
 *******************************************************************************/
 void UsbCamera_SetConfiguration(void)
 {
-	printf("set");
 	DEVICE_INFO *pInfo = &Device_Info;
 
 	if (pInfo->Current_Configuration != 0)
@@ -253,7 +251,6 @@ void UsbCamera_SetConfiguration(void)
 *******************************************************************************/
 void UsbCamera_SetDeviceAddress(void)
 {
-	printf("addr");
 	bDeviceState = ADDRESSED;
 }
 
@@ -266,7 +263,6 @@ void UsbCamera_SetDeviceAddress(void)
 *******************************************************************************/
 void UsbCamera_Status_In(void)
 {
-	printf("in");
 }
 
 /*******************************************************************************
@@ -279,7 +275,6 @@ void UsbCamera_Status_In(void)
 void UsbCamera_Status_Out(void)
 {
 
-	printf("out");
 }
 
 /*******************************************************************************
@@ -292,7 +287,6 @@ void UsbCamera_Status_Out(void)
 *******************************************************************************/
 RESULT UsbCamera_Data_Setup(uint8_t RequestNo)
 {
-	printf("setup");
 	uint8_t *(*CopyRoutine)(uint16_t);
 	CopyRoutine = NULL;
 

@@ -37,18 +37,7 @@ void MY_NVIC_PriorityGroupConfig(u8 NVIC_Group)
 void MY_NVIC_Init(u8 NVIC_PreemptionPriority,u8 NVIC_SubPriority,u8 NVIC_Channel,u8 NVIC_Group)	 
 { 
 	u32 temp;	
-	// MY_NVIC_PriorityGroupConfig(NVIC_Group);//设置分组
-	temp = NVIC_PreemptionPriority<<(4-NVIC_Group);	  
-	temp |= NVIC_SubPriority&(0x0f>>NVIC_Group);
-	temp &= 0xf;//取低四位  
-	if(NVIC_Channel<32)NVIC->ISER[0] |= 1<<NVIC_Channel;//使能中断位(要清除的话,相反操作就OK)
-	else NVIC->ISER[1] |= 1<<(NVIC_Channel-32);    
-	NVIC->IP[NVIC_Channel] |= temp<<4;//设置响应优先级和抢断优先级   	    	  				   
-}
-void MY_NVIC_Init2(u8 NVIC_PreemptionPriority,u8 NVIC_SubPriority,u8 NVIC_Channel,u8 NVIC_Group)	 
-{ 
-	u32 temp;	
-	// MY_NVIC_PriorityGroupConfig(NVIC_Group);//设置分组
+	MY_NVIC_PriorityGroupConfig(NVIC_Group);//设置分组
 	temp = NVIC_PreemptionPriority<<(4-NVIC_Group);	  
 	temp |= NVIC_SubPriority&(0x0f>>NVIC_Group);
 	temp &= 0xf;//取低四位  

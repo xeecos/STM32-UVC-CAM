@@ -20,9 +20,9 @@ const uint8_t Camera_DeviceDescriptor[CAMERA_SIZ_DEVICE_DESC] =
 	0x02,									/* bDeviceSubClass */
 	0x01,									/* bDeviceProtocol */
 	0x40,									/* bMaxPacketSize 40 */
-	0x92, 0x19,								/* idVendor = 0x1985*/
-	0x01, 0x01,								/* idProduct  = 0x1017*/
-	0x00, 0x01,								/* bcdDevice */
+	0x83, 0x04,								/* idVendor = 0x1985*/
+	0x30, 0x57,								/* idProduct  = 0x1017*/
+	0x00, 0x02,								/* bcdDevice */
 	1,										/* iManufacturer */
 	2,										/* iProduct */
 	3,										/* iSerialNumber */
@@ -201,28 +201,16 @@ const uint8_t Camera_StringProduct[CAMERA_SIZ_STRING_PRODUCT] =
 	CAMERA_SIZ_STRING_PRODUCT,				/* bLength */
 	USB_STRING_DESCRIPTOR_TYPE,				/* bDescriptorType */
 	/* Product name:  */
-	'W', 0,
-	'K', 0,
-	'J', 0,
-	' ', 0,
-	'S', 0,
-	'T', 0,
-	'M', 0,
-	
-	'3', 0,
-	'2', 0,
-	'F', 0,
-	'1', 0,
-	'0', 0,
-	'3', 0,
-	
+	'E', 0,
+	'z', 0,
+	'C', 0,
+	'a', 0,
+	'm', 0,
 	' ', 0,
 	'U', 0,
 	'V', 0,
 	'C', 0,
-	
 	' ', 0,
-	
 	'C', 0,
 	'a', 0,
 	'm', 0,
@@ -236,7 +224,6 @@ uint8_t Camera_StringSerial[CAMERA_SIZ_STRING_SERIAL] =
 {
 	CAMERA_SIZ_STRING_SERIAL,				/* bLength */
 	USB_STRING_DESCRIPTOR_TYPE,				/* bDescriptorType */
-	/* ���к� */
 	'1', 0,
 	'.', 0,
 	'1', 0

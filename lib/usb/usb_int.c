@@ -47,6 +47,7 @@ void CTR_LP(void)
 		_SetISTR((uint16_t)CLR_CTR); /* clear CTR flag */
 		/* extract highest priority endpoint number */
 		EPindex = (uint8_t)(wIstr & ISTR_EP_ID);
+		printf("EPindex:%d %x\n",EPindex,wIstr);
 		if (EPindex == 0)
 		{
 			/* Decode and service control endpoint interrupt */
@@ -121,6 +122,7 @@ void CTR_LP(void)
 
 			/* process related endpoint register */
 			wEPVal = _GetENDPOINT(EPindex);
+			printf("wEPVal:%lld, %lld\n",wEPVal,wEPVal & EP_CTR_TX);
 			if ((wEPVal & EP_CTR_RX) != 0)
 			{
 				/* clear int flag */

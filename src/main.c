@@ -10,8 +10,8 @@ int main()
     GPIOA->CRH &= 0X0FFFFFFF;
     GPIOA->CRH |= GPIO_CRH_MODE12_0;
     MY_NVIC_PriorityGroupConfig(2);
-    Stm32_Clock_Init(9);
-    // SetSysClockToHSE();
+    // Stm32_Clock_Init(9);
+    SetSysClockToHSE();
     // SystemCoreClockUpdate();
     // printf("SystemCoreClock:%ld\n",SystemCoreClock);
     delay_init();
@@ -29,7 +29,7 @@ int main()
     {
         delay_ms(1000);
         // GPIOB->ODR ^= (1<<15);  // toggle diodes
-        printf("ack\n");
+        // printf("ack\n");
 
     }
 }
