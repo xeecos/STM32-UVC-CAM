@@ -1,39 +1,39 @@
-#include "delay.h"
-#include "usart.h"
-#include "sys.h"
-#include "usb_init.h"
-#include "hw_config.h"
+// #include "delay.h"
+// #include "usart.h"
+// #include "sys.h"
+// #include "usb_init.h"
+// #include "hw_config.h"
 
-int main()
-{
+// int main()
+// {
 
-    RCC->APB2ENR |= RCC_APB2ENR_IOPAEN | RCC_APB2ENR_AFIOEN;              // enable the clock to GPIO
-    GPIOA->CRH &= 0X0FFFFFFF;
-    GPIOA->CRH |= GPIO_CRH_MODE12_0;
-    MY_NVIC_PriorityGroupConfig(2);
-    Stm32_Clock_Init(9);
-    // SetSysClockToHSE();
-    // SystemCoreClockUpdate();
-    // printf("SystemCoreClock:%ld\n",SystemCoreClock);
-    delay_init();
+//     RCC->APB2ENR |= RCC_APB2ENR_IOPAEN | RCC_APB2ENR_AFIOEN;              // enable the clock to GPIO
+//     GPIOA->CRH &= 0X0FFFFFFF;
+//     GPIOA->CRH |= GPIO_CRH_MODE12_0;
+//     MY_NVIC_PriorityGroupConfig(2);
+//     Stm32_Clock_Init(9);
+//     // SetSysClockToHSE();
+//     // SystemCoreClockUpdate();
+//     // printf("SystemCoreClock:%ld\n",SystemCoreClock);
+//     delay_init();
 
-    usart_init();
-	// USB配置
-    Set_USBClock();
-    USB_Init();
-    USB_Interrupts_Config();
+//     usart_init();
+// 	// USB配置
+//     Set_USBClock();
+//     USB_Init();
+//     USB_Interrupts_Config();
     
-    // GPIOB->CRH &= 0X0FFFFFFF;
-    // GPIOB->CRH |= GPIO_CRH_MODE15_0;   // set pins to be general purpose output
+//     // GPIOB->CRH &= 0X0FFFFFFF;
+//     // GPIOB->CRH |= GPIO_CRH_MODE15_0;   // set pins to be general purpose output
 
-    while (1) 
-    {
-        delay_ms(1000);
-        // GPIOB->ODR ^= (1<<15);  // toggle diodes
-        printf("ack\n");
+//     while (1) 
+//     {
+//         delay_ms(1000);
+//         // GPIOB->ODR ^= (1<<15);  // toggle diodes
+//         printf("ack\n");
 
-    }
-}
+//     }
+// }
 
 /* HAL */
 // void SystemClock_Config(void)
@@ -93,23 +93,51 @@ int main()
 //     return 0;
 // }
 /* SPL */
-// #include "stm32f10x.h"
-// #define RCC_GPIOC RCC_APB2Periph_GPIOC
-// #define LEDBUILDIN GPIO_Pin_13
-// #define LEDPORT GPIOC
-// int main(void)
-// {
-// 	RCC_APB2PeriphClockCmd(RCC_GPIOC, ENABLE);
+#include "stm32f10x.h"
+#include "delay.h"
+#include "usart.h"
+#include "usb_init.h"
+int main(void)
+{
+	SystemInit();
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_AFIO, ENABLE);
+	GPIO_InitTypeDef GPIO_InitStructure;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    //P12: USB DP, P11: USB DM
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11 | GPIO_Pin_12;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
 
-// 	GPIO_InitTypeDef GPIO_InitStructure;
-// 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-// 	GPIO_InitStructure.GPIO_Pin = LEDBUILDIN;
-// 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-// 	GPIO_Init(LEDPORT, &GPIO_InitStructure);
+	NVIC_InitTypeDef NVIC_InitStructure; 
+    /* 2 bit for pre-emption priority, 2 bits for subpriority */
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+    
+    /* Enable the USB interrupt */
+    NVIC_InitStructure.NVIC_IRQChannel = USB_LP_CAN1_RX0_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
 
+    /* Enable the USB Wake-up interrupt */
+    NVIC_InitStructure.NVIC_IRQChannel = USBWakeUp_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
 
-// 	while (1)
-// 	{
-// 		GPIO_ResetBits(LEDPORT, LEDBUILDIN);
-// 	}
-// }
+    /* Select USBCLK source */
+    RCC_USBCLKConfig(RCC_USBCLKSource_PLLCLK_1Div5);
+    /* Enable the USB clock */
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_USB, ENABLE);
+	delay_init();
+    usart_init();
+	// USB配置
+    USB_Init();
+    USB_Interrupts_Config();
+	while (1)
+	{
+        delay_ms(1000);
+        printf("ack\n");
+	}
+	return 0;
+}
