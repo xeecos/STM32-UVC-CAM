@@ -4,6 +4,7 @@
 #include "stm32f1xx.h"
 #include "usb_init.h"
 #include "hw_config.h"
+#include "stm32f1xx_ll_exti.h"
 static void SetSysClockToHSE(void)
 {
   __IO uint32_t StartUpCounter = 0, HSEStatus = 0;
@@ -72,49 +73,89 @@ static void SetSysClockToHSE(void)
   }  
 }
 
+// int main()
+// {
+
+//     RCC->APB2ENR |= RCC_APB2ENR_IOPAEN | RCC_APB2ENR_AFIOEN;              // enable the clock to GPIO
+//     GPIOA->CRH &= 0X0FFFFFFF;
+//     GPIOA->CRH |= GPIO_CRH_MODE12_0;
+//     MY_NVIC_PriorityGroupConfig(2);
+
+//     SetSysClockToHSE();
+//     SystemCoreClockUpdate();
+//     printf("SystemCoreClock:%ld\n",SystemCoreClock);
+//     delay_init();
+
+//     usart_init();
+// 	// USB配置
+//     Set_USBClock();
+//     USB_Init();
+//     USB_Interrupts_Config();
+    
+//     // GPIOB->CRH &= 0X0FFFFFFF;
+//     // GPIOB->CRH |= GPIO_CRH_MODE15_0;   // set pins to be general purpose output
+
+//     while (1) 
+//     {
+//         delay_ms(1000);
+//         // GPIOB->ODR ^= (1<<15);  // toggle diodes
+//         printf("ack\n");
+
+//     }
+// }
+
+void SystemClock_Config(void)
+{
+    RCC_ClkInitTypeDef RCC_ClkInitStruct;
+    RCC_OscInitTypeDef RCC_OscInitStruct;
+
+    /* Enable HSE Oscillator and activate PLL with HSE as source */
+    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+    RCC_OscInitStruct.HSEState        = RCC_HSE_ON;
+    RCC_OscInitStruct.HSEPredivValue  = RCC_HSE_PREDIV_DIV1;
+    RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+    RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+    RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
+    HAL_RCC_OscConfig(&RCC_OscInitStruct);
+  
+    /* Select PLL as system clock source and configure the HCLK, PCLK1 and PCLK2 
+        clocks dividers */
+    RCC_ClkInitStruct.ClockType = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);
+    RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+    RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+    RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+    RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+    HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2);
+}
 int main()
 {
-
-    RCC->APB2ENR |= RCC_APB2ENR_IOPAEN | RCC_APB2ENR_AFIOEN;              // enable the clock to GPIO
-    GPIOA->CRH &= 0X0FFFFFFF;
-    GPIOA->CRH |= GPIO_CRH_MODE12_0;
-    MY_NVIC_PriorityGroupConfig(2);
-
-    SetSysClockToHSE();
-    
-    delay_init();
+    HAL_Init();
+    SystemClock_Config();
 
     usart_init();
-	// USB配置
+
     Set_USBClock();
     USB_Init();
-    USB_Interrupts_Config();
+    // USB_Interrupts_Config();
+    LL_EXTI_InitTypeDef EXTI_InitStruct;
+    EXTI_InitStruct.Line_0_31 = EXTI_LINE_18;
+	EXTI_InitStruct.Mode = EXTI_MODE_INTERRUPT;
+	EXTI_InitStruct.Trigger = EXTI_TRIGGER_RISING;	//上升沿
+	EXTI_InitStruct.LineCommand = ENABLE;
+	LL_EXTI_Init(&EXTI_InitStruct);
 
-    // GPIOB->CRH &= 0X0FFFFFFF;
-    // GPIOB->CRH |= GPIO_CRH_MODE15_0;   // set pins to be general purpose output
+    HAL_NVIC_SetPriorityGrouping(2);
+    HAL_NVIC_SetPriority(USB_LP_CAN1_RX0_IRQn, 1, 0);
+    HAL_NVIC_EnableIRQ(USB_LP_CAN1_RX0_IRQn);
+
+    HAL_NVIC_SetPriorityGrouping(2);
+    HAL_NVIC_SetPriority(USBWakeUp_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(USBWakeUp_IRQn);
 
     while (1) 
     {
         delay_ms(1000);
-        // GPIOB->ODR ^= (1<<15);  // toggle diodes
         printf("ack\n");
-
     }
+    return 0;
 }
-
-// void setup()
-// {
-//     serial_init();
-//     
-//     // delay(1000);
-//     // USB_Interrupts_Config();
-//     // Set_USBClock();
-//     // USB_Init();
-//     // pinMode(PB15,OUTPUT);
-// }
-// void loop()
-// {
-//     // digitalWrite(PB15,LOW);
-//     delay(1000);
-//     uart_log("ack");
-// }
