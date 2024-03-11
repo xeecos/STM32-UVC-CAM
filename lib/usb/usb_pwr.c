@@ -24,13 +24,13 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-vu32 bDeviceState = UNCONNECTED; /* USB device status */
-volatile u8 fSuspendEnabled = USB_TRUE;  /* true when suspend is possible */
+volatile uint32_t bDeviceState = UNCONNECTED; /* USB device status */
+volatile uint8_t fSuspendEnabled = USB_TRUE;  /* true when suspend is possible */
 
 struct
 {
 	volatile RESUME_STATE eState;
-	volatile u8 bESOFcnt;
+	volatile uint8_t bESOFcnt;
 }
 ResumeS;
 
@@ -48,7 +48,7 @@ ResumeS;
 *******************************************************************************/
 RESULT PowerOn(void)
 {
-	u16 wRegVal = 0;
+	uint16_t wRegVal = 0;
 
 	//USB_Cable_Config(ENABLE);//使能1.5K上拉 
 	/*** CNTR_PWDN = 0(退出断电, 强制复位) ***/
@@ -99,7 +99,7 @@ RESULT PowerOff()
 *******************************************************************************/
 void Suspend(void)
 {
-	u16 wCNTR;
+	uint16_t wCNTR;
 	/* suspend preparation */
 	/* ... */
 
@@ -133,7 +133,7 @@ void Suspend(void)
 *******************************************************************************/
 void Resume_Init(void)
 {
-	u16 wCNTR;
+	uint16_t wCNTR;
 
 	/* ------------------ ONLY WITH BUS-POWERED DEVICES ---------------------- */
 	/* restart the clocks */
@@ -170,7 +170,7 @@ void Resume_Init(void)
 *******************************************************************************/
 void Resume(RESUME_STATE eResumeSetVal)
 {
-	u16 wCNTR;
+	uint16_t wCNTR;
 
 	if (eResumeSetVal != RESUME_ESOF)
 		ResumeS.eState = eResumeSetVal;

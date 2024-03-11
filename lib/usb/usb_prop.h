@@ -23,10 +23,10 @@
 /* Exported types ------------------------------------------------------------*/
 typedef struct
 {
-	u32 bitrate;
-	u8 format;
-	u8 paritytype;
-	u8 datatype;
+	uint32_t bitrate;
+	uint8_t format;
+	uint8_t paritytype;
+	uint8_t datatype;
 }LINE_CODING;
 
 /* Exported constants --------------------------------------------------------*/
@@ -54,15 +54,15 @@ void UsbCamera_SetConfiguration(void);
 void UsbCamera_SetDeviceAddress(void);
 void UsbCamera_Status_In(void);
 void UsbCamera_Status_Out(void);
-RESULT UsbCamera_Data_Setup(u8);
-RESULT UsbCamera_NoData_Setup(u8);
-RESULT UsbCamera_Get_Interface_Setting(u8 Interface, u8 AlternateSetting);
-u8 *UsbCamera_GetDeviceDescriptor(u16);
-u8 *UsbCamera_GetConfigDescriptor(u16);
-u8 *UsbCamera_GetStringDescriptor(u16);
+RESULT UsbCamera_Data_Setup(uint8_t);
+RESULT UsbCamera_NoData_Setup(uint8_t);
+RESULT UsbCamera_Get_Interface_Setting(uint8_t Interface, uint8_t AlternateSetting);
+uint8_t *UsbCamera_GetDeviceDescriptor(uint16_t);
+uint8_t *UsbCamera_GetConfigDescriptor(uint16_t);
+uint8_t *UsbCamera_GetStringDescriptor(uint16_t);
 
-u8* VideoCommitControl_Command(u16 Length);
-u8* VideoProbeControl_Command(u16 Length);
+uint8_t* VideoCommitControl_Command(uint16_t Length);
+uint8_t* VideoProbeControl_Command(uint16_t Length);
 
 
 #endif /* __usb_prop_H */

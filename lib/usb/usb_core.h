@@ -37,8 +37,8 @@ typedef enum _CONTROL_STATE
 
 typedef struct OneDescriptor
 {
-	u8 *Descriptor;
-	u16 Descriptor_Size;
+	uint8_t *Descriptor;
+	uint16_t Descriptor_Size;
 }ONE_DESCRIPTOR, *PONE_DESCRIPTOR;
 /* All the request process routines return a value of this type
    If the return value is not SUCCESS or NOT_READY,
@@ -78,45 +78,45 @@ typedef struct _ENDPOINT_INFO
 	 Usb_rLength is the data remain to be received,
 	 Usb_rPointer is the Offset of data buffer
 	 */
-	u16  Usb_wLength;
-	u16  Usb_wOffset;
-	u16  PacketSize;
-	u8   *(*CopyData)(u16 Length);
+	uint16_t  Usb_wLength;
+	uint16_t  Usb_wOffset;
+	uint16_t  PacketSize;
+	uint8_t   *(*CopyData)(uint16_t Length);
 }ENDPOINT_INFO;
 
 /*-*-*-*-*-*-*-*-*-*-*-* Definitions for device level -*-*-*-*-*-*-*-*-*-*-*-*/
 
 typedef struct _DEVICE
 {
-	u8 Total_Endpoint;     /* Number of endpoints that are used */
-	u8 Total_Configuration;/* Number of configuration available */
+	uint8_t Total_Endpoint;     /* Number of endpoints that are used */
+	uint8_t Total_Configuration;/* Number of configuration available */
 }
 DEVICE;
 
 typedef union
 {
-	u16 w;
+	uint16_t w;
 	struct BW
 	{
-		u8 bb1;
-		u8 bb0;
+		uint8_t bb1;
+		uint8_t bb0;
 	}
 	bw;
-} u16_u8;
+} uint16_t_uint8_t;
 
 typedef struct _DEVICE_INFO
 {
-	u8 USBbmRequestType;       /* bmRequestType */
-	u8 USBbRequest;            /* bRequest */
-	u16_u8 USBwValues;         /* wValue */
-	u16_u8 USBwIndexs;         /* wIndex */
-	u16_u8 USBwLengths;        /* wLength */
+	uint8_t USBbmRequestType;       /* bmRequestType */
+	uint8_t USBbRequest;            /* bRequest */
+	uint16_t_uint8_t USBwValues;         /* wValue */
+	uint16_t_uint8_t USBwIndexs;         /* wIndex */
+	uint16_t_uint8_t USBwLengths;        /* wLength */
 
-	u8 ControlState;           /* of type CONTROL_STATE */
-	u8 Current_Feature;
-	u8 Current_Configuration;   /* Selected configuration */
-	u8 Current_Interface;       /* Selected interface of current configuration */
-	u8 Current_AlternateSetting;/* Selected Alternate Setting of current
+	uint8_t ControlState;           /* of type CONTROL_STATE */
+	uint8_t Current_Feature;
+	uint8_t Current_Configuration;   /* Selected configuration */
+	uint8_t Current_Interface;       /* Selected interface of current configuration */
+	uint8_t Current_AlternateSetting;/* Selected Alternate Setting of current
 									   interface*/
 
 	ENDPOINT_INFO Ctrl_Info;
@@ -147,7 +147,7 @@ typedef struct _DEVICE_PROP
 	 Since GET_CONFIGURATION & GET_INTERFACE are highly related to
 	 the individual classes, they will be checked and processed here.
 	 */
-	RESULT(*Class_Data_Setup)(u8 RequestNo);
+	RESULT(*Class_Data_Setup)(uint8_t RequestNo);
 
 	/* Procedure of process on setup stage of a class specified request without data stage */
 	/* All class specified requests without data stage are processed in Class_NoData_Setup
@@ -158,24 +158,24 @@ typedef struct _DEVICE_PROP
 	 Since SET_CONFIGURATION & SET_INTERFACE are highly related to
 	 the individual classes, they will be checked and processed here.
 	 */
-	RESULT(*Class_NoData_Setup)(u8 RequestNo);
+	RESULT(*Class_NoData_Setup)(uint8_t RequestNo);
 
 	/*Class_Get_Interface_Setting
 	 This function is used by the file usb_core.c to test if the selected Interface
-	 and Alternate Setting (u8 Interface, u8 AlternateSetting) are supported by
+	 and Alternate Setting (uint8_t Interface, uint8_t AlternateSetting) are supported by
 	 the application.
 	 This function is writing by user. It should return "SUCCESS" if the Interface
 	 and Alternate Setting are supported by the application or "UNSUPPORT" if they
 	 are not supported. */
 
-	RESULT(*Class_Get_Interface_Setting)(u8 Interface, u8 AlternateSetting);
+	RESULT(*Class_Get_Interface_Setting)(uint8_t Interface, uint8_t AlternateSetting);
 
-	u8* (*GetDeviceDescriptor)(u16 Length);
-	u8* (*GetConfigDescriptor)(u16 Length);
-	u8* (*GetStringDescriptor)(u16 Length);
+	uint8_t* (*GetDeviceDescriptor)(uint16_t Length);
+	uint8_t* (*GetConfigDescriptor)(uint16_t Length);
+	uint8_t* (*GetStringDescriptor)(uint16_t Length);
 
-	u8* RxEP_buffer;
-	u8 MaxPacketSize;
+	uint8_t* RxEP_buffer;
+	uint8_t MaxPacketSize;
 
 }DEVICE_PROP;
 
@@ -211,23 +211,23 @@ USER_STANDARD_REQUESTS;
 
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
-u8 Setup0_Process(void);
-u8 Post0_Process(void);
-u8 Out0_Process(void);
-u8 In0_Process(void);
+uint8_t Setup0_Process(void);
+uint8_t Post0_Process(void);
+uint8_t Out0_Process(void);
+uint8_t In0_Process(void);
 
 RESULT Standard_SetEndPointFeature(void);
 RESULT Standard_SetDeviceFeature(void);
 
-u8 *Standard_GetConfiguration(u16 Length);
+uint8_t *Standard_GetConfiguration(uint16_t Length);
 RESULT Standard_SetConfiguration(void);
-u8 *Standard_GetInterface(u16 Length);
+uint8_t *Standard_GetInterface(uint16_t Length);
 RESULT Standard_SetInterface(void);
-u8 *Standard_GetDescriptorData(u16 Length, PONE_DESCRIPTOR pDesc);
+uint8_t *Standard_GetDescriptorData(uint16_t Length, PONE_DESCRIPTOR pDesc);
 
-u8 *Standard_GetStatus(u16 Length);
+uint8_t *Standard_GetStatus(uint16_t Length);
 RESULT Standard_ClearFeature(void);
-void SetDeviceAddress(u8);
+void SetDeviceAddress(uint8_t);
 void NOP_Process(void);
 
 extern DEVICE_PROP Device_Property;
@@ -236,8 +236,8 @@ extern  DEVICE  Device_Table;
 extern DEVICE_INFO Device_Info;
 
 /* cells saving status during interrupt servicing */
-extern u16 SaveRState;
-extern u16 SaveTState;
+extern uint16_t SaveRState;
+extern uint16_t SaveTState;
 
 #endif /* __USB_CORE_H */
 

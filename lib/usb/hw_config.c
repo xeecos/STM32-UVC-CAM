@@ -82,10 +82,10 @@ void Leave_LowPowerMode(void)
 //UVC payload head
 
 #define CAMERA_SIZ_STREAMHD			2
-u8 sendbuf[PACKET_SIZE] = { 0x02, 0x01 };			// 发送数据缓冲区
+uint8_t sendbuf[PACKET_SIZE] = { 0x02, 0x01 };			// 发送数据缓冲区
 u32 sendsize = 0;									// 已发送字节数
 
-void myMemcpy(const u8* src, u8* dst, u32 len)
+void myMemcpy(const uint8_t* src, uint8_t* dst, u32 len)
 {
 	u32 i = 0;
 	for (i = 0; i < len; ++i)
@@ -141,7 +141,7 @@ void USB_Interrupts_Config(void)
 void UsbCamera_Fillbuf(void)
 {
 	s32 datalen = 0;		// 本次发送的字节数
-	u8 *payload = 0;		// 发送数据指针
+	uint8_t *payload = 0;		// 发送数据指针
 
 	// 发送缓冲区有效数据地址
 	payload = sendbuf + CAMERA_SIZ_STREAMHD;
@@ -216,20 +216,20 @@ void Get_SerialNum(void)
 
 	if (Device_Serial0 != 0)
 	{
-		Camera_StringSerial[2] = (u8)(Device_Serial0 & 0x000000FF);
-		Camera_StringSerial[4] = (u8)((Device_Serial0 & 0x0000FF00) >> 8);
-		Camera_StringSerial[6] = (u8)((Device_Serial0 & 0x00FF0000) >> 16);
-		Camera_StringSerial[8] = (u8)((Device_Serial0 & 0xFF000000) >> 24);
+		Camera_StringSerial[2] = (uint8_t)(Device_Serial0 & 0x000000FF);
+		Camera_StringSerial[4] = (uint8_t)((Device_Serial0 & 0x0000FF00) >> 8);
+		Camera_StringSerial[6] = (uint8_t)((Device_Serial0 & 0x00FF0000) >> 16);
+		Camera_StringSerial[8] = (uint8_t)((Device_Serial0 & 0xFF000000) >> 24);
 
-		Camera_StringSerial[10] = (u8)(Device_Serial1 & 0x000000FF);
-		Camera_StringSerial[12] = (u8)((Device_Serial1 & 0x0000FF00) >> 8);
-		Camera_StringSerial[14] = (u8)((Device_Serial1 & 0x00FF0000) >> 16);
-		Camera_StringSerial[16] = (u8)((Device_Serial1 & 0xFF000000) >> 24);
+		Camera_StringSerial[10] = (uint8_t)(Device_Serial1 & 0x000000FF);
+		Camera_StringSerial[12] = (uint8_t)((Device_Serial1 & 0x0000FF00) >> 8);
+		Camera_StringSerial[14] = (uint8_t)((Device_Serial1 & 0x00FF0000) >> 16);
+		Camera_StringSerial[16] = (uint8_t)((Device_Serial1 & 0xFF000000) >> 24);
 
-		Camera_StringSerial[18] = (u8)(Device_Serial2 & 0x000000FF);
-		Camera_StringSerial[20] = (u8)((Device_Serial2 & 0x0000FF00) >> 8);
-		Camera_StringSerial[22] = (u8)((Device_Serial2 & 0x00FF0000) >> 16);
-		Camera_StringSerial[24] = (u8)((Device_Serial2 & 0xFF000000) >> 24);
+		Camera_StringSerial[18] = (uint8_t)(Device_Serial2 & 0x000000FF);
+		Camera_StringSerial[20] = (uint8_t)((Device_Serial2 & 0x0000FF00) >> 8);
+		Camera_StringSerial[22] = (uint8_t)((Device_Serial2 & 0x00FF0000) >> 16);
+		Camera_StringSerial[24] = (uint8_t)((Device_Serial2 & 0xFF000000) >> 24);
 	}
 }
 

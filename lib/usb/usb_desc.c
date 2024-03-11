@@ -11,7 +11,7 @@
 #include "usb_desc.h"
 
 /* USB Standard Device Descriptor */
-const u8 Camera_DeviceDescriptor[CAMERA_SIZ_DEVICE_DESC] =
+const uint8_t Camera_DeviceDescriptor[CAMERA_SIZ_DEVICE_DESC] =
 {
 	CAMERA_SIZ_DEVICE_DESC,					/* bLength */
 	USB_DEVICE_DESCRIPTOR_TYPE,				/* bDescriptorType */
@@ -29,7 +29,7 @@ const u8 Camera_DeviceDescriptor[CAMERA_SIZ_DEVICE_DESC] =
 	0x01									/* bNumConfigurations */
 };
 
-const u8 Camera_ConfigDescriptor[CAMERA_SIZ_CONFIG_DESC] =
+const uint8_t Camera_ConfigDescriptor[CAMERA_SIZ_CONFIG_DESC] =
 {
 	/* Configuration Descriptor */
 	0x09,									/* bLength */
@@ -100,7 +100,7 @@ const u8 Camera_ConfigDescriptor[CAMERA_SIZ_CONFIG_DESC] =
 	0x04,									/* bDescriptorType : INTERFACE */
 	0x01,									/* bInterfaceNumber: Index of this interface */
 	0x00,									/* bAlternateSetting: Index of this alternate setting */
-	0x00,									/* bNumEndpoints : 0 endpoints ¨C no bandwidth used*/
+	0x00,									/* bNumEndpoints : 0 endpoints ï¿½C no bandwidth used*/
 	0x0e,									/* bInterfaceClass : CC_VIDEO */
 	0x02,									/* bInterfaceSubClass : SC_VIDEOSTREAMING */
 	0x00,									/* bInterfaceProtocol : PC_PROTOCOL_UNDEFINED */
@@ -129,8 +129,8 @@ const u8 Camera_ConfigDescriptor[CAMERA_SIZ_CONFIG_DESC] =
 	0x01,									/* bNumFrameDescriptors : One frame descriptor for this format follows. */
 	0x01,									/* bmFlags : Uses fixed size samples.. */
 	0x01,									/* bDefaultFrameIndex : Default frame index is 1. */
-	0x00,									/* bAspectRatioX : Non-interlaced stream ¨C not required. */
-	0x00,									/* bAspectRatioY : Non-interlaced stream ¨C not required. */
+	0x00,									/* bAspectRatioX : Non-interlaced stream ï¿½C not required. */
+	0x00,									/* bAspectRatioY : Non-interlaced stream ï¿½C not required. */
 	0x00,									/* bmInterlaceFlags : Non-interlaced stream */
 	0x00,									/* bCopyProtect : No restrictions imposed on the duplication of this video stream. */
 	/* 11 bytes, total size 90 */
@@ -157,7 +157,7 @@ const u8 Camera_ConfigDescriptor[CAMERA_SIZ_CONFIG_DESC] =
 	0x04,									/* bDescriptorType: INTERFACE descriptor type */
 	0x01,									/* bInterfaceNumber: Index of this interface */
 	0x01,									/* bAlternateSetting: Index of this alternate setting */
-	0x01,									/* bNumEndpoints: endpoints, 1 ¨C data endpoint */
+	0x01,									/* bNumEndpoints: endpoints, 1 ï¿½C data endpoint */
 	0x0e,									/* bInterfaceClass: CC_VIDEO */
 	0x02,									/* bInterfaceSubClass: SC_VIDEOSTREAMING */
 	0x00,									/* bInterfaceProtocol: PC_PROTOCOL_UNDEFINED */
@@ -175,7 +175,7 @@ const u8 Camera_ConfigDescriptor[CAMERA_SIZ_CONFIG_DESC] =
 
 
 /* USB String Descriptors */
-const u8 Camera_StringLangID[CAMERA_SIZ_STRING_LANGID] =
+const uint8_t Camera_StringLangID[CAMERA_SIZ_STRING_LANGID] =
 {
 	CAMERA_SIZ_STRING_LANGID,
 	USB_STRING_DESCRIPTOR_TYPE,
@@ -183,7 +183,7 @@ const u8 Camera_StringLangID[CAMERA_SIZ_STRING_LANGID] =
 	0x04 /* LangID = 0x0409: U.S. English */
 };
 
-const u8 Camera_StringVendor[CAMERA_SIZ_STRING_VENDOR] =
+const uint8_t Camera_StringVendor[CAMERA_SIZ_STRING_VENDOR] =
 {
 	CAMERA_SIZ_STRING_VENDOR,				/* Size of Vendor string */
 	USB_STRING_DESCRIPTOR_TYPE,				/* bDescriptorType*/
@@ -196,7 +196,7 @@ const u8 Camera_StringVendor[CAMERA_SIZ_STRING_VENDOR] =
 	'a', 0
 };
 
-const u8 Camera_StringProduct[CAMERA_SIZ_STRING_PRODUCT] =
+const uint8_t Camera_StringProduct[CAMERA_SIZ_STRING_PRODUCT] =
 {
 	CAMERA_SIZ_STRING_PRODUCT,				/* bLength */
 	USB_STRING_DESCRIPTOR_TYPE,				/* bDescriptorType */
@@ -232,11 +232,11 @@ const u8 Camera_StringProduct[CAMERA_SIZ_STRING_PRODUCT] =
 
 }; 
 
-u8 Camera_StringSerial[CAMERA_SIZ_STRING_SERIAL] =
+uint8_t Camera_StringSerial[CAMERA_SIZ_STRING_SERIAL] =
 {
 	CAMERA_SIZ_STRING_SERIAL,				/* bLength */
 	USB_STRING_DESCRIPTOR_TYPE,				/* bDescriptorType */
-	/* ÐòÁÐºÅ */
+	/* ï¿½ï¿½ï¿½Ðºï¿½ */
 	'1', 0,
 	'.', 0,
 	'1', 0

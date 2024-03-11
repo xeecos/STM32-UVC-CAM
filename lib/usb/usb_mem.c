@@ -32,17 +32,17 @@
 * Output         : None.
 * Return         : None	.
 *******************************************************************************/
-void UserToPMABufferCopy (u8 *pbUsrBuf, u16 wPMABufAddr, u16 wNBytes)
+void UserToPMABufferCopy (uint8_t *pbUsrBuf, uint16_t wPMABufAddr, uint16_t wNBytes)
 {
-	u32 n = (wNBytes + 1) >> 1;   /* n = (wNBytes + 1) / 2 */
-	u32 i, temp1, temp2;
-	u16 *pdwVal;
-	pdwVal = (u16 *)(wPMABufAddr * 2 + PMAAddr);
+	uint32_t n = (wNBytes + 1) >> 1;   /* n = (wNBytes + 1) / 2 */
+	uint32_t i, temp1, temp2;
+	uint16_t *pdwVal;
+	pdwVal = (uint16_t *)(wPMABufAddr * 2 + PMAAddr);
 	for (i = n; i != 0; i--)
 	{
-		temp1 = (u16)* pbUsrBuf;
+		temp1 = (uint16_t)* pbUsrBuf;
 		pbUsrBuf++;
-		temp2 = temp1 | (u16)* pbUsrBuf << 8;
+		temp2 = temp1 | (uint16_t)* pbUsrBuf << 8;
 		*pdwVal++ = temp2;
 		pdwVal++;
 		pbUsrBuf++;
@@ -57,15 +57,15 @@ void UserToPMABufferCopy (u8 *pbUsrBuf, u16 wPMABufAddr, u16 wNBytes)
 * Output         : None.
 * Return         : None.
 *******************************************************************************/
-void PMAToUserBufferCopy (u8 *pbUsrBuf, u16 wPMABufAddr, u16 wNBytes)
+void PMAToUserBufferCopy (uint8_t *pbUsrBuf, uint16_t wPMABufAddr, uint16_t wNBytes)
 {
-	u32 n = (wNBytes + 1) >> 1;/* /2*/
-	u32 i;
-	u32 *pdwVal;
-	pdwVal = (u32 *)(wPMABufAddr * 2 + PMAAddr);
+	uint32_t n = (wNBytes + 1) >> 1;/* /2*/
+	uint32_t i;
+	uint32_t *pdwVal;
+	pdwVal = (uint32_t *)(wPMABufAddr * 2 + PMAAddr);
 	for (i = n; i != 0; i--)
 	{
-		*(u16*)pbUsrBuf++ = *pdwVal++;
+		*(uint16_t*)pbUsrBuf++ = *pdwVal++;
 		pbUsrBuf++;
 	}
 }

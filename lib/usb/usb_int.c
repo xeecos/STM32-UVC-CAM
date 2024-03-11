@@ -20,8 +20,8 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-u16 SaveRState;
-u16 SaveTState;
+uint16_t SaveRState;
+uint16_t SaveTState;
 
 /* Extern variables ----------------------------------------------------------*/
 extern void(*pEpInt_IN[7])(void);    /*  Handles IN  interrupts   */
@@ -40,13 +40,13 @@ extern void(*pEpInt_OUT[7])(void);   /*  Handles OUT interrupts   */
 *******************************************************************************/
 void CTR_LP(void)
 {
-	u32 wEPVal = 0;
+	uint32_t wEPVal = 0;
 	/* stay in loop while pending ints */
 	while (((wIstr = _GetISTR()) & ISTR_CTR) != 0)
 	{
-		_SetISTR((u16)CLR_CTR); /* clear CTR flag */
+		_SetISTR((uint16_t)CLR_CTR); /* clear CTR flag */
 		/* extract highest priority endpoint number */
-		EPindex = (u8)(wIstr & ISTR_EP_ID);
+		EPindex = (uint8_t)(wIstr & ISTR_EP_ID);
 		if (EPindex == 0)
 		{
 			/* Decode and service control endpoint interrupt */
@@ -155,13 +155,13 @@ void CTR_LP(void)
 *******************************************************************************/
 void CTR_HP(void)
 {
-	u32 wEPVal = 0;
+	uint32_t wEPVal = 0;
 
 	while (((wIstr = _GetISTR()) & ISTR_CTR) != 0)
 	{
-		_SetISTR((u16)CLR_CTR); /* clear CTR flag */
+		_SetISTR((uint16_t)CLR_CTR); /* clear CTR flag */
 		/* extract highest priority endpoint number */
-		EPindex = (u8)(wIstr & ISTR_EP_ID);
+		EPindex = (uint8_t)(wIstr & ISTR_EP_ID);
 		/* process related endpoint register */
 		wEPVal = _GetENDPOINT(EPindex);
 		if ((wEPVal & EP_CTR_RX) != 0)

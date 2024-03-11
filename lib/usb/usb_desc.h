@@ -25,8 +25,8 @@
 /* Exported macro ------------------------------------------------------------*/
 #define   UNCOMPRESS        0
 
-#define MAKE_WORD(x)        (u8)((x)&0xFF),(u8)(((x)>>8)&0xFF)
-#define MAKE_DWORD(x)       (u8)((x)&0xFF),(u8)(((x)>>8)&0xFF),(u8)(((x)>>16)&0xFF),(u8)(((x)>>24)&0xFF)
+#define MAKE_WORD(x)        (uint8_t)((x)&0xFF),(uint8_t)(((x)>>8)&0xFF)
+#define MAKE_DWORD(x)       (uint8_t)((x)&0xFF),(uint8_t)(((x)>>8)&0xFF),(uint8_t)(((x)>>16)&0xFF),(uint8_t)(((x)>>24)&0xFF)
 
 
 /* Exported define -----------------------------------------------------------*/
@@ -67,12 +67,12 @@
 #define STANDARD_ENDPOINT_DESC_SIZE             0x09
 
 /* Exported functions ------------------------------------------------------- */
-extern const u8 Camera_DeviceDescriptor[CAMERA_SIZ_DEVICE_DESC];
-extern const u8 Camera_ConfigDescriptor[CAMERA_SIZ_CONFIG_DESC];
-extern const u8 Camera_StringLangID[CAMERA_SIZ_STRING_LANGID];
-extern const u8 Camera_StringVendor[CAMERA_SIZ_STRING_VENDOR];
-extern const u8 Camera_StringProduct[CAMERA_SIZ_STRING_PRODUCT];
-extern u8 Camera_StringSerial[CAMERA_SIZ_STRING_SERIAL];
+extern const uint8_t Camera_DeviceDescriptor[CAMERA_SIZ_DEVICE_DESC];
+extern const uint8_t Camera_ConfigDescriptor[CAMERA_SIZ_CONFIG_DESC];
+extern const uint8_t Camera_StringLangID[CAMERA_SIZ_STRING_LANGID];
+extern const uint8_t Camera_StringVendor[CAMERA_SIZ_STRING_VENDOR];
+extern const uint8_t Camera_StringProduct[CAMERA_SIZ_STRING_PRODUCT];
+extern uint8_t Camera_StringSerial[CAMERA_SIZ_STRING_SERIAL];
 
 #endif /* __USB_DESC_H */
 /******************* (C) COPYRIGHT 2008 STMicroelectronics *****END OF FILE****/

@@ -28,22 +28,22 @@
 /* Private variables ---------------------------------------------------------*/
 typedef struct  _VideoControl
 {
-	u8    bmHint[2];                      // 0x02
-	u8    bFormatIndex[1];                // 0x03
-	u8    bFrameIndex[1];                 // 0x04
-	u8    dwFrameInterval[4];             // 0x08
-	u8    wKeyFrameRate[2];               // 0x0A
-	u8    wPFrameRate[2];                 // 0x0C
-	u8    wCompQuality[2];                // 0x0E
-	u8    wCompWindowSize[2];             // 0x10
-	u8    wDelay[2];                      // 0x12
-	u8    dwMaxVideoFrameSize[4];         // 0x16
-	u8    dwMaxPayloadTransferSize[4];    // 0x1A
-	u8    dwClockFrequency[4];            // 0x1C
-	u8    bmFramingInfo[1];
-	u8    bPreferedVersion[1];
-	u8    bMinVersion[1];
-	u8    bMaxVersion[1];
+	uint8_t    bmHint[2];                      // 0x02
+	uint8_t    bFormatIndex[1];                // 0x03
+	uint8_t    bFrameIndex[1];                 // 0x04
+	uint8_t    dwFrameInterval[4];             // 0x08
+	uint8_t    wKeyFrameRate[2];               // 0x0A
+	uint8_t    wPFrameRate[2];                 // 0x0C
+	uint8_t    wCompQuality[2];                // 0x0E
+	uint8_t    wCompWindowSize[2];             // 0x10
+	uint8_t    wDelay[2];                      // 0x12
+	uint8_t    dwMaxVideoFrameSize[4];         // 0x16
+	uint8_t    dwMaxPayloadTransferSize[4];    // 0x1A
+	uint8_t    dwClockFrequency[4];            // 0x1C
+	uint8_t    bmFramingInfo[1];
+	uint8_t    bPreferedVersion[1];
+	uint8_t    bMinVersion[1];
+	uint8_t    bMaxVersion[1];
 }   VideoControl;
 
 //VideoStreaming Requests应答，参考USB_Video_Class_1_1.pdf p103~
@@ -128,20 +128,20 @@ USER_STANDARD_REQUESTS User_Standard_Requests =
 
 ONE_DESCRIPTOR Device_Descriptor =
 {
-	(u8*)Camera_DeviceDescriptor,
+	(uint8_t*)Camera_DeviceDescriptor,
 	CAMERA_SIZ_DEVICE_DESC
 };
 ONE_DESCRIPTOR Config_Descriptor =
 {
-	(u8*)Camera_ConfigDescriptor,
+	(uint8_t*)Camera_ConfigDescriptor,
 	CAMERA_SIZ_CONFIG_DESC
 };
 ONE_DESCRIPTOR String_Descriptor[4] =
 {
-	{ (u8*)Camera_StringLangID, CAMERA_SIZ_STRING_LANGID },
-	{ (u8*)Camera_StringVendor, CAMERA_SIZ_STRING_VENDOR },
-	{ (u8*)Camera_StringProduct, CAMERA_SIZ_STRING_PRODUCT },
-	{ (u8*)Camera_StringSerial, CAMERA_SIZ_STRING_SERIAL }
+	{ (uint8_t*)Camera_StringLangID, CAMERA_SIZ_STRING_LANGID },
+	{ (uint8_t*)Camera_StringVendor, CAMERA_SIZ_STRING_VENDOR },
+	{ (uint8_t*)Camera_StringProduct, CAMERA_SIZ_STRING_PRODUCT },
+	{ (uint8_t*)Camera_StringSerial, CAMERA_SIZ_STRING_SERIAL }
 };
 
 /* Extern variables ----------------------------------------------------------*/
@@ -290,10 +290,10 @@ void UsbCamera_Status_Out(void)
 * Output         : None.
 * Return         : USB_UNSUPPORT or USB_SUCCESS.
 *******************************************************************************/
-RESULT UsbCamera_Data_Setup(u8 RequestNo)
+RESULT UsbCamera_Data_Setup(uint8_t RequestNo)
 {
 	printf("setup");
-	u8 *(*CopyRoutine)(u16);
+	uint8_t *(*CopyRoutine)(uint16_t);
 	CopyRoutine = NULL;
 
 
@@ -331,7 +331,7 @@ RESULT UsbCamera_Data_Setup(u8 RequestNo)
 * Output         : None.
 * Return         : USB_UNSUPPORT or USB_SUCCESS.
 *******************************************************************************/
-RESULT UsbCamera_NoData_Setup(u8 RequestNo)
+RESULT UsbCamera_NoData_Setup(uint8_t RequestNo)
 {
 	return USB_UNSUPPORT;
 }
@@ -343,7 +343,7 @@ RESULT UsbCamera_NoData_Setup(u8 RequestNo)
 * Output         : None.
 * Return         : The address of the device descriptor.
 *******************************************************************************/
-u8 *UsbCamera_GetDeviceDescriptor(u16 Length)
+uint8_t *UsbCamera_GetDeviceDescriptor(uint16_t Length)
 {
 	return Standard_GetDescriptorData(Length, &Device_Descriptor);
 }
@@ -355,7 +355,7 @@ u8 *UsbCamera_GetDeviceDescriptor(u16 Length)
 * Output         : None.
 * Return         : The address of the configuration descriptor.
 *******************************************************************************/
-u8 *UsbCamera_GetConfigDescriptor(u16 Length)
+uint8_t *UsbCamera_GetConfigDescriptor(uint16_t Length)
 {
 	return Standard_GetDescriptorData(Length, &Config_Descriptor);
 }
@@ -367,9 +367,9 @@ u8 *UsbCamera_GetConfigDescriptor(u16 Length)
 * Output         : None.
 * Return         : The address of the string descriptors.
 *******************************************************************************/
-u8 *UsbCamera_GetStringDescriptor(u16 Length)
+uint8_t *UsbCamera_GetStringDescriptor(uint16_t Length)
 {
-	u8 wValue0 = pInformation->USBwValue0;
+	uint8_t wValue0 = pInformation->USBwValue0;
 	if (wValue0 > 4)
 	{
 		return NULL;
@@ -383,12 +383,12 @@ u8 *UsbCamera_GetStringDescriptor(u16 Length)
 * Function Name  :
 * Description    : test the interface and the alternate setting according to the
 *                  supported one.
-* Input1         : u8: Interface : interface number.
-* Input2         : u8: AlternateSetting : Alternate Setting number.
+* Input1         : uint8_t: Interface : interface number.
+* Input2         : uint8_t: AlternateSetting : Alternate Setting number.
 * Output         : None.
 * Return         : The address of the string descriptors.
 *******************************************************************************/
-RESULT UsbCamera_Get_Interface_Setting(u8 Interface, u8 AlternateSetting)
+RESULT UsbCamera_Get_Interface_Setting(uint8_t Interface, uint8_t AlternateSetting)
 {
 	if (AlternateSetting > 1)
 	{
@@ -408,7 +408,7 @@ RESULT UsbCamera_Get_Interface_Setting(u8 Interface, u8 AlternateSetting)
 * Output         :
 * Return         :
 *******************************************************************************/
-u8* VideoProbeControl_Command(u16 Length)
+uint8_t* VideoProbeControl_Command(uint16_t Length)
 {
 	if (Length == 0)
 	{
@@ -416,7 +416,7 @@ u8* VideoProbeControl_Command(u16 Length)
 		return NULL;
 	} else
 	{
-		return((u8*)(&videoProbeControl));
+		return((uint8_t*)(&videoProbeControl));
 	}
 }
 
@@ -427,7 +427,7 @@ u8* VideoProbeControl_Command(u16 Length)
 * Output         :
 * Return         :
 *******************************************************************************/
-u8* VideoCommitControl_Command(u16 Length)
+uint8_t* VideoCommitControl_Command(uint16_t Length)
 {
 	if (Length == 0)
 	{
@@ -435,7 +435,7 @@ u8* VideoCommitControl_Command(u16 Length)
 		return NULL;
 	} else
 	{
-		return((u8*)(&videoCommitControl));
+		return((uint8_t*)(&videoCommitControl));
 	}
 }
 
