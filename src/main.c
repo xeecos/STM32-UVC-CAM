@@ -108,6 +108,8 @@ int main(void)
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
     GPIO_Init(GPIOA, &GPIO_InitStructure);
 
+    USB_Interrupts_Config();
+	
 	NVIC_InitTypeDef NVIC_InitStructure; 
     /* 2 bit for pre-emption priority, 2 bits for subpriority */
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
@@ -133,7 +135,6 @@ int main(void)
     usart_init();
 	// USB配置
     USB_Init();
-    USB_Interrupts_Config();
 	while (1)
 	{
         delay_ms(1000);
