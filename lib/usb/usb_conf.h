@@ -34,8 +34,9 @@
 /*-------------------------------------------------------------*/
 ///* buffer table base address */
 ///* buffer table base address */
-// #define BTABLE_ADDRESS      (0x00)
-
+#ifndef BTABLE_ADDRESS
+#define BTABLE_ADDRESS      (0x00)
+#endif
 /* EP0  */
 /* rx/tx buffer base address */
 #define ENDP0_RXADDR        (0x10)
