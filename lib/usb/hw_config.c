@@ -47,6 +47,7 @@ void Set_USBClock(void)
 *******************************************************************************/
 void Enter_LowPowerMode(void)
 {
+	printf("SUSPENDED\n");
 	/* Set the device state to suspend */
 	bDeviceState = SUSPENDED;
 	/* Request to enter STOP mode with regulator in low power mode */
@@ -62,6 +63,7 @@ void Enter_LowPowerMode(void)
 *******************************************************************************/
 void Leave_LowPowerMode(void)
 {
+	printf("leave SUSPENDED\n");
 	DEVICE_INFO *pInfo = &Device_Info;
 
 
@@ -179,7 +181,6 @@ void UsbCamera_Fillbuf(void)
 	// 复制数据到PMA
 	if (_GetENDPOINT(ENDP1) & EP_DTOG_TX)
 	{
-		
 		// User use buffer0
 		UserToPMABufferCopy(sendbuf, ENDP1_BUF0Addr, datalen);
 		SetEPDblBuf0Count(ENDP1, EP_DBUF_IN, datalen);

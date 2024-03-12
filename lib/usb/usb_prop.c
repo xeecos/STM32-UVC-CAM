@@ -160,7 +160,7 @@ void UsbCamera_init(void)
 
 	/* Update the serial number string descriptor with the data from the unique
 	ID*/
-	//Get_SerialNum();
+	Get_SerialNum();
 
 	pInformation->Current_Configuration = 0;
 
@@ -187,6 +187,7 @@ void UsbCamera_init(void)
 *******************************************************************************/
 void UsbCamera_Reset(void)
 {
+	printf("reset\n");
 	/* Set Usb device as not configured state */
 	pInformation->Current_Configuration = 0;
 
@@ -251,6 +252,7 @@ void UsbCamera_SetConfiguration(void)
 *******************************************************************************/
 void UsbCamera_SetDeviceAddress(void)
 {
+	printf("set address\n");
 	bDeviceState = ADDRESSED;
 }
 
@@ -263,6 +265,7 @@ void UsbCamera_SetDeviceAddress(void)
 *******************************************************************************/
 void UsbCamera_Status_In(void)
 {
+	printf("status in\n");
 }
 
 /*******************************************************************************
@@ -274,7 +277,7 @@ void UsbCamera_Status_In(void)
 *******************************************************************************/
 void UsbCamera_Status_Out(void)
 {
-
+	printf("status out\n");
 }
 
 /*******************************************************************************
@@ -290,7 +293,7 @@ RESULT UsbCamera_Data_Setup(uint8_t RequestNo)
 	uint8_t *(*CopyRoutine)(uint16_t);
 	CopyRoutine = NULL;
 
-
+	printf("USB_SUCCESS:%d\n",RequestNo);
 	if ((RequestNo == GET_CUR) || (RequestNo == SET_CUR))
 	{
 		if (pInformation->USBwIndex == 0x0100)
@@ -309,7 +312,7 @@ RESULT UsbCamera_Data_Setup(uint8_t RequestNo)
 	{
 		return USB_UNSUPPORT;
 	}
-
+	printf("USB_SUCCESS\n");
 	pInformation->Ctrl_Info.CopyData = CopyRoutine;
 	pInformation->Ctrl_Info.Usb_wOffset = 0;
 	(*CopyRoutine)(0);
@@ -339,6 +342,7 @@ RESULT UsbCamera_NoData_Setup(uint8_t RequestNo)
 *******************************************************************************/
 uint8_t *UsbCamera_GetDeviceDescriptor(uint16_t Length)
 {
+	printf("get device descriptor\n");
 	return Standard_GetDescriptorData(Length, &Device_Descriptor);
 }
 

@@ -55,7 +55,7 @@
 #ifdef UVC_1_1
 #define CAMERA_SIZ_CONFIG_DESC                  144
 #else
-#define CAMERA_SIZ_CONFIG_DESC					192
+#define CAMERA_SIZ_CONFIG_DESC					144
 #endif
 
 #define CAMERA_SIZ_DEVICE_DESC                  18

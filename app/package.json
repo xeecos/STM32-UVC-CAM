@@ -9,6 +9,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "usb": "^2.12.1"
+    "usb": "^2.12.1",
+    "uvc": "^1.0.0"
   }
 }

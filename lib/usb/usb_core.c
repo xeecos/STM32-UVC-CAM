@@ -398,6 +398,8 @@ uint8_t *Standard_GetDescriptorData(uint16_t Length, ONE_DESCRIPTOR *pDesc)
 	if (Length == 0)
 	{
 		pInformation->Ctrl_Info.Usb_wLength = pDesc->Descriptor_Size - wOffset;
+
+		printf("get config descriptor:%d %d\n",pDesc->Descriptor_Size,wOffset);
 		return 0;
 	}
 
@@ -653,11 +655,8 @@ void Data_Setup0(void)
 	uint32_t Related_Endpoint, Reserved;
 	uint32_t wOffset, Status;
 
-
-
 	CopyRoutine = NULL;
 	wOffset = 0;
-
 	if (Request_No == GET_DESCRIPTOR)//6  GET_DEscriptOR：用于主机获取设备的特定描述符
 	{
 		//pInformation->USBbmRequestType是下面的两种 标准请求或设备请求
