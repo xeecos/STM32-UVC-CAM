@@ -1,0 +1,14 @@
+{
+  "name": "uvc-cam",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "usb": "^2.12.1"
+  }
+}
