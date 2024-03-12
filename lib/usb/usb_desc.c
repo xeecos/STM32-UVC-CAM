@@ -20,12 +20,12 @@ const uint8_t Camera_DeviceDescriptor[CAMERA_SIZ_DEVICE_DESC] =
 	0x02,									/* bDeviceSubClass */
 	0x01,									/* bDeviceProtocol */
 	0x40,									/* bMaxPacketSize 40 */
-	0x83, 0x04,								/* idVendor = 0x1985*/
-	0x30, 0x57,								/* idProduct  = 0x1017*/
-	0x00, 0x02,								/* bcdDevice */
+	0xB1, 0x20,								/* idVendor = 0x20B1*/
+	0xE0, 0x1D,								/* idProduct  = 0x1DE0*/
+	0x00, 0x01,								/* bcdDevice */
 	1,										/* iManufacturer */
 	2,										/* iProduct */
-	3,										/* iSerialNumber */
+	0,										/* iSerialNumber */
 	0x01									/* bNumConfigurations */
 };
 

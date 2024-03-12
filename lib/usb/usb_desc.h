@@ -61,8 +61,8 @@
 #define CAMERA_SIZ_DEVICE_DESC                  18
 #define CAMERA_SIZ_STRING_LANGID                4
 #define CAMERA_SIZ_STRING_VENDOR                14
-#define CAMERA_SIZ_STRING_PRODUCT               50
-#define CAMERA_SIZ_STRING_SERIAL                26
+#define CAMERA_SIZ_STRING_PRODUCT               34
+#define CAMERA_SIZ_STRING_SERIAL                8
 
 #define STANDARD_ENDPOINT_DESC_SIZE             0x09
 
