@@ -25,7 +25,6 @@
 /* Exported functions ------------------------------------------------------- */
 void CTR_LP (void);
 void CTR_HP (void);
-
 /* External variables --------------------------------------------------------*/
 
 #endif /* __USB_INT_H */

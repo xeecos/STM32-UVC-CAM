@@ -42,7 +42,6 @@ void USB_Interrupts_Config(void);
 void USB_Cable_Config (FunctionalState NewState);
 //void UsbCamera_StreamStart(void);
 void USB_Port_Set(FunctionalState NewState, FunctionalState Pin_In_IPU);
-void UsbCamera_Fillbuf(void);
 uint8_t JoyState(void);
 void Get_SerialNum(void);
 

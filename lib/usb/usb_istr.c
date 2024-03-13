@@ -30,16 +30,7 @@ volatile uint8_t bIntPackSOF = 0;  /* SOFs received between 2 consecutive packet
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 /* function pointers to non-control endpoints service routines */
-void (*pEpInt_IN[7])(void) =
-{
-	EP1_IN_Callback,
-	EP2_IN_Callback,
-	EP3_IN_Callback,
-	EP4_IN_Callback,
-	EP5_IN_Callback,
-	EP6_IN_Callback,
-	EP7_IN_Callback,
-};
+
 
 void (*pEpInt_OUT[7])(void) =
 {

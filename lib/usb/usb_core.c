@@ -991,9 +991,10 @@ void NOP_Process(void)
 * Output         : None.
 * Return         : None.
 *******************************************************************************/
+
+
 void EP1_IN_Callback(void)
 {
-	UsbCamera_Fillbuf();
 }
 
 /******************* (C) COPYRIGHT 2008 STMicroelectronics *****END OF FILE****/

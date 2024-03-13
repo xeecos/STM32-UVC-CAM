@@ -45,7 +45,7 @@
 /* EP1  */
 /* tx buffer base address */
 #define ENDP1_BUF0Addr      (0x90)
-#define ENDP1_BUF1Addr      (0x90+PACKET_SIZE)      
+#define ENDP1_BUF1Addr      (0x90+0x40)      
 
 /*-------------------------------------------------------------*/
 /* -------------------   ISTR events  -------------------------*/
