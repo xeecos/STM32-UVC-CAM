@@ -100,7 +100,7 @@ const uint8_t Camera_ConfigDescriptor[CAMERA_SIZ_CONFIG_DESC] =
 	0x04,									/* bDescriptorType : INTERFACE */
 	0x01,									/* bInterfaceNumber: Index of this interface */
 	0x00,									/* bAlternateSetting: Index of this alternate setting */
-	0x00,									/* bNumEndpoints : 0 endpoints �C no bandwidth used*/
+	0x01,									/* bNumEndpoints : 0 endpoints �C no bandwidth used*/
 	0x0e,									/* bInterfaceClass : CC_VIDEO */
 	0x02,									/* bInterfaceSubClass : SC_VIDEOSTREAMING */
 	0x00,									/* bInterfaceProtocol : PC_PROTOCOL_UNDEFINED */
@@ -153,23 +153,23 @@ const uint8_t Camera_ConfigDescriptor[CAMERA_SIZ_CONFIG_DESC] =
 	/* 38 bytes, total size 128 */
 	/* 1.2.2 Operational Alternate Setting 1 */
 	/* 1.2.2.1 Standard VideoStream Interface Descriptor */
-	0x09,									/* bLength */
-	0x04,									/* bDescriptorType: INTERFACE descriptor type */
-	0x01,									/* bInterfaceNumber: Index of this interface */
-	0x01,									/* bAlternateSetting: Index of this alternate setting */
-	0x01,									/* bNumEndpoints: endpoints, 1 �C data endpoint */
-	0x0e,									/* bInterfaceClass: CC_VIDEO */
-	0x02,									/* bInterfaceSubClass: SC_VIDEOSTREAMING */
-	0x00,									/* bInterfaceProtocol: PC_PROTOCOL_UNDEFINED */
-	0x00,									/* iInterface: Unused */
+	// 0x09,									/* bLength */
+	// 0x04,									/* bDescriptorType: INTERFACE descriptor type */
+	// 0x01,									/* bInterfaceNumber: Index of this interface */
+	// 0x01,									/* bAlternateSetting: Index of this alternate setting */
+	// 0x00,									/* bNumEndpoints: endpoints, 1 �C data endpoint */
+	// 0x0e,									/* bInterfaceClass: CC_VIDEO */
+	// 0x02,									/* bInterfaceSubClass: SC_VIDEOSTREAMING */
+	// 0x00,									/* bInterfaceProtocol: PC_PROTOCOL_UNDEFINED */
+	// 0x00,									/* iInterface: Unused */
 	/* 9 bytes, total size 137 */
 	/* 1.2.2.2 Standard VideoStream Isochronous Video Data Endpoint Descriptor */
 	0x07,									/* bLength */
 	0x05,									/* bDescriptorType: ENDPOINT */
 	0x81,									/* bEndpointAddress: IN endpoint 1 */
-	0x01,									/* bmAttributes: Isochronous transfer type. Asynchronous synchronization type. */
+	0x02,									/* bmAttributes: Isochronous transfer type. Asynchronous synchronization type. */
 	MAKE_WORD(PACKET_SIZE),					/* wMaxPacketSize: Max packet size, in bytes */
-	0x01,									/* bInterval: One frame interval */
+	0x01									/* bInterval: One frame interval */
 	/* 7 bytes, total size 144 */
 };
 

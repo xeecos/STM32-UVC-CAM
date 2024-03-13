@@ -44,7 +44,7 @@
 //uvc-MJPEG帧率
 #define IMG_MJPG_FRAMERATE      5           //预定义MJPEG视频帧率
 
-#define PACKET_SIZE                             0xB0        //176 
+#define PACKET_SIZE                             0x40        //176 
 #define MIN_BIT_RATE                        (20*1024*IMG_MJPG_FRAMERATE)
 #define MAX_BIT_RATE                        (400*1024*IMG_MJPG_FRAMERATE)
 
@@ -52,11 +52,7 @@
 
 #define FRAME_INTERVEL          (10000000ul/IMG_MJPG_FRAMERATE)     //帧间间隔时间，单位100ns
 
-#ifdef UVC_1_1
-#define CAMERA_SIZ_CONFIG_DESC                  144
-#else
 #define CAMERA_SIZ_CONFIG_DESC					144
-#endif
 
 #define CAMERA_SIZ_DEVICE_DESC                  18
 #define CAMERA_SIZ_STRING_LANGID                4

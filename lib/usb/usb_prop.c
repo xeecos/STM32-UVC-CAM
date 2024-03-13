@@ -60,7 +60,7 @@ VideoControl    videoCommitControl =
 	{ 0x00, 0x00 },                      // wDelay
 	{ MAKE_DWORD(MAX_FRAME_SIZE) },     // dwMaxVideoFrameSize
 	{ 0x00, 0x00, 0x00, 0x00 },         // dwMaxPayloadTransferSize
-	{ 0x00, 0x00, 0x00, 0x00 },         // dwClockFrequency
+	{ 0x80, 0x8d, 0x5b, 0x00 },         // dwClockFrequency
 	{ 0x00 },                           // bmFramingInfo
 	{ 0x00 },                           // bPreferedVersion
 	{ 0x00 },                           // bMinVersion
@@ -80,7 +80,7 @@ VideoControl    videoProbeControl =
 	{ 0x00, 0x00 },                      // wDelay
 	{ MAKE_DWORD(MAX_FRAME_SIZE) },    // dwMaxVideoFrameSize
 	{ 0x00, 0x00, 0x00, 0x00 },         // dwMaxPayloadTransferSize
-	{ 0x00, 0x00, 0x00, 0x00 },         // dwClockFrequency
+	{ 0x80, 0x8d, 0x5b, 0x00 },         // dwClockFrequency
 	{ 0x00 },                           // bmFramingInfo
 	{ 0x00 },                           // bPreferedVersion
 	{ 0x00 },                           // bMinVersion
@@ -205,8 +205,8 @@ void UsbCamera_Reset(void)
 	SetEPRxValid(ENDP0);
 
 	/* Initialize Endpoint 1 */
-	SetEPType(ENDP1, EP_ISOCHRONOUS);
-	SetEPDoubleBuff(ENDP1);
+	SetEPType(ENDP1, EP_BULK);
+	// SetEPDoubleBuff(ENDP1);
 	SetEPDblBuffAddr(ENDP1, ENDP1_BUF0Addr, ENDP1_BUF1Addr);
 	SetEPDblBuffCount(ENDP1, EP_DBUF_OUT, PACKET_SIZE);
 	ClearDTOG_RX(ENDP1);
@@ -218,7 +218,7 @@ void UsbCamera_Reset(void)
 	SetEPTxStatus(ENDP1, EP_TX_VALID);
 	// SetEPTxStatus(ENDP1, EP_TX_NAK);
 
-	SetEPRxValid(ENDP0);
+	// SetEPTxValid(ENDP1);
 	/* Set this device to response on default address */
 	SetDeviceAddress(0);
 
