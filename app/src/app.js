@@ -1,8 +1,17 @@
-const { findByIds } = require('usb');
+const { findByIds,WebUSBDevice ,getDeviceList} = require('usb');
 
 
-const device = findByIds(0x20B1, 0x1DE0);
+let device = findByIds(0x20B1, 0x1DE0);//046d:0825
 
+// let device;//= findByIds(0x046d, 0x0825);
+// const devices = getDeviceList();
+
+// for (const d of devices) {
+//     if(d.deviceDescriptor.idProduct==0x825)
+//     {
+//         device = d;
+//     }
+// }
 // async function createDevice()
 // {
 //     const webDevice = await WebUSBDevice.createInstance(device);
@@ -12,15 +21,62 @@ const device = findByIds(0x20B1, 0x1DE0);
 //     }
 // }
 // createDevice();
+// (async () => {
+//     // Uses a blocking call, so is async
 
+//     // Uses blocking calls, so is async
+//     const webDevice = await WebUSBDevice.createInstance(device);
+
+//     if (webDevice) {
+//         webDevice.open();
+//         console.log(webDevice.configurations[0].interfaces[1].alternates[1].endpoints); // WebUSB device
+//         webDevice.transferIn(1,176).then(res=>{
+//             console.log(res);
+//         })
+//     }
+// })();
 async function transfer()
 {
-    device.open();
-    console.log(device)
     // device.detatchKernelDriver();
-    let interface = device.interfaces[0];
-    interface.claim();
+    let dev = await WebUSBDevice.createInstance(device);
+    dev.open();
+    // device.detatchKernelDriver();
+    // console.log("open:",device);
+    // for(let i=0;i<device.interfaces.length; i++)
+    // {
+    //     // console.log(interface);
+    // }
 
+    // console.log(dev.configurations[0].interfaces[1].alternates[1].endpoints);
+    dev.claimInterface(1).then(res=>{
+        dev.selectAlternateInterface(1,0).then(res=>{
+            console.log(1)
+            dev.transferIn(1,64).then(res=>{
+                console.log(res.data);
+            })
+        })
+        
+    });
+    // dev.claimInterface(1).then(res=>{
+    //     dev.selectAlternateInterface(1,1);
+    // });
+    // dev.controlTransferIn({
+    //     requestType:"class",
+    //     recipient:"interface",
+    //     request:0x01,
+    //     value:0x0001,
+    //     index:1},64).then(res=>{
+    //         console.log(res);
+    //     });
+    // dev.selectAlternateInterface(1,0).then(res=>{
+    //     console.log(res);
+    // })
+    // dev.transferOut(1, "hello").then(res=>{
+    //         console.log(res);
+    //     });
+    // dev.transferIn(0x81, 176).then(res=>{
+    //     console.log(res);
+    // })
     // let outEndpoint = endpoints[0];
     // let inEndpoint = endpoints[1];
     // console.log(device.interfaces[0])
