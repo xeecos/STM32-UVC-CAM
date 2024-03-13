@@ -39,7 +39,7 @@ const uint8_t Camera_ConfigDescriptor[CAMERA_SIZ_CONFIG_DESC] =
 	0x02,									/* bNumInterfaces */
 	0x01,									/* bConfigurationValue */
 	0x00,									/* iConfiguration */
-	0x80,									/* bmAttributes  BUS Powred, no remote wakeup*/
+	0xC0,									/* bmAttributes  BUS Powred, no remote wakeup*/
 	0xFA,									/* bMaxPower = 500 mA*/
 	/* 09 byte, total size 9*/
 	/* 1. Standard Video Interface Collection IAD */
@@ -167,7 +167,7 @@ const uint8_t Camera_ConfigDescriptor[CAMERA_SIZ_CONFIG_DESC] =
 	0x07,									/* bLength */
 	0x05,									/* bDescriptorType: ENDPOINT */
 	0x81,									/* bEndpointAddress: IN endpoint 1 */
-	0x05,									/* bmAttributes: Isochronous transfer type. Asynchronous synchronization type. */
+	0x01,									/* bmAttributes: Isochronous transfer type. Asynchronous synchronization type. */
 	MAKE_WORD(PACKET_SIZE),					/* wMaxPacketSize: Max packet size, in bytes */
 	0x01,									/* bInterval: One frame interval */
 	/* 7 bytes, total size 144 */
@@ -188,12 +188,12 @@ const uint8_t Camera_StringVendor[CAMERA_SIZ_STRING_VENDOR] =
 	CAMERA_SIZ_STRING_VENDOR,				/* Size of Vendor string */
 	USB_STRING_DESCRIPTOR_TYPE,				/* bDescriptorType*/
 	/* Manufacturer:  */
-	'W', 0, 
-	'a', 0, 
-	'h', 0, 
-	'a', 0, 
-	'h', 0, 
-	'a', 0
+	'x', 0, 
+	'e', 0, 
+	'e', 0, 
+	'c', 0, 
+	'o', 0, 
+	's', 0
 };
 
 const uint8_t Camera_StringProduct[CAMERA_SIZ_STRING_PRODUCT] =
