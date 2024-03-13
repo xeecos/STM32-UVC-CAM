@@ -28,7 +28,7 @@ uint16_t SaveTState;
 #include "usb_desc.h"
 //UVC payload head
 
-#define CAMERA_SIZ_STREAMHD			2
+#define CAMERA_SIZ_STREAMHD			0
 uint8_t sendbuf[PACKET_SIZE] = { 0x02, 0x01 };			// 发送数据缓冲区
 u32 sendsize = 0;									// 已发送字节数
 
@@ -42,23 +42,7 @@ void myMemcpy(const uint8_t* src, uint8_t* dst, u32 len)
 }
 void UsbCamera_SendImage(void)
 {
-	printf("fill\n");
-	// uint8_t buf[64];
-	// buf[0] = 0x2;
-	// buf[1] = 0x1;
-	// if (_GetENDPOINT(ENDP1) & EP_DTOG_TX)
-	// {
-	// 	// User use buffer0
-	// 	UserToPMABufferCopy(buf, ENDP1_BUF0Addr, 64);
-	// 	SetEPDblBuf0Count(ENDP1, EP_DBUF_IN, 64);
-	// } else{
-	// 	// User use buffer1
-	// 	UserToPMABufferCopy(buf, ENDP1_BUF1Addr, 64);
-	// 	SetEPDblBuf1Count(ENDP1, EP_DBUF_IN, 64);
-	// }
-	// _ToggleDTOG_TX(ENDP1);					// 反转DTOG_TX
-	// _SetEPTxStatus(ENDP1, EP_TX_VALID);
-	// return;
+	printf("fill:%d\n",sendsize);
 	s32 datalen = 0;		// 本次发送的字节数
 	uint8_t *payload = 0;		// 发送数据指针
 
@@ -114,7 +98,9 @@ void UsbCamera_SendImage(void)
 	{ 
 		sendsize = 0; 
 	}
-
+	else
+	{
+	}
 	return;
 }
 /* Extern variables ----------------------------------------------------------*/

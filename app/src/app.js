@@ -1,4 +1,4 @@
-const { findByIds,WebUSBDevice ,getDeviceList} = require('usb');
+const { findByIds,WebUSBDevice ,usb} = require('usb');
 
 
 let device = findByIds(0x20B1, 0x1DE0);//046d:0825
@@ -35,6 +35,19 @@ let device = findByIds(0x20B1, 0x1DE0);//046d:0825
 //         })
 //     }
 // })();
+async function getImage()
+{
+    return new Promise(resolve=>{
+
+        let endpoint = device.interfaces[1].endpoint(0x81);
+        console.log(endpoint)
+        // endpoint.startPoll(3,64);
+        // endpoint.on("data", function(data) { 
+        //     console.log(data);
+        // });
+        resolve();
+    })
+}
 async function transfer()
 {
     // device.detatchKernelDriver();
@@ -49,11 +62,18 @@ async function transfer()
 
     // console.log(dev.configurations[0].interfaces[1].alternates[1].endpoints);
     dev.claimInterface(1).then(res=>{
-        dev.selectAlternateInterface(1,0).then(res=>{
-            console.log(1)
-            dev.transferIn(1,64).then(res=>{
-                console.log(res.data);
-            })
+        dev.selectAlternateInterface(1,0).then(async (res)=>{
+            for(let i=0;i<1;i++)
+            {
+                await getImage();
+                // await getImage();
+                // let r = await dev.transferIn(1,64);
+                // console.log(r.data);
+                
+                // dev.transferIn(1,64).then(res=>{
+                //     console.log(res.data);
+                // })
+            }
         })
         
     });
