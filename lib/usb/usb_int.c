@@ -24,13 +24,13 @@ uint16_t SaveRState;
 uint16_t SaveTState;
 
 // 测试部分
-// #include "srcjpg.h"
-// #include "usb_desc.h"
+#include "srcjpg.h"
+#include "usb_desc.h"
 //UVC payload head
 
-// #define CAMERA_SIZ_STREAMHD			2
-// uint8_t sendbuf[PACKET_SIZE] = { 0x02, 0x01 };			// 发送数据缓冲区
-// u32 sendsize = 0;									// 已发送字节数
+#define CAMERA_SIZ_STREAMHD			2
+uint8_t sendbuf[PACKET_SIZE] = { 0x02, 0x01 };			// 发送数据缓冲区
+u32 sendsize = 0;									// 已发送字节数
 
 void myMemcpy(const uint8_t* src, uint8_t* dst, u32 len)
 {
@@ -43,77 +43,77 @@ void myMemcpy(const uint8_t* src, uint8_t* dst, u32 len)
 void UsbCamera_SendImage(void)
 {
 	printf("fill\n");
-	uint8_t buf[64];
-	buf[0] = 0x2;
-	buf[1] = 0x1;
-	if (_GetENDPOINT(ENDP1) & EP_DTOG_TX)
-	{
-		// User use buffer0
-		UserToPMABufferCopy(buf, ENDP1_BUF0Addr, 64);
-		SetEPDblBuf0Count(ENDP1, EP_DBUF_IN, 64);
-	} else{
-		// User use buffer1
-		UserToPMABufferCopy(buf, ENDP1_BUF1Addr, 64);
-		SetEPDblBuf1Count(ENDP1, EP_DBUF_IN, 64);
-	}
-	_ToggleDTOG_TX(ENDP1);					// 反转DTOG_TX
-	_SetEPTxStatus(ENDP1, EP_TX_VALID);
-	// return;
-	// s32 datalen = 0;		// 本次发送的字节数
-	// uint8_t *payload = 0;		// 发送数据指针
-
-	// // 发送缓冲区有效数据地址
-	// payload = sendbuf + CAMERA_SIZ_STREAMHD;
-	// // 读数据到发送缓冲区
-	// if (0 == sendsize)
-	// {
-	// 	sendbuf[1] &= 0x01;		// 清除BFH
-	// 	sendbuf[1] ^= 0x01;		// 切换FID
-
-	// 	// 计算本次发送数据长度
-	// 	datalen = PACKET_SIZE - CAMERA_SIZ_STREAMHD;
-	// 	// 读出发送数据
-	// 	myMemcpy(sbuf + sendsize, payload, datalen);
-		
-	// 	sendsize = datalen;
-	// 	datalen += CAMERA_SIZ_STREAMHD;
-	// } else{
-	// 	// 图像的后续包
-	// 	datalen = PACKET_SIZE - CAMERA_SIZ_STREAMHD;
-	// 	// 判断是否为最后一个数据包
-	// 	if (sendsize + datalen >= SBUF_SIZE)
-	// 	{
-	// 		datalen = SBUF_SIZE - sendsize;
-	// 		// 结束包标记(EOF置位,帧结束位指示视频结束，仅在属于图像帧的最后一个USB传输操作中设置该位)
-	// 		sendbuf[1] |= 0x02;
-	// 	}
-	// 	// 读出发送数据
-	// 	myMemcpy(sbuf + sendsize, payload, datalen);
-		
-	// 	sendsize += datalen;
-	// 	datalen += CAMERA_SIZ_STREAMHD;
-	// }
-
-	// // 复制数据到PMA
+	// uint8_t buf[64];
+	// buf[0] = 0x2;
+	// buf[1] = 0x1;
 	// if (_GetENDPOINT(ENDP1) & EP_DTOG_TX)
 	// {
 	// 	// User use buffer0
-	// 	UserToPMABufferCopy(sendbuf, ENDP1_BUF0Addr, datalen);
-	// 	SetEPDblBuf0Count(ENDP1, EP_DBUF_IN, datalen);
+	// 	UserToPMABufferCopy(buf, ENDP1_BUF0Addr, 64);
+	// 	SetEPDblBuf0Count(ENDP1, EP_DBUF_IN, 64);
 	// } else{
 	// 	// User use buffer1
-	// 	UserToPMABufferCopy(sendbuf, ENDP1_BUF1Addr, datalen);
-	// 	SetEPDblBuf1Count(ENDP1, EP_DBUF_IN, datalen);
+	// 	UserToPMABufferCopy(buf, ENDP1_BUF1Addr, 64);
+	// 	SetEPDblBuf1Count(ENDP1, EP_DBUF_IN, 64);
 	// }
-
 	// _ToggleDTOG_TX(ENDP1);					// 反转DTOG_TX
-	// _SetEPTxStatus(ENDP1, EP_TX_VALID);		// 允许数据发送
+	// _SetEPTxStatus(ENDP1, EP_TX_VALID);
+	// return;
+	s32 datalen = 0;		// 本次发送的字节数
+	uint8_t *payload = 0;		// 发送数据指针
 
-	// // 判断本帧图像是否发送完成
-	// if (sendsize >= SBUF_SIZE)
-	// { 
-	// 	sendsize = 0; 
-	// }
+	// 发送缓冲区有效数据地址
+	payload = sendbuf + CAMERA_SIZ_STREAMHD;
+	// 读数据到发送缓冲区
+	if (0 == sendsize)
+	{
+		sendbuf[1] &= 0x01;		// 清除BFH
+		sendbuf[1] ^= 0x01;		// 切换FID
+
+		// 计算本次发送数据长度
+		datalen = PACKET_SIZE - CAMERA_SIZ_STREAMHD;
+		// 读出发送数据
+		myMemcpy(sbuf + sendsize, payload, datalen);
+		
+		sendsize = datalen;
+		datalen += CAMERA_SIZ_STREAMHD;
+	} else{
+		// 图像的后续包
+		datalen = PACKET_SIZE - CAMERA_SIZ_STREAMHD;
+		// 判断是否为最后一个数据包
+		if (sendsize + datalen >= SBUF_SIZE)
+		{
+			datalen = SBUF_SIZE - sendsize;
+			// 结束包标记(EOF置位,帧结束位指示视频结束，仅在属于图像帧的最后一个USB传输操作中设置该位)
+			sendbuf[1] |= 0x02;
+		}
+		// 读出发送数据
+		myMemcpy(sbuf + sendsize, payload, datalen);
+		
+		sendsize += datalen;
+		datalen += CAMERA_SIZ_STREAMHD;
+	}
+
+	// 复制数据到PMA
+	if (_GetENDPOINT(ENDP1) & EP_DTOG_TX)
+	{
+		// User use buffer0
+		UserToPMABufferCopy(sendbuf, ENDP1_BUF0Addr, datalen);
+		SetEPDblBuf0Count(ENDP1, EP_DBUF_IN, datalen);
+	} else{
+		// User use buffer1
+		UserToPMABufferCopy(sendbuf, ENDP1_BUF1Addr, datalen);
+		SetEPDblBuf1Count(ENDP1, EP_DBUF_IN, datalen);
+	}
+
+	_ToggleDTOG_TX(ENDP1);					// 反转DTOG_TX
+	_SetEPTxStatus(ENDP1, EP_TX_VALID);		// 允许数据发送
+
+	// 判断本帧图像是否发送完成
+	if (sendsize >= SBUF_SIZE)
+	{ 
+		sendsize = 0; 
+	}
 
 	return;
 }
