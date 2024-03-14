@@ -243,17 +243,16 @@ void BF3003_Pin_Init()
     TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
     TIM_OCInitTypeDef TIM_OCInitStructure;
 
-    TIM_TimeBaseInitStructure.TIM_Prescaler = 72 - 1;
+    TIM_TimeBaseInitStructure.TIM_Prescaler = 18 - 1;
     TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-    TIM_TimeBaseInitStructure.TIM_Period = 1000 - 1;
+    TIM_TimeBaseInitStructure.TIM_Period = 4 - 1;
     TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
-    //((1+TIM_Prescaler)/72)*(1+TIM_Period)
-    // 72000000  / (TIM_Period + 1) * (TIM_Prescaler + 1)
+    // 72000000  / (TIM_Period + 1) / (TIM_Prescaler + 1)
     TIM_TimeBaseInit(TIM3, &TIM_TimeBaseInitStructure);
 
     TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
     TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
-    TIM_OCInitStructure.TIM_Pulse = 500;
+    TIM_OCInitStructure.TIM_Pulse = 2;
     TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_Low;
 
     TIM_OC1Init(TIM3, &TIM_OCInitStructure);
