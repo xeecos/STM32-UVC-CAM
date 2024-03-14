@@ -360,42 +360,29 @@ void BF3003_Handle(void)
  * @param  无
  * @retval 无
  */
-uint8_t frame[320 * 40];
+uint8_t frame[2][640 * 8];
 void BF3003_GetPic(void)
 {
-    uint16_t i, j;
-    while (BF3003_VS() == 0)
-        ; /* 保证进入一个新的帧时序，而不是在帧时序的一半进入 */
-    while (BF3003_VS() == 1)
-        ;
-    for (i = 0; i < 240; i++)
+    uint16_t i, j, k, l;
+    while (BF3003_VS() == 0); /* 保证进入一个新的帧时序，而不是在帧时序的一半进入 */
+    while (BF3003_VS() == 1);
+    for (i = 0; i < 480; i+=16)
     {
-        while (BF3003_HREF() == 0)
-            ;
-        for (j = 0; j < 320 * 2; j++)
-        {
-            while (BF3003_PCLK() == 0)
-                ;
-            frame[640 * i + j] = (GPIOB->IDR >> 8)&0xff;
-            while (BF3003_PCLK() == 1)
-                ;
-        }
-        if (i == 19)
-            break;
-        while (BF3003_HREF() == 1)
-            ;
+		for(k=0; k<2; k++)
+		{
+			for(l=0;l<8;l++)
+			{
+				int offset = 640 * l;
+				while (BF3003_HREF() == 0);
+				for (j = 0; j < 640; j++)
+				{
+					while (BF3003_PCLK() == 0);
+					frame[k][offset + j] = GPIOB->IDR >> 8;
+					while (BF3003_PCLK() == 1);
+				}
+				while (BF3003_HREF() == 1);
+			}
+		}
     }
-    while (BF3003_VS() == 0)
-        ;
-
-    // Serial_SendByte(0x01);
-    // Serial_SendByte(0xFE);
-    // for (i = 0; i < 320 * 40; i++)
-    // {
-    //     Serial_SendByte(frame[i]);
-    // }
-    // Serial_SendByte(0xFE);
-    // Serial_SendByte(0x01);
-
-    Delay_Ms(1000);
+    while (BF3003_VS() == 0);
 }
