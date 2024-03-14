@@ -10,8 +10,8 @@
 */
 void SCCB_W_SCL(uint8_t BitValue)
 {
-    // //HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, BitValue);
-    delay_us(10);
+    GPIO_WriteBit(GPIOA, GPIO_Pin_15, BitValue);
+    Delay_Us(10);
 }
 /*
   * @brief  修改SDA的电平
@@ -20,8 +20,8 @@ void SCCB_W_SCL(uint8_t BitValue)
 */
 void SCCB_W_SDA(uint8_t BitValue)
 {
-    //HAL_GPIO_WritePin(GPIOB, GPIO_PIN_11, BitValue);
-    delay_us(10);
+    GPIO_WriteBit(GPIOB, GPIO_Pin_3, BitValue);
+    Delay_Us(10);
 }
 /*
   * @brief  读取SDA的电平
@@ -31,8 +31,8 @@ void SCCB_W_SDA(uint8_t BitValue)
 uint8_t SCCB_R_SDA(void)
 {
     uint8_t BitValue;
-    // BitValue = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_11);
-    delay_us(10);
+    BitValue = GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_3);
+    Delay_Us(10);
     return BitValue;
 }
 /*
@@ -42,14 +42,17 @@ uint8_t SCCB_R_SDA(void)
 */
 void SCCB_Init(void)
 {
+    GPIO_InitTypeDef GPIO_InitStructure;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD;
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOB, &GPIO_InitStructure);
     
-    // GPIO_InitTypeDef GPIO_InitStructure;
-    // GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_OD;
-    // GPIO_InitStructure.Pin = GPIO_PIN_10 | GPIO_PIN_11;
-    // GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
-    // HAL_GPIO_Init(GPIOB, &GPIO_InitStructure);
-    
-    // //HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10 | GPIO_PIN_11, GPIO_PIN_SET);
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD;
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
+    GPIO_WriteBit(GPIOB, GPIO_Pin_3, Bit_SET);
 }
 /*
   * @brief  产生SCCB开始信号
@@ -59,11 +62,11 @@ void SCCB_Init(void)
 void SCCB_Start(void)
 {
     SCCB_W_SDA(1);
-    delay_us(10);
+    Delay_Us(10);
     SCCB_W_SCL(1);
-    delay_us(2);
+    Delay_Us(2);
     SCCB_W_SDA(0);
-    delay_us(2);
+    Delay_Us(2);
     SCCB_W_SCL(0);
 }
 /*
@@ -87,13 +90,13 @@ void SCCB_SendByte(uint8_t Byte)
     uint8_t i;
     for (i = 0; i < 8; i ++)
     {    
-        delay_us(2);
+        Delay_Us(2);
         SCCB_W_SDA(Byte & (0x80 >> i));
-        delay_us(2);
+        Delay_Us(2);
         SCCB_W_SCL(1);
-        delay_us(2);
+        Delay_Us(2);
         SCCB_W_SCL(0);
-        delay_us(2);
+        Delay_Us(2);
     }
 }
 /*
@@ -110,7 +113,7 @@ uint8_t SCCB_ReceiveByte(void)
         SCCB_W_SCL(1);
         if (SCCB_R_SDA() == 1){Byte |= (0x80 >> i);}
         SCCB_W_SCL(0);
-        delay_us(1);
+        Delay_Us(1);
     }
     return Byte;
 }

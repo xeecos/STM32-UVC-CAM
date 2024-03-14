@@ -56,7 +56,7 @@ void USART1_IRQHandler(void)
 	OSIntExit();
 #endif
 }
-void usart_init()
+void Usart_Init()
 {
 	uint16_t mantissa;
 	uint16_t fraction;	   

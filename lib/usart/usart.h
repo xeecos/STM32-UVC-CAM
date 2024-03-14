@@ -8,8 +8,7 @@
 	  	
 extern uint8_t  USART_RX_BUF[USART_REC_LEN]; //接收缓冲,最大USART_REC_LEN个字节.末字节为换行符 
 extern uint16_t USART_RX_STA;         		//接收状态标记	
-void usart_init();
-void usart_send(const char *msg, ...);
+void Usart_Init();
 #endif	   
 
 

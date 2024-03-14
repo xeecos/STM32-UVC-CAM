@@ -5,9 +5,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-void delay_init();
-void delay_ms(uint16_t nms);
-void delay_us(uint32_t nus);
+void Delay_Init();
+void Delay_Ms(uint16_t nms);
+void Delay_Us(uint32_t nus);
 
 #ifdef __cplusplus
 }

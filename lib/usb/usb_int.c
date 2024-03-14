@@ -57,7 +57,7 @@ void UsbCamera_SendImage(void)
 		// 计算本次发送数据长度
 		datalen = PACKET_SIZE - CAMERA_SIZ_STREAMHD;
 		// 读出发送数据
-		myMemcpy(sbuf + sendsize, payload, datalen);
+		// myMemcpy(sbuf + sendsize, payload, datalen);
 		
 		sendsize = datalen;
 		datalen += CAMERA_SIZ_STREAMHD;
@@ -72,7 +72,7 @@ void UsbCamera_SendImage(void)
 			sendbuf[1] |= 0x02;
 		}
 		// 读出发送数据
-		myMemcpy(sbuf + sendsize, payload, datalen);
+		// myMemcpy(sbuf + sendsize, payload, datalen);
 		
 		sendsize += datalen;
 		datalen += CAMERA_SIZ_STREAMHD;

@@ -46,6 +46,8 @@ USER_STANDARD_REQUESTS  *pUser_Standard_Requests;
 //初始化USB
 void USB_Init(void)
 {
+    Set_USBClock();
+    USB_Interrupts_Config();
 	pInformation = &Device_Info;
 	//typedef enum _CONTROL_STATE
 	//{

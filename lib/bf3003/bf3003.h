@@ -47,7 +47,7 @@
 #define BF3003_INT_TIM_MAX_LO       0X8f
 
 void BF3003_Init(void);
-
+void BF3003_Handle(void);
 void BF3003_GetPic(void);
 
 void BF3003_WriteReg(uint8_t RegAddress, uint8_t Data);

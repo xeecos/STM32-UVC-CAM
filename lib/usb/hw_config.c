@@ -83,6 +83,7 @@ void Leave_LowPowerMode(void)
 //USB中断配置
 void USB_Interrupts_Config(void)
 {
+    MY_NVIC_PriorityGroupConfig(2);
 	EXTI->IMR |= EXTI_RTSR_TR18;//  开启线18上的中断
 	EXTI->RTSR |= EXTI_RTSR_TR18;//line 18上事件上升降沿触发	 
 	MY_NVIC_Init(1, 0, USB_LP_CAN1_RX0_IRQn, 2);//组2，优先级次之 
