@@ -212,15 +212,15 @@ uint8_t regs[REGS_COUNT][2] = {
 /* @brief 下面几个函数主要是用于便捷读取串口电平 */
 uint8_t BF3003_VS(void)
 {
-    return 1;//GPIO_ReadInputDataBit(GPIOB, GPIO_PIN_12);
+    return GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_6);
 }
 uint8_t BF3003_HREF(void)
 {
-    return 1;//GPIO_ReadInputDataBit(GPIOB, GPIO_PIN_13);
+    return GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_7);
 }
 uint8_t BF3003_PCLK(void)
 {
-    return 1;//GPIO_ReadInputDataBit(GPIOB, GPIO_PIN_14);
+    return GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_5);
 }
 /*
  * @brief    BF3003引脚初始化函数，在BF3003_Init() 里触发，不需外部调用
@@ -245,16 +245,16 @@ void BF3003_Pin_Init()
     TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
     TIM_OCInitTypeDef TIM_OCInitStructure;
 
-    TIM_TimeBaseInitStructure.TIM_Prescaler = 72 - 1;
+    TIM_TimeBaseInitStructure.TIM_Prescaler = 1 - 1;
     TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-    TIM_TimeBaseInitStructure.TIM_Period = 1000 - 1;
+    TIM_TimeBaseInitStructure.TIM_Period = 18 - 1;
     TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     // 72000000  / (TIM_Period + 1) / (TIM_Prescaler + 1)
     TIM_TimeBaseInit(TIM3, &TIM_TimeBaseInitStructure);
 
     TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
     TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
-    TIM_OCInitStructure.TIM_Pulse = 500;
+    TIM_OCInitStructure.TIM_Pulse = 9;
     TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
 
     TIM_OC1Init(TIM3, &TIM_OCInitStructure);
@@ -356,7 +356,7 @@ void BF3003_Init(void)
 
 void BF3003_Handle(void)
 {
-    // BF3003_GetPic();
+    BF3003_GetPic();
 }
 /*
  * @brief    读取图像信息并发送至电脑显示
@@ -367,6 +367,7 @@ uint8_t frame[2][640 * 8];
 void BF3003_GetPic(void)
 {
     uint16_t i, j, k, l;
+	printf("get pic start\n");
     while (BF3003_VS() == 0); /* 保证进入一个新的帧时序，而不是在帧时序的一半进入 */
     while (BF3003_VS() == 1);
     for (i = 0; i < 480; i+=16)
@@ -379,13 +380,13 @@ void BF3003_GetPic(void)
 				while (BF3003_HREF() == 0);
 				for (j = 0; j < 640; j++)
 				{
-					while (BF3003_PCLK() == 0);
+					// while (BF3003_PCLK() == 0);
 					frame[k][offset + j] = GPIOB->IDR >> 8;
-					while (BF3003_PCLK() == 1);
+					// while (BF3003_PCLK() == 1);
 				}
-				while (BF3003_HREF() == 1);
+				// while (BF3003_HREF() == 1);
 			}
 		}
     }
-    while (BF3003_VS() == 0);
+	// printf("get pic finish\n");
 }
