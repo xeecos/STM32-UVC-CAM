@@ -1,0 +1,1 @@
+wchisp flash ../.pio/genericSTM32F103C8/firmware.elf
