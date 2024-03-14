@@ -231,31 +231,34 @@ void BF3003_Pin_Init()
 {
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA|RCC_APB2Periph_GPIOB|RCC_APB2Periph_AFIO, ENABLE);
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
-    
+
     GPIO_InitTypeDef GPIO_InitStruct;  
     /* XCLK初始化 */
     GPIO_InitStruct.GPIO_Pin = GPIO_Pin_4;
-    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_Out_PP;  
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF_PP;  
     GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+	GPIO_PinRemapConfig(GPIO_PartialRemap_TIM3, ENABLE); 
     GPIO_PinRemapConfig(GPIO_Remap_SWJ_NoJTRST,ENABLE);
 
     TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
     TIM_OCInitTypeDef TIM_OCInitStructure;
 
-    TIM_TimeBaseInitStructure.TIM_Prescaler = 18 - 1;
+    TIM_TimeBaseInitStructure.TIM_Prescaler = 72 - 1;
     TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-    TIM_TimeBaseInitStructure.TIM_Period = 4 - 1;
+    TIM_TimeBaseInitStructure.TIM_Period = 1000 - 1;
     TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     // 72000000  / (TIM_Period + 1) / (TIM_Prescaler + 1)
     TIM_TimeBaseInit(TIM3, &TIM_TimeBaseInitStructure);
 
     TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
     TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
-    TIM_OCInitStructure.TIM_Pulse = 2;
-    TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_Low;
+    TIM_OCInitStructure.TIM_Pulse = 500;
+    TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
 
     TIM_OC1Init(TIM3, &TIM_OCInitStructure);
+	TIM_OC1PreloadConfig(TIM3, TIM_OCPreload_Enable);
     TIM_Cmd(TIM3, ENABLE);
 
     /* VSYNC HREF PIXCLK初始化 */
@@ -320,6 +323,7 @@ uint8_t BF3003_ReadReg(uint8_t RegAddress)
  */
 void BF3003_Configure(void)
 {
+    SCCB_Init();        // SCCB初始化
     uint8_t ver = 0;
 	while (1)
 	{
@@ -347,7 +351,6 @@ void BF3003_Configure(void)
 void BF3003_Init(void)
 {
     BF3003_Pin_Init();  // 引脚初始化
-    SCCB_Init();        // SCCB初始化
     BF3003_Configure(); // 寄存器预设
 }
 
