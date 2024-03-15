@@ -39,12 +39,12 @@ async function getImage()
 {
     return new Promise(resolve=>{
 
-        let endpoint = device.interfaces[1].endpoint(0x81);
-        console.log(endpoint)
-        // endpoint.startPoll(3,64);
-        // endpoint.on("data", function(data) { 
-        //     console.log(data);
-        // });
+        let endpoint = device.interfaces[0].endpoint(0x81);
+        // console.log(endpoint)
+        endpoint.startPoll(1,64);
+        endpoint.on("data", function(data) { 
+            console.log(data);
+        });
         resolve();
     })
 }
@@ -54,15 +54,14 @@ async function transfer()
     let dev = await WebUSBDevice.createInstance(device);
     dev.open();
     // device.detatchKernelDriver();
-    // console.log("open:",device);
     // for(let i=0;i<device.interfaces.length; i++)
     // {
     //     // console.log(interface);
     // }
 
     // console.log(dev.configurations[0].interfaces[1].alternates[1].endpoints);
-    dev.claimInterface(1).then(res=>{
-        dev.selectAlternateInterface(1,0).then(async (res)=>{
+    dev.claimInterface(0).then(async res=>{
+        // dev.selectAlternateInterface(1,0).then(async (res)=>{
             for(let i=0;i<1;i++)
             {
                 await getImage();
@@ -74,7 +73,7 @@ async function transfer()
                 //     console.log(res.data);
                 // })
             }
-        })
+        // })
         
     });
     // dev.claimInterface(1).then(res=>{
