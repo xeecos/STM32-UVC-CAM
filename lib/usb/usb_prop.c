@@ -196,7 +196,7 @@ void UsbCamera_Reset(void)
 	SetBTABLE(BTABLE_ADDRESS);
 
 	/* Initialize Endpoint 0 */
-	SetEPType(ENDP0, EP_BULK);
+	SetEPType(ENDP0, EP_CONTROL);
 	SetEPTxStatus(ENDP0, EP_TX_NAK);
 	SetEPRxAddr(ENDP0, ENDP0_RXADDR);
 	SetEPRxCount(ENDP0, PACKET_SIZE);
@@ -219,7 +219,7 @@ void UsbCamera_Reset(void)
 	// SetEPTxStatus(ENDP1, EP_TX_NAK);
 
 	// SetEPTxValid(ENDP1);
-	SetEPRxValid(ENDP0);
+	// SetEPRxValid(ENDP0);
 	/* Set this device to response on default address */
 	SetDeviceAddress(0);
 

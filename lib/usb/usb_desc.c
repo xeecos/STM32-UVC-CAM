@@ -51,7 +51,6 @@ const uint8_t Camera_ConfigDescriptor[WINUSB_CONFIG_DESC_SIZE] =
     0x00,   /* bAlternateSetting: Alternate setting */
     0x02,   /* bNumEndpoints: Two endpoints used */
     0xff,   /* bInterfaceClass: vendor */
-  //  0x00,   /* bInterfaceClass: vendor */
     0x00,   /* bInterfaceSubClass: */
     0x00,   /* bInterfaceProtocol: */
     0x00,   /* iInterface: */
@@ -60,7 +59,7 @@ const uint8_t Camera_ConfigDescriptor[WINUSB_CONFIG_DESC_SIZE] =
     0x07,   								/* bLength: Endpoint Descriptor size */
     USB_ENDPOINT_DESCRIPTOR_TYPE,      	/* bDescriptorType: Endpoint */
     0x01,                        			  /* bEndpointAddress */
-    0x02,                              	/* bmAttributes: Bulk */
+    0x01,                              	/* bmAttributes: Bulk */
     0x40,  								              /* wMaxPacketSize: */
     0x00,
     0x00,                              	/* bInterval: ignore for Bulk transfer */
