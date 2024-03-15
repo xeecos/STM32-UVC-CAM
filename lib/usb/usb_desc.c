@@ -228,5 +228,102 @@ uint8_t Camera_StringSerial[CAMERA_SIZ_STRING_SERIAL] =
 	'.', 0,
 	'1', 0
 };
+#define USB_REQ_MS_VENDOR_CODE	 	0xA0
+const uint8_t USBD_OS_STRING[8] = { 
+   'M',
+   'S',
+   'F',
+   'T',
+   '1',
+   '0',
+   '0',
+   USB_REQ_MS_VENDOR_CODE, 
+}; 
 
+const uint8_t USBD_WINUSB_OSFeatureDesc[USB_LEN_OS_FEATURE_DESC] =
+{
+	0x28, 0, 0, 0, // length
+	0, 1,          // bcd version 1.0
+	4, 0,          // windex: extended compat ID descritor
+	1,             // no of function
+	0, 0, 0, 0, 0, 0, 0, // reserve 7 bytes
+	// function
+	0,             // interface no
+	0,             // reserved
+	'W', 'I', 'N', 'U', 'S', 'B', 0, 0, //  first ID
+    0,   0,   0,   0,   0,   0, 0, 0,  // second ID
+	0,   0,   0,   0,   0,   0 // reserved 6 bytes      
+};
+const uint8_t USBD_WINUSB_OSPropertyDesc[USB_LEN_OS_PROPERTY_DESC] =
+{
+      0x8E, 0, 0, 0,  // length 246 byte
+      0x00, 0x01,   // BCD version 1.0
+      0x05, 0x00,   // Extended Property Descriptor Index(5)
+      0x01, 0x00,   // number of section (1)
+//; property section        
+      0x84, 0x00, 0x00, 0x00,   // size of property section
+      0x1, 0, 0, 0,   //; property data type (1)
+      0x28, 0,        //; property name length (42)
+      'D', 0,
+      'e', 0,
+      'v', 0,
+      'i', 0,
+      'c', 0,
+      'e', 0,
+      'I', 0,
+      'n', 0,
+      't', 0,
+      'e', 0,
+      'r', 0,
+      'f', 0,
+      'a', 0,
+      'c', 0,
+      'e', 0,
+      'G', 0,
+      'U', 0,
+      'I', 0,
+      'D', 0,
+      0, 0,
+      // D6805E56-0447-4049-9848-46D6B2AC5D28
+      0x4E, 0, 0, 0,  // ; property data length
+      '{', 0,
+      '1', 0,
+      '3', 0,
+      'E', 0,
+      'B', 0,
+      '3', 0,
+      '6', 0,
+      '0', 0,
+      'B', 0,
+      '-', 0,
+      'B', 0,
+      'C', 0,
+      '1', 0,
+      'E', 0,
+      '-', 0,
+      '4', 0,
+      '6', 0,
+      'C', 0,
+      'B', 0,
+      '-', 0,
+      'A', 0,
+      'C', 0,
+      '8', 0,
+      'B', 0,
+      '-', 0,
+      'E', 0,
+      'F', 0,
+      '3', 0,
+      'D', 0,
+      'A', 0,
+      '4', 0,
+      '7', 0,
+      'B', 0,
+      '4', 0,
+      '0', 0,
+      '6', 0,
+      '2', 0,
+      '}', 0,
+      0, 0,
+};
 /************************END OF FILE***************************************/

@@ -58,7 +58,8 @@
 #define CAMERA_SIZ_STRING_VENDOR                14
 #define CAMERA_SIZ_STRING_PRODUCT               34
 #define CAMERA_SIZ_STRING_SERIAL                8
-
+#define USB_LEN_OS_PROPERTY_DESC                0x8E
+#define USB_LEN_OS_FEATURE_DESC                 0x28
 #define STANDARD_ENDPOINT_DESC_SIZE             0x09
 
 /* Exported functions ------------------------------------------------------- */
@@ -68,6 +69,7 @@ extern const uint8_t Camera_StringLangID[CAMERA_SIZ_STRING_LANGID];
 extern const uint8_t Camera_StringVendor[CAMERA_SIZ_STRING_VENDOR];
 extern const uint8_t Camera_StringProduct[CAMERA_SIZ_STRING_PRODUCT];
 extern uint8_t Camera_StringSerial[CAMERA_SIZ_STRING_SERIAL];
-
+extern const uint8_t USBD_WINUSB_OSPropertyDesc[USB_LEN_OS_PROPERTY_DESC];
+extern const uint8_t USBD_OS_STRING[8];
 #endif /* __USB_DESC_H */
 /******************* (C) COPYRIGHT 2008 STMicroelectronics *****END OF FILE****/

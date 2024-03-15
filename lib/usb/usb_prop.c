@@ -357,6 +357,7 @@ uint8_t *UsbCamera_GetDeviceDescriptor(uint16_t Length)
 *******************************************************************************/
 uint8_t *UsbCamera_GetConfigDescriptor(uint16_t Length)
 {
+	
 	return Standard_GetDescriptorData(Length, &Config_Descriptor);
 }
 
@@ -372,7 +373,11 @@ uint8_t *UsbCamera_GetStringDescriptor(uint16_t Length)
 	uint8_t wValue0 = pInformation->USBwValue0;
 	if (wValue0 > 4)
 	{
-		return NULL;
+		if(wValue0==0xEE)
+		{
+			return Standard_GetDescriptorData(Length,&USBD_OS_STRING);
+		}
+		return 0;
 	} else
 	{
 		return Standard_GetDescriptorData(Length, &String_Descriptor[wValue0]);
