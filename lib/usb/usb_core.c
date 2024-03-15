@@ -395,11 +395,11 @@ uint8_t *Standard_GetDescriptorData(uint16_t Length, ONE_DESCRIPTOR *pDesc)
 	uint32_t  wOffset;
 
 	wOffset = pInformation->Ctrl_Info.Usb_wOffset;
+	printf("get config descriptor:%d %d\n",pDesc->Descriptor_Size, wOffset);
 	if (Length == 0)
 	{
 		pInformation->Ctrl_Info.Usb_wLength = pDesc->Descriptor_Size - wOffset;
 
-		printf("get config descriptor:%x %x\n",pDesc->Descriptor_Size, wOffset);
 		return 0;
 	}
 
@@ -996,5 +996,4 @@ void NOP_Process(void)
 void EP1_IN_Callback(void)
 {
 }
-
 /******************* (C) COPYRIGHT 2008 STMicroelectronics *****END OF FILE****/

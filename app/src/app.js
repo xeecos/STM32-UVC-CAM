@@ -35,73 +35,30 @@ let device = findByIds(0x20B1, 0x1DE0);//046d:0825
 //         })
 //     }
 // })();
-async function getImage()
+async function getImage(endpoint)
 {
     return new Promise(resolve=>{
-
-        let endpoint = device.interfaces[0].endpoint(0x81);
-        // console.log(endpoint)
-        endpoint.startPoll(1,64);
-        endpoint.on("data", function(data) { 
-            console.log(data);
-        });
-        resolve();
+        endpoint.transfer(64,(err,data)=>{
+            resolve(data);
+        })
     })
 }
 async function transfer()
 {
-    // device.detatchKernelDriver();
-    let dev = await WebUSBDevice.createInstance(device);
-    dev.open();
-    // device.detatchKernelDriver();
-    // for(let i=0;i<device.interfaces.length; i++)
-    // {
-    //     // console.log(interface);
-    // }
-
-    // console.log(dev.configurations[0].interfaces[1].alternates[1].endpoints);
-    dev.claimInterface(0).then(async res=>{
-        // dev.selectAlternateInterface(1,0).then(async (res)=>{
-            for(let i=0;i<1;i++)
-            {
-                await getImage();
-                // await getImage();
-                // let r = await dev.transferIn(1,64);
-                // console.log(r.data);
-                
-                // dev.transferIn(1,64).then(res=>{
-                //     console.log(res.data);
-                // })
-            }
-        // })
-        
-    });
-    // dev.claimInterface(1).then(res=>{
-    //     dev.selectAlternateInterface(1,1);
+    device.open();
+    device.interfaces[0].claim();
+    let endpoint = device.interfaces[0].endpoints[0];
+    // endpoint.startPoll();
+    // endpoint.on("data", function(data) { 
+    //     console.log(data);
     // });
-    // dev.controlTransferIn({
-    //     requestType:"class",
-    //     recipient:"interface",
-    //     request:0x01,
-    //     value:0x0001,
-    //     index:1},64).then(res=>{
-    //         console.log(res);
-    //     });
-    // dev.selectAlternateInterface(1,0).then(res=>{
-    //     console.log(res);
-    // })
-    // dev.transferOut(1, "hello").then(res=>{
-    //         console.log(res);
-    //     });
-    // dev.transferIn(0x81, 176).then(res=>{
-    //     console.log(res);
-    // })
-    // let outEndpoint = endpoints[0];
-    // let inEndpoint = endpoints[1];
-    // console.log(device.interfaces[0])
+    for(let i=0;i<10;i++)
+    {
+        console.log(await getImage(endpoint));
+    }
 }
 transfer();
-// console.log(device)
+// console.log(0x41f1&0x80)
 // let endpoints = device.interfaces[0].endpoints;
 // console.log(device);
 // const { Context, Device, DeviceHandle, LibUvc } = require("uvc");

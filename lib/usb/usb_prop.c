@@ -192,7 +192,7 @@ void UsbCamera_Reset(void)
 	pInformation->Current_Configuration = 0;
 
 	/* Current Feature initialization */
-	// pInformation->Current_Feature = Camera_ConfigDescriptor[7];
+	pInformation->Current_Feature = Camera_ConfigDescriptor[7];
 	SetBTABLE(BTABLE_ADDRESS);
 
 	/* Initialize Endpoint 0 */
@@ -219,7 +219,7 @@ void UsbCamera_Reset(void)
 	// SetEPTxStatus(ENDP1, EP_TX_NAK);
 
 	// SetEPTxValid(ENDP1);
-	// SetEPRxValid(ENDP0);
+	SetEPRxValid(ENDP0);
 	/* Set this device to response on default address */
 	SetDeviceAddress(0);
 
@@ -357,7 +357,7 @@ uint8_t *UsbCamera_GetDeviceDescriptor(uint16_t Length)
 *******************************************************************************/
 uint8_t *UsbCamera_GetConfigDescriptor(uint16_t Length)
 {
-	
+	printf("get config descriptor\n");
 	return Standard_GetDescriptorData(Length, &Config_Descriptor);
 }
 
@@ -371,11 +371,12 @@ uint8_t *UsbCamera_GetConfigDescriptor(uint16_t Length)
 uint8_t *UsbCamera_GetStringDescriptor(uint16_t Length)
 {
 	uint8_t wValue0 = pInformation->USBwValue0;
+	printf("wValue0:%d\n",wValue0);
 	if (wValue0 > 4)
 	{
 		if(wValue0==0xEE)
 		{
-			return Standard_GetDescriptorData(Length,&USBD_OS_STRING);
+			return Standard_GetDescriptorData(Length, &USBD_OS_STRING);
 		}
 		return 0;
 	} else

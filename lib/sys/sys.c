@@ -206,7 +206,6 @@ void SetSysClockToHSE(void)
     #endif
 
     RCC->CFGR &= ~RCC_CFGR_PLLMULL; //Clear
-
     // RCC->CFGR &= ~RCC_CFGR_USBPRE; //USBclk=PLLclk/1.5=48Mhz
     
     /* HCLK = SYSCLK */

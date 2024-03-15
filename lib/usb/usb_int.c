@@ -28,9 +28,9 @@ uint16_t SaveTState;
 #include "usb_desc.h"
 //UVC payload head
 
-#define CAMERA_SIZ_STREAMHD			0
-uint8_t sendbuf[PACKET_SIZE] = { 0x02, 0x01 };			// 发送数据缓冲区
-u32 sendsize = 0;									// 已发送字节数
+#define CAMERA_SIZ_STREAMHD			2
+uint8_t sendbuf[PACKET_SIZE] = {0x2, 0x1};			// 发送数据缓冲区
+uint32_t sendsize = 0;									// 已发送字节数
 
 void myMemcpy(const uint8_t* src, uint8_t* dst, u32 len)
 {
@@ -42,7 +42,7 @@ void myMemcpy(const uint8_t* src, uint8_t* dst, u32 len)
 }
 void UsbCamera_SendImage(void)
 {
-	printf("fill:%d\n",sendsize);
+	// printf("fill:%d\n",datalen);
 	s32 datalen = 0;		// 本次发送的字节数
 	uint8_t *payload = 0;		// 发送数据指针
 
@@ -53,32 +53,23 @@ void UsbCamera_SendImage(void)
 	{
 		sendbuf[1] &= 0x01;		// 清除BFH
 		sendbuf[1] ^= 0x01;		// 切换FID
-
-		// 计算本次发送数据长度
 		datalen = PACKET_SIZE - CAMERA_SIZ_STREAMHD;
-		// 读出发送数据
 		myMemcpy(sbuf + sendsize, payload, datalen);
-		
 		sendsize = datalen;
 		datalen += CAMERA_SIZ_STREAMHD;
 	} else{
 		// 图像的后续包
 		datalen = PACKET_SIZE - CAMERA_SIZ_STREAMHD;
-		// 判断是否为最后一个数据包
 		if (sendsize + datalen >= SBUF_SIZE)
 		{
 			datalen = SBUF_SIZE - sendsize;
-			// 结束包标记(EOF置位,帧结束位指示视频结束，仅在属于图像帧的最后一个USB传输操作中设置该位)
 			sendbuf[1] |= 0x02;
 		}
-		// 读出发送数据
 		myMemcpy(sbuf + sendsize, payload, datalen);
-		
 		sendsize += datalen;
 		datalen += CAMERA_SIZ_STREAMHD;
 	}
 
-	// 复制数据到PMA
 	if (_GetENDPOINT(ENDP1) & EP_DTOG_TX)
 	{
 		// User use buffer0
@@ -90,13 +81,12 @@ void UsbCamera_SendImage(void)
 		SetEPDblBuf1Count(ENDP1, EP_DBUF_IN, datalen);
 	}
 
-	_ToggleDTOG_TX(ENDP1);					// 反转DTOG_TX
-	_SetEPTxStatus(ENDP1, EP_TX_VALID);		// 允许数据发送
-
+	SetEPTxValid(ENDP1);
+  	FreeUserBuffer(ENDP1, EP_DBUF_OUT);	
 	// 判断本帧图像是否发送完成
 	if (sendsize >= SBUF_SIZE)
 	{ 
-		sendsize = 0; 
+		sendsize = 0;
 	}
 	else
 	{
@@ -209,6 +199,7 @@ void CTR_LP(void)
 
 			/* process related endpoint register */
 			wEPVal = _GetENDPOINT(EPindex);
+			printf("CTR_LP:%x %d\n",wEPVal, EPindex);
 			if ((wEPVal & EP_CTR_RX) != 0)
 			{
 				/* clear int flag */
@@ -223,9 +214,15 @@ void CTR_LP(void)
 			{
 				/* clear int flag */
 				_ClearEP_CTR_TX(EPindex);
-
 				/* call IN service function */
+				if(EPindex==1)
+				{
+				UsbCamera_SendImage();
+				}
+				else
+				{
 				(*pEpInt_IN[EPindex - 1])();
+				}
 			} /* if((wEPVal & EP_CTR_TX) != 0) */
 
 		}/* if(EPindex == 0) else */
@@ -241,38 +238,38 @@ void CTR_LP(void)
 * Output         : None.
 * Return         : None.
 *******************************************************************************/
-// void CTR_HP(void)
-// {
-// 	uint32_t wEPVal = 0;
+void CTR_HP(void)
+{
+	uint32_t wEPVal = 0;
 
-// 	while (((wIstr = _GetISTR()) & ISTR_CTR) != 0)
-// 	{
-// 		_SetISTR((uint16_t)CLR_CTR); /* clear CTR flag */
-// 		/* extract highest priority endpoint number */
-// 		EPindex = (uint8_t)(wIstr & ISTR_EP_ID);
-// 		/* process related endpoint register */
-// 		wEPVal = _GetENDPOINT(EPindex);
-// 		if ((wEPVal & EP_CTR_RX) != 0)
-// 		{
-// 			/* clear int flag */
-// 			_ClearEP_CTR_RX(EPindex);
+	while (((wIstr = _GetISTR()) & ISTR_CTR) != 0)
+	{
+		_SetISTR((uint16_t)CLR_CTR); /* clear CTR flag */
+		/* extract highest priority endpoint number */
+		EPindex = (uint8_t)(wIstr & ISTR_EP_ID);
+		/* process related endpoint register */
+		wEPVal = _GetENDPOINT(EPindex);
+		if ((wEPVal & EP_CTR_RX) != 0)
+		{
+			/* clear int flag */
+			_ClearEP_CTR_RX(EPindex);
 
-// 			/* call OUT service function */
-// 			(*pEpInt_OUT[EPindex - 1])();
+			/* call OUT service function */
+			(*pEpInt_OUT[EPindex - 1])();
 
-// 		} /* if((wEPVal & EP_CTR_RX) */
-// 		else if ((wEPVal & EP_CTR_TX) != 0)
-// 		{
-// 			/* clear int flag */
-// 			_ClearEP_CTR_TX(EPindex);
+		} /* if((wEPVal & EP_CTR_RX) */
+		else if ((wEPVal & EP_CTR_TX) != 0)
+		{
+			/* clear int flag */
+			_ClearEP_CTR_TX(EPindex);
 
-// 			/* call IN service function */
-// 			(*pEpInt_IN[EPindex - 1])();
+			/* call IN service function */
+			(*pEpInt_IN[EPindex - 1])();
 
 
-// 		} /* if((wEPVal & EP_CTR_TX) != 0) */
+		} /* if((wEPVal & EP_CTR_TX) != 0) */
 
-// 	}/* while(...) */
-// }
+	}/* while(...) */
+}
 
 /******************* (C) COPYRIGHT 2008 STMicroelectronics *****END OF FILE****/
