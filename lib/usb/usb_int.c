@@ -215,14 +215,7 @@ void CTR_LP(void)
 				/* clear int flag */
 				_ClearEP_CTR_TX(EPindex);
 				/* call IN service function */
-				if(EPindex==1)
-				{
-				UsbCamera_SendImage();
-				}
-				else
-				{
 				(*pEpInt_IN[EPindex - 1])();
-				}
 			} /* if((wEPVal & EP_CTR_TX) != 0) */
 
 		}/* if(EPindex == 0) else */
