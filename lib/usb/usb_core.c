@@ -399,7 +399,7 @@ uint8_t *Standard_GetDescriptorData(uint16_t Length, ONE_DESCRIPTOR *pDesc)
 	{
 		pInformation->Ctrl_Info.Usb_wLength = pDesc->Descriptor_Size - wOffset;
 
-		printf("get config descriptor:%d %d\n",pDesc->Descriptor_Size,wOffset);
+		printf("get config descriptor:%x %x\n",pDesc->Descriptor_Size, wOffset);
 		return 0;
 	}
 

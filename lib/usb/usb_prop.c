@@ -192,14 +192,14 @@ void UsbCamera_Reset(void)
 	pInformation->Current_Configuration = 0;
 
 	/* Current Feature initialization */
-	pInformation->Current_Feature = Camera_ConfigDescriptor[7];
+	// pInformation->Current_Feature = Camera_ConfigDescriptor[7];
 	SetBTABLE(BTABLE_ADDRESS);
 
 	/* Initialize Endpoint 0 */
-	SetEPType(ENDP0, EP_CONTROL);
+	SetEPType(ENDP0, EP_BULK);
 	SetEPTxStatus(ENDP0, EP_TX_NAK);
 	SetEPRxAddr(ENDP0, ENDP0_RXADDR);
-	SetEPRxCount(ENDP0, Device_Property.MaxPacketSize);
+	SetEPRxCount(ENDP0, PACKET_SIZE);
 	SetEPTxAddr(ENDP0, ENDP0_TXADDR);
 	Clear_Status_Out(ENDP0);
 	SetEPRxValid(ENDP0);
