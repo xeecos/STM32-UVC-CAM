@@ -160,7 +160,7 @@ void UsbCamera_init(void)
 
 	/* Update the serial number string descriptor with the data from the unique
 	ID*/
-	Get_SerialNum();
+	// Get_SerialNum();
 
 	pInformation->Current_Configuration = 0;
 
@@ -211,8 +211,8 @@ void UsbCamera_Reset(void)
 	SetEPDblBuffCount(ENDP1, EP_DBUF_OUT, PACKET_SIZE);
 	ClearDTOG_RX(ENDP1);
 	ClearDTOG_TX(ENDP1);
-	SetEPDblBuf0Count(ENDP1, EP_DBUF_IN, 0);
-	SetEPDblBuf1Count(ENDP1, EP_DBUF_IN, 0);
+	// SetEPDblBuf0Count(ENDP1, EP_DBUF_IN, 0);
+	// SetEPDblBuf1Count(ENDP1, EP_DBUF_IN, 0);
     ToggleDTOG_RX(ENDP1);
 	SetEPRxStatus(ENDP1, EP_RX_DIS);
 	SetEPTxStatus(ENDP1, EP_TX_VALID);

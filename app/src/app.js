@@ -54,7 +54,16 @@ async function transfer()
     // });
     for(let i=0;i<10;i++)
     {
-        console.log(await getImage(endpoint));
+        let buf = await getImage(endpoint);
+        console.log(buf)
+        if(buf[0]==0x2)
+        {
+            console.log("tail:",i);
+        }
+        if(buf[0]==0x1)
+        {
+            console.log("head:",i);
+        }
     }
 }
 transfer();

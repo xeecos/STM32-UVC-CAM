@@ -51,8 +51,8 @@ void UsbCamera_SendImage(void)
 	// 读数据到发送缓冲区
 	if (0 == sendsize)
 	{
-		sendbuf[1] &= 0x01;		// 清除BFH
-		sendbuf[1] ^= 0x01;		// 切换FID
+		sendbuf[0] = 0x01;		// 清除BFH
+		sendbuf[1] = 0x01;		// 清除BFH
 		datalen = PACKET_SIZE - CAMERA_SIZ_STREAMHD;
 		myMemcpy(sbuf + sendsize, payload, datalen);
 		sendsize = datalen;
@@ -63,14 +63,21 @@ void UsbCamera_SendImage(void)
 		if (sendsize + datalen >= SBUF_SIZE)
 		{
 			datalen = SBUF_SIZE - sendsize;
-			sendbuf[1] |= 0x02;
+			sendbuf[0] = 0x02;
+			sendbuf[1] = 0x02;
+		}
+		else
+		{
+			sendbuf[0] = 0x03;
+			sendbuf[1] = 0x03;
 		}
 		myMemcpy(sbuf + sendsize, payload, datalen);
 		sendsize += datalen;
 		datalen += CAMERA_SIZ_STREAMHD;
 	}
 
-	if (_GetENDPOINT(ENDP1) & EP_DTOG_TX)
+	ToggleDTOG_RX(ENDP1); 
+	if (GetENDPOINT(ENDP1) & EP_DTOG_RX)
 	{
 		// User use buffer0
 		UserToPMABufferCopy(sendbuf, ENDP1_BUF0Addr, datalen);
@@ -80,9 +87,7 @@ void UsbCamera_SendImage(void)
 		UserToPMABufferCopy(sendbuf, ENDP1_BUF1Addr, datalen);
 		SetEPDblBuf1Count(ENDP1, EP_DBUF_IN, datalen);
 	}
-
-	SetEPTxValid(ENDP1);
-  	FreeUserBuffer(ENDP1, EP_DBUF_OUT);	
+	SetEPTxStatus(ENDP1, EP_TX_VALID);		// 允许数据发送
 	// 判断本帧图像是否发送完成
 	if (sendsize >= SBUF_SIZE)
 	{ 

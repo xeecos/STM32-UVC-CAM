@@ -49,19 +49,6 @@ void USB_Init(void)
     Set_USBClock();
     USB_Interrupts_Config();
 	pInformation = &Device_Info;
-	//typedef enum _CONTROL_STATE
-	//{
-	//	WAIT_SETUP,       /* 0 */
-	//	SETTING_UP,       /* 1 */
-	//	IN_DATA,          /* 2 */
-	//	OUT_DATA,         /* 3 */
-	//	LAST_IN_DATA,     /* 4 */
-	//	LAST_OUT_DATA,    /* 5 */
-	//	WAIT_STATUS_IN,   /* 7 */
-	//	WAIT_STATUS_OUT,  /* 8 */
-	//	STALLED,          /* 9 */
-	//	PAUSE             /* 10 */
-	//} CONTROL_STATE;    /* The state machine states of a control pipe */
 
 	pInformation->ControlState = IN_DATA;
 

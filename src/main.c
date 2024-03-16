@@ -9,7 +9,7 @@ int main()
     SetSysClockToHSE();
     Delay_Init();
     Usart_Init();
-    // BF3003_Init();
+    BF3003_Init();
     USB_Init();
 
     while (1) 
