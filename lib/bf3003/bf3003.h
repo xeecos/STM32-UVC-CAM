@@ -52,5 +52,10 @@ void BF3003_GetPic(void);
 
 void BF3003_WriteReg(uint8_t RegAddress, uint8_t Data);
 uint8_t BF3003_ReadReg(uint8_t RegAddress);
-
+void BF3003_LineBegin();
+void BF3003_FrameBegin();
+void BF3003_ReadPixel();
+uint8_t BF3003_VS(void);
+uint8_t BF3003_HREF(void);
+uint8_t BF3003_PCLK(void);
 #endif

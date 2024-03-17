@@ -20,6 +20,7 @@
 #include "usb_istr.h"
 #include "usb_lib.h"
 #include "usb_pwr.h"
+#include "bf3003.h"
 	   
 /*******************************************************************************
 * Function Name  : USB_HP_CAN_TX_IRQHandler
@@ -55,10 +56,31 @@ void USB_LP_CAN1_RX0_IRQHandler(void)
 *******************************************************************************/
 void USBWakeUp_IRQHandler(void)
 {
-  printf("wakeup\n");
+    printf("wakeup\n");
 	EXTI->PR|=1<<18;  // 清除USB唤醒中断挂起位
 }
 
+void EXTI9_5_IRQHandler(void)
+{
+    if(EXTI_GetITStatus(EXTI_Line6) != RESET)
+    {
+        //VSYNC
+        BF3003_FrameBegin();
+        EXTI_ClearITPendingBit(EXTI_Line6);
+    }
+    if(EXTI_GetITStatus(EXTI_Line7) != RESET)
+    {
+        //HREF
+        BF3003_LineBegin();
+        EXTI_ClearITPendingBit(EXTI_Line7);
+    }
+    // if(EXTI_GetITStatus(EXTI_Line5) != RESET)
+    // {
+    //     //PIXCLK
+    //     BF3003_ReadPixel();
+    //     EXTI_ClearITPendingBit(EXTI_Line5);
+    // }
+}
 
 /**
   * @brief  This function handles NMI exception.

@@ -12,9 +12,16 @@
 #define BF3003_VER_BME              0xFD
 
 #define REGS_COUNT	38
+
+uint8_t frame[2][640 * 1];
+int8_t frameIdx;
+uint16_t pixelIdx = 0;
+uint32_t totalCount = 0;
+uint16_t lineIdx = 0;
+
 uint8_t regs[REGS_COUNT][2] = {
 	{BF3003_COM7, 0b10000000},
-	{BF3003_COM2, 0b00000001},
+	{BF3003_COM2, 0b00000000},
 	/*
 	Common control 2
 	Bit[7:6]: vclk output drive capability
@@ -53,7 +60,7 @@ uint8_t regs[REGS_COUNT][2] = {
 	Bit[0]:HREF ahead 0.5 clk(YUV MCLK,RawData PCLK) or not
 	0x0c[1:0]: Internal use only
 	*/
-	{BF3003_CLKRC, 0x0},
+	{BF3003_CLKRC, 0b00},
 	/*
 	Mclk_div control
 	Bit[7：2]: Internal use only
@@ -63,7 +70,7 @@ uint8_t regs[REGS_COUNT][2] = {
 		10:divided by 4 F(MCLK)=F(pll output clock)/4
 		11: no clocking, digital stand by mode(all clocks freeze)
 	*/
-	{BF3003_COM7, 0b00000100},
+	{BF3003_COM7, 0b00000001},
 	/*
 		Bit[7]: SCCB Register Reset
 			0: No change
@@ -126,9 +133,9 @@ uint8_t regs[REGS_COUNT][2] = {
 		Bit[1]: VSYNC option, 0:active low, 1:active high.
 		Bit[0]: HSYNC option, 0:active high, 1:active low.
 	*/
-	{BF3003_VHREF, 0b0},
+	{BF3003_VHREF, 0b10},
 	{BF3003_HSTART, 0x2},
-	{BF3003_HSTOP, 0xA2},
+	{BF3003_HSTOP, 0xA0},
 	{BF3003_VSTART, 0x0},
 	{BF3003_VSTOP, 0x78},
 	{BF3003_PLLCTL, 0x2A},
@@ -180,9 +187,9 @@ uint8_t regs[REGS_COUNT][2] = {
 	*/
 	{BF3003_MODE_SEL, 0b0},
 	{BF3003_SUBSAMPLE, 0b0},
-	{BF3003_BLUE_GAIN, 0x19},
-	{BF3003_RED_GAIN, 0x15},
-	{BF3003_GREEN_GAIN, 0x33},
+	{BF3003_BLUE_GAIN, 0x1},
+	{BF3003_RED_GAIN, 0x1},
+	{BF3003_GREEN_GAIN, 0x1},
 	{BF3003_DICOM1, 0x80},
 	/*Bit[7]: YCBCR RANGE select
 		0: YCBCR 0~255
@@ -204,7 +211,9 @@ uint8_t regs[REGS_COUNT][2] = {
 	{BF3003_INT_MEAN_H, 0x32},
 	{BF3003_INT_TIM_MIN, 0x0},
 	{BF3003_INT_TIM_HI, 0x00},
-	{BF3003_INT_TIM_LO, 0x06},
+	{BF3003_INT_TIM_LO, 0x08},
+	//bf3003_write8(BF3003_INT_TIM_HI,coarse>>8);
+	// bf3003_write8(BF3003_INT_TIM_LO,coarse&0xff);
 	{BF3003_INT_TIM_MAX_HI, 0xff},
 	{BF3003_INT_TIM_MAX_LO, 0xff},
 	{0, 0},
@@ -229,8 +238,6 @@ uint8_t BF3003_PCLK(void)
  */
 void BF3003_Pin_Init()
 {
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA|RCC_APB2Periph_GPIOB|RCC_APB2Periph_AFIO, ENABLE);
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
 
     GPIO_InitTypeDef GPIO_InitStruct;  
     /* XCLK初始化 */
@@ -245,16 +252,16 @@ void BF3003_Pin_Init()
     TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
     TIM_OCInitTypeDef TIM_OCInitStructure;
 
-    TIM_TimeBaseInitStructure.TIM_Prescaler = 1 - 1;
+    TIM_TimeBaseInitStructure.TIM_Prescaler = 36 - 1;
     TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-    TIM_TimeBaseInitStructure.TIM_Period = 18 - 1;
+    TIM_TimeBaseInitStructure.TIM_Period = 2 - 1;
     TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     // 72000000  / (TIM_Period + 1) / (TIM_Prescaler + 1)
     TIM_TimeBaseInit(TIM3, &TIM_TimeBaseInitStructure);
 
     TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
     TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
-    TIM_OCInitStructure.TIM_Pulse = 9;
+    TIM_OCInitStructure.TIM_Pulse = 1;
     TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
 
     TIM_OC1Init(TIM3, &TIM_OCInitStructure);
@@ -267,11 +274,52 @@ void BF3003_Pin_Init()
     GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOB, &GPIO_InitStruct);
 
+	// GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource5);
+	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource6);
+	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource7);
+
+	EXTI_InitTypeDef   EXTI_InitStructure;
+	EXTI_InitStructure.EXTI_Line = EXTI_Line7;//href
+	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
+	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+	EXTI_Init(&EXTI_InitStructure);
+
+	EXTI_InitStructure.EXTI_Line = EXTI_Line6;//vsync
+	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
+	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+	EXTI_Init(&EXTI_InitStructure);
+
+	MY_NVIC_Init(1, 1, EXTI9_5_IRQn, 2);
+
     /* D0-D7 IO口初始化 */
     GPIO_InitStruct.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
     GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN_FLOATING;
     GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOB, &GPIO_InitStruct);
+}
+uint8_t pixelEnable;
+void BF3003_Pixel_Enable()
+{
+	// EXTI_InitTypeDef   EXTI_InitStructure;
+	// EXTI_InitStructure.EXTI_Line = EXTI_Line5;
+	// EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+	// EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
+	// EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+	// EXTI_Init(&EXTI_InitStructure);
+	pixelEnable = 1;
+}
+void BF3003_Pixel_Disable()
+{
+	// EXTI_InitTypeDef   EXTI_InitStructure;
+	// EXTI_InitStructure.EXTI_Line = EXTI_Line5;
+	// EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+	// EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
+	// EXTI_InitStructure.EXTI_LineCmd = DISABLE;
+	// EXTI_Init(&EXTI_InitStructure);
+	lineIdx++;
+	pixelEnable = 0;
 }
 /*
  * @brief    BF3003写寄存器
@@ -363,30 +411,43 @@ void BF3003_Handle(void)
  * @param  无
  * @retval 无
  */
-uint8_t frame[2][640 * 8];
+
+void BF3003_FrameBegin()
+{
+	frameIdx = -1;
+	lineIdx = 0;
+	pixelIdx = 0;
+	totalCount = 0;
+	// printf("frame:%d %d\n",lineIdx, totalCount);
+}
+
+void BF3003_LineBegin()
+{
+	pixelIdx = 0;
+	BF3003_Pixel_Enable();
+}
+
+void BF3003_ReadPixel()
+{
+	frame[lineIdx&1][pixelIdx] = GPIOB->IDR >> 8;
+	pixelIdx++;
+	totalCount++;
+	if(pixelIdx>=640)
+	{
+		BF3003_Pixel_Disable();
+	}
+}
 void BF3003_GetPic(void)
 {
-    uint16_t i, j, k, l;
-	printf("get pic start\n");
-    while (BF3003_VS() == 0); /* 保证进入一个新的帧时序，而不是在帧时序的一半进入 */
-    while (BF3003_VS() == 1);
-    for (i = 0; i < 480; i+=16)
-    {
-		for(k=0; k<2; k++)
-		{
-			for(l=0;l<8;l++)
-			{
-				int offset = 640 * l;
-				while (BF3003_HREF() == 0);
-				for (j = 0; j < 640; j++)
-				{
-					// while (BF3003_PCLK() == 0);
-					frame[k][offset + j] = GPIOB->IDR >> 8;
-					// while (BF3003_PCLK() == 1);
-				}
-				// while (BF3003_HREF() == 1);
-			}
-		}
-    }
 	// printf("get pic finish\n");
+	if(pixelEnable)
+	{
+		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+		BF3003_ReadPixel();
+		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+	}
 }

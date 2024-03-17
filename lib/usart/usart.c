@@ -65,7 +65,7 @@ void Usart_Init()
 	fraction = (temp-mantissa)*16; //得到小数部分	 
     mantissa <<= 4;
 	mantissa += fraction; 
-	RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;   //使能PORTA口时钟  
+	// RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;   //使能PORTA口时钟  
 	GPIOA->CRH &= 0XFFFFF00F;//IO状态设置
 	GPIOA->CRH |= 0X000008B0;//IO状态设置
 		  

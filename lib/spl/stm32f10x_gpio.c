@@ -282,8 +282,8 @@ uint8_t GPIO_ReadInputDataBit(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
   uint8_t bitstatus = 0x00;
   
   /* Check the parameters */
-  assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
-  assert_param(IS_GET_GPIO_PIN(GPIO_Pin)); 
+  // assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
+  // assert_param(IS_GET_GPIO_PIN(GPIO_Pin)); 
   
   if ((GPIOx->IDR & GPIO_Pin) != (uint32_t)Bit_RESET)
   {

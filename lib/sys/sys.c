@@ -37,7 +37,6 @@ void MY_NVIC_PriorityGroupConfig(u8 NVIC_Group)
 void MY_NVIC_Init(u8 NVIC_PreemptionPriority,u8 NVIC_SubPriority,u8 NVIC_Channel,u8 NVIC_Group)	 
 { 
 	u32 temp;	
-	MY_NVIC_PriorityGroupConfig(NVIC_Group);//设置分组
 	temp = NVIC_PreemptionPriority<<(4-NVIC_Group);	  
 	temp |= NVIC_SubPriority&(0x0f>>NVIC_Group);
 	temp &= 0xf;//取低四位  

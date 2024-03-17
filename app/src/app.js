@@ -1,5 +1,6 @@
 const { findByIds,WebUSBDevice ,usb} = require('usb');
-
+const {encode} = require("jpeg-js");
+const fs = require("fs")
 
 let device = findByIds(0x20B1, 0x1DE0);//046d:0825
 
@@ -52,18 +53,131 @@ async function transfer()
     // endpoint.on("data", function(data) { 
     //     console.log(data);
     // });
-    for(let i=0;i<10;i++)
+    let prevLine = 0;
+    let lines = [];
+    let linesCount = [];
+    let start = false;
+    let bufCount = 1;
+    let line = 0;
+    let cout = 0;
+    let time = Date.now();
+    endpoint.startPoll(1,bufCount*64);
+    endpoint.on("data", function(buffer) { 
+        // if(buffer.length==2)
+        // {
+        //     return;
+        // }
+        // cout+=buffer.length;
+        // if(cout>=300*1024)
+        // {
+        //     let t = Date.now()-time;
+        //     console.log(t,":",cout/1024/1024/(t/1000),cout);
+        //     time = Date.now();
+        //     cout = 0;
+
+        // }
+        // return;
+        if(buffer.length==2)
+        {
+            start = true;
+            line = 0;
+            cout = 0;
+            return;
+        }
+        if(buffer.length>0)
+        {
+            for(let i=0;i<64*bufCount;i++)
+            {
+                lines[line*640+cout+i] = buffer[i];
+            }
+            cout+=64*bufCount;
+            if(cout>=640)
+            {
+                cout = 0;
+                line++;
+            }
+            if(line==480)
+            {
+                let t = Date.now()-time;
+                console.log("encode:",t/1000);
+                time = Date.now();
+                let data = [];
+                for(let i=0,count=640*480;i<count;i++)
+                {
+                    let g = lines[i]&0xff;
+                    data.push(g);
+                    data.push(g);
+                    data.push(g);
+                    data.push(0xff);
+                }
+                let jpegData = encode({width:640, height:480,data},80);
+                fs.writeFileSync("tmp.jpeg",jpegData.data);
+                line = 0;
+                start = false;
+            }
+        }
+    });
+    return;
+    while(1)
     {
         let buf = await getImage(endpoint);
-        console.log(buf)
-        if(buf[0]==0x2)
+        if(buf.length>0)
         {
-            console.log("tail:",i);
+            let line = (buf[0]<<8)+buf[1];
+            if(prevLine==479&&line==0)
+            {
+                if(lines.length > 307100)
+                {
+                    console.log("encode")
+                    let data = [];
+                    for(let i=0;i<480;i++)
+                    {
+                        console.log(linesCount[i]);
+                    }
+                    for(let i=0,count=640*480;i<count;i++)
+                    {
+                        let g = lines[i]&0xff;
+                        data.push(g);
+                        data.push(g);
+                        data.push(g);
+                        data.push(0xff);
+                    }
+                    let jpegData = encode({width:640, height:480,data},80);
+                    fs.writeFileSync("tmp.jpeg",jpegData.data);
+                }
+                console.log(Date.now(),":",lines.length);
+    
+                start = true;
+                lines = [];
+                for(let i=0;i<480;i++){
+                    linesCount[i] = 0;
+                }
+            }
+            if(start)
+            {
+                for(let i=2;i<64;i++)
+                {
+                    if(linesCount[line]<640)
+                    {
+                        lines[line*640+linesCount[line]] = buf[i];
+                        linesCount[line]++;
+                    }
+                }
+            }
+            prevLine = line;
         }
-        if(buf[0]==0x1)
-        {
-            console.log("head:",i);
-        }
+        // if(buf[1]>1)
+        // {
+        //     console.log(buf);
+        // }
+        // if(buf[0]==0x2)
+        // {
+        //     console.log("tail:",i);
+        // }
+        // if(buf[0]==0x1)
+        // {
+        //     console.log("head:",i);
+        // }
     }
 }
 transfer();

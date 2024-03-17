@@ -28,13 +28,18 @@ uint16_t SaveTState;
 #include "usb_desc.h"
 //UVC payload head
 
-#define CAMERA_SIZ_STREAMHD			2
+#define CAMERA_SIZ_STREAMHD			0
+extern uint8_t frame[2][640 * 1];
+extern int8_t frameIdx;
+extern uint16_t lineIdx;
 uint8_t sendbuf[PACKET_SIZE] = {0x2, 0x1};			// 发送数据缓冲区
-uint32_t sendsize = 0;									// 已发送字节数
-
-void myMemcpy(const uint8_t* src, uint8_t* dst, u32 len)
+uint32_t sendsize = 0;								// 已发送字节数
+uint16_t frameSize = 640*1;	
+uint16_t lastLineIdx;
+// int8_t lastFrameId = -1;
+void dataMemcpy(const uint8_t* src, uint8_t* dst, uint8_t len)
 {
-	u32 i = 0;
+	uint8_t i = 0;
 	for (i = 0; i < len; ++i)
 	{
 		dst[i] = src[i];
@@ -42,40 +47,44 @@ void myMemcpy(const uint8_t* src, uint8_t* dst, u32 len)
 }
 void UsbCamera_SendImage(void)
 {
-	// printf("fill:%d\n",datalen);
-	s32 datalen = 0;		// 本次发送的字节数
-	uint8_t *payload = 0;		// 发送数据指针
-
-	// 发送缓冲区有效数据地址
-	payload = sendbuf + CAMERA_SIZ_STREAMHD;
-	// 读数据到发送缓冲区
-	if (0 == sendsize)
+	if(lineIdx<1)
 	{
-		sendbuf[0] = 0x01;		// 清除BFH
-		sendbuf[1] = 0x01;		// 清除BFH
-		datalen = PACKET_SIZE - CAMERA_SIZ_STREAMHD;
-		myMemcpy(sbuf + sendsize, payload, datalen);
-		sendsize = datalen;
-		datalen += CAMERA_SIZ_STREAMHD;
-	} else{
-		// 图像的后续包
-		datalen = PACKET_SIZE - CAMERA_SIZ_STREAMHD;
-		if (sendsize + datalen >= SBUF_SIZE)
+		sendsize = 0;
+		sendbuf[0] = 0xff;
+		sendbuf[1] = 0xff;
+		ToggleDTOG_RX(ENDP1); 
+		if (GetENDPOINT(ENDP1) & EP_DTOG_RX)
 		{
-			datalen = SBUF_SIZE - sendsize;
-			sendbuf[0] = 0x02;
-			sendbuf[1] = 0x02;
+			// User use buffer0
+			UserToPMABufferCopy(sendbuf, ENDP1_BUF0Addr, 2);
+			SetEPDblBuf0Count(ENDP1, EP_DBUF_IN, 2);
+		} else{
+			// User use buffer1
+			UserToPMABufferCopy(sendbuf, ENDP1_BUF1Addr, 2);
+			SetEPDblBuf1Count(ENDP1, EP_DBUF_IN, 2);
 		}
-		else
-		{
-			sendbuf[0] = 0x03;
-			sendbuf[1] = 0x03;
-		}
-		myMemcpy(sbuf + sendsize, payload, datalen);
-		sendsize += datalen;
-		datalen += CAMERA_SIZ_STREAMHD;
+		SetEPTxStatus(ENDP1, EP_TX_VALID);
+		return;
 	}
-
+	uint8_t datalen = 0;
+	frameIdx = 1-(lineIdx%2);
+	if (sendsize==0)
+	{
+		datalen = PACKET_SIZE;
+		dataMemcpy(frame[frameIdx], sendbuf, datalen);
+		sendsize = datalen;
+		lastLineIdx = lineIdx;
+	} 
+	else if(sendsize<frameSize)
+	{
+		datalen = PACKET_SIZE;
+		if (sendsize + datalen >= frameSize)
+		{
+			datalen = frameSize - sendsize;
+		}
+		dataMemcpy(frame[frameIdx] + sendsize, sendbuf, datalen);
+		sendsize += datalen;
+	}
 	ToggleDTOG_RX(ENDP1); 
 	if (GetENDPOINT(ENDP1) & EP_DTOG_RX)
 	{
@@ -88,15 +97,13 @@ void UsbCamera_SendImage(void)
 		SetEPDblBuf1Count(ENDP1, EP_DBUF_IN, datalen);
 	}
 	SetEPTxStatus(ENDP1, EP_TX_VALID);		// 允许数据发送
-	// 判断本帧图像是否发送完成
-	if (sendsize >= SBUF_SIZE)
-	{ 
-		sendsize = 0;
-	}
-	else
+	if(sendsize>=frameSize)
 	{
+		if(lineIdx!=lastLineIdx)
+		{
+			sendsize = 0;
+		}
 	}
-	return;
 }
 /* Extern variables ----------------------------------------------------------*/
 // extern void(*pEpInt_IN[7])(void);    /*  Handles IN  interrupts   */
