@@ -62,17 +62,19 @@ void USBWakeUp_IRQHandler(void)
 
 void EXTI9_5_IRQHandler(void)
 {
-    if(EXTI_GetITStatus(EXTI_Line6) != RESET)
-    {
-        //VSYNC
-        BF3003_FrameBegin();
-        EXTI_ClearITPendingBit(EXTI_Line6);
-    }
     if(EXTI_GetITStatus(EXTI_Line7) != RESET)
     {
         //HREF
         BF3003_LineBegin();
         EXTI_ClearITPendingBit(EXTI_Line7);
+        return;
+    }
+    if(EXTI_GetITStatus(EXTI_Line6) != RESET)
+    {
+        //VSYNC
+        BF3003_FrameBegin();
+        EXTI_ClearITPendingBit(EXTI_Line6);
+        return;
     }
     // if(EXTI_GetITStatus(EXTI_Line5) != RESET)
     // {

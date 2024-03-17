@@ -173,7 +173,7 @@ uint8_t regs[REGS_COUNT][2] = {
 	0: Select {0x89[5],0x9E[7:0]} as Banding Filter Value.
 	1: Select {0x89[4],0x9D[7:0]} as Banding Filter Value
 	*/
-	{BF3003_TEST_MODE, 0b00000000},
+	{BF3003_TEST_MODE, 0b10100111},
 	/*
 	BIT[7] : 
 		1: test pattern enable
@@ -216,6 +216,7 @@ uint8_t regs[REGS_COUNT][2] = {
 	// bf3003_write8(BF3003_INT_TIM_LO,coarse&0xff);
 	{BF3003_INT_TIM_MAX_HI, 0xff},
 	{BF3003_INT_TIM_MAX_LO, 0xff},
+	{0xF5, 0b110111},
 	{0, 0},
 };
 /* @brief 下面几个函数主要是用于便捷读取串口电平 */
@@ -275,8 +276,8 @@ void BF3003_Pin_Init()
     GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 	// GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource5);
-	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource6);
-	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource7);
+	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource6);//vsync
+	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource7);//href
 
 	EXTI_InitTypeDef   EXTI_InitStructure;
 	EXTI_InitStructure.EXTI_Line = EXTI_Line7;//href
@@ -287,11 +288,11 @@ void BF3003_Pin_Init()
 
 	EXTI_InitStructure.EXTI_Line = EXTI_Line6;//vsync
 	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
+	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;
 	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStructure);
 
-	MY_NVIC_Init(1, 0, EXTI9_5_IRQn, 2);
+	MY_NVIC_Init(2, 0, EXTI9_5_IRQn, 2);
 
     /* D0-D7 IO口初始化 */
     GPIO_InitStruct.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
@@ -414,17 +415,18 @@ void BF3003_Handle(void)
 
 void BF3003_FrameBegin()
 {
+	// printf("frame:%d %d\n",lineIdx, totalCount);
 	frameIdx = -1;
 	lineIdx = 0;
 	pixelIdx = 0;
 	totalCount = 0;
-	// printf("frame:%d %d\n",lineIdx, totalCount);
 }
 
 void BF3003_LineBegin()
 {
 	pixelIdx = 0;
-	BF3003_Pixel_Enable();
+	pixelEnable = 1;
+	// BF3003_Pixel_Enable();
 }
 
 void BF3003_ReadPixel()
@@ -442,12 +444,20 @@ void BF3003_GetPic(void)
 	// printf("get pic finish\n");
 	if(pixelEnable)
 	{
-		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
-		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
-		BF3003_ReadPixel();
-		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
-		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
-		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
-		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+		// for(int j=0;j<480;j++)
+		{
+			// pixelIdx = 0;
+			// for(int i=0;i<640;i++)
+			{
+				while(BF3003_PCLK()==0);
+				BF3003_ReadPixel();
+			}
+			// lineIdx++;
+			// while(BF3003_HREF()==0);
+		}
+		// if(lineIdx>=480)
+		// {
+		// 	pixelEnable = 0;
+		// }
 	}
 }
