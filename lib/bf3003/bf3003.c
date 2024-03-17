@@ -291,7 +291,7 @@ void BF3003_Pin_Init()
 	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStructure);
 
-	MY_NVIC_Init(1, 1, EXTI9_5_IRQn, 2);
+	MY_NVIC_Init(1, 0, EXTI9_5_IRQn, 2);
 
     /* D0-D7 IO口初始化 */
     GPIO_InitStruct.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
