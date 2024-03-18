@@ -423,17 +423,15 @@ void BF3003_Handle(void)
 void BF3003_FrameBegin()
 {
 	// printf("frame:%d %d\n",lineIdx, totalCount);
+	
 	lineIdx = 0;
 	pixelIdx = 0;
 }
 void BF3003_LineBegin()
 {
 	pixelIdx = 0;
-	if(lineIdx<480)
-	{
-		EXTI_InitStructurePCLK.EXTI_LineCmd = ENABLE;
-		EXTI_Init(&EXTI_InitStructurePCLK);
-	}
+	EXTI_InitStructurePCLK.EXTI_LineCmd = ENABLE;
+	EXTI_Init(&EXTI_InitStructurePCLK);
 }
 
 void BF3003_ReadPixel()
