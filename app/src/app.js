@@ -12,7 +12,6 @@ async function transfer()
     let endpoint = device.interfaces[0].endpoints[0];
     let image = [[],[]];
     let start = false;
-    let dataReady = false;
     let bufCount = 1;
     let line = 0;
     let cout = 0;
@@ -41,6 +40,8 @@ async function transfer()
     // encodeData();
 
     endpoint.startPoll(1,bufCount*64);
+    let successCount = 0;
+    let failCount = 0;
     endpoint.on("data", function(buffer) { 
         // if(buffer.length==2)
         // {
@@ -64,7 +65,17 @@ async function transfer()
                 console.log("encode:",t/1000, line);
                 time = Date.now();
                 imageIdx = 1 - imageIdx;
-                if(line==480)encodeData();
+
+                if(line==480)
+                {
+                    successCount++;
+                    encodeData();
+                }
+                else
+                {
+                    failCount++;
+                }
+                console.log("percent:",(successCount/(successCount+failCount)*100).toFixed(2),"success:", successCount, " fail:", failCount)
             }
             start = true;
             line = 0;

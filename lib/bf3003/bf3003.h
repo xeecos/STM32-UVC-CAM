@@ -35,8 +35,8 @@
 #define BF3003_HREF_CNTL            0xE2
 #define BF3003_DM_LNL               0x92
 #define BF3003_DM_LNH               0x93
-#define BF3003_DM_ROWL              0xE3
-#define BF3003_DM_ROWH              0xE4
+#define BF3003_DM_ROWL              0xE4
+#define BF3003_DM_ROWH              0xE3
 #define BF3003_TSLB                 0x3A
 #define BF3003_AE_MODE              0x80
 #define BF3003_AE_SPEED             0x81

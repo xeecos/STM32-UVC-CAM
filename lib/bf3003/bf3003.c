@@ -13,15 +13,14 @@
 
 #define REGS_COUNT	42
 
-uint8_t frame[2][640 * 1];
-int8_t frameIdx;
+uint8_t frame[2][640];
 uint16_t pixelIdx = 0;
 uint32_t totalCount = 0;
 uint16_t lineIdx = 0;
 
 uint8_t regs[REGS_COUNT][2] = {
 	{BF3003_COM7, 0b10000000},
-	{BF3003_COM2, 0b00000000},
+	{BF3003_COM2, 0b00001111},
 	/*
 	Common control 2
 	Bit[7:6]: vclk output drive capability
@@ -105,7 +104,7 @@ uint8_t regs[REGS_COUNT][2] = {
 		06h: G3HR5,B5G3L 07h: G3LR5,B5G3H
 		08h: G6B2H,B3LR5 09h: G6R2H,R3LB5
 	*/
-	{BF3003_COM8, 0b00001110},
+	{BF3003_COM8, 0b00001111},
 	/*
 		Auto mode Contrl
 		Bit[7:6] reserved
@@ -157,27 +156,27 @@ uint8_t regs[REGS_COUNT][2] = {
 		111:delay tenth,delay nine pclk;
 	*/
 	{BF3003_EXHCH,0x00},
-	{BF3003_EXHCL,0x10},
+	{BF3003_EXHCL,0x40},
 	/*
 	Dummy Pixel Insert MSB
 		Bit[7:4]: 4MSB for dummy pixel insert in horizontal direction
 	Dummy Pixel Insert LSB
 		8 LSB for dummy pixel insert in horizontal direction
 	*/
-	{BF3003_DM_ROWL, 0x00},
+	{BF3003_DM_ROWH, 0x00},
 	/*
 		Dummy line insert before active line low 8 bits 
 	*/
-	{BF3003_DM_ROWH, 0x00},
+	{BF3003_DM_ROWL, 0x00},
 	/*
 		Dummy line insert before active line high 8 bits 
 	*/
-	{BF3003_DM_LNL, 0x20},
+	{BF3003_DM_LNL, 0x00},
 	/*
 		insert the dummy line after active line(Dummy line low 8bits)
 		it's default value is 0x28;
 	*/
-	{BF3003_DM_LNH, 0x0},
+	{BF3003_DM_LNH, 0x00},
 	/*
 		insert the dummy line after active line(Dummy line high 8bits) 
 	*/
@@ -265,6 +264,9 @@ uint8_t regs[REGS_COUNT][2] = {
  * @param  无
  * @retval 无
  */
+
+
+EXTI_InitTypeDef   EXTI_InitStructurePCLK;
 void BF3003_Pin_Init()
 {
 
@@ -278,7 +280,7 @@ void BF3003_Pin_Init()
     /* PIXCLK VSYNC HREF 初始化 */
     GPIO_InitStruct.GPIO_Pin = GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
     GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IPU;  
-    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_10MHz;
     GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 	GPIO_PinRemapConfig(GPIO_PartialRemap_TIM3, ENABLE); 
@@ -287,16 +289,16 @@ void BF3003_Pin_Init()
     TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
     TIM_OCInitTypeDef TIM_OCInitStructure;
 
-    TIM_TimeBaseInitStructure.TIM_Prescaler = 18 - 1;
+    TIM_TimeBaseInitStructure.TIM_Prescaler = 36 - 1;
     TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-    TIM_TimeBaseInitStructure.TIM_Period = 4 - 1;
+    TIM_TimeBaseInitStructure.TIM_Period = 2 - 1;
     TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     // 72000000  / (TIM_Period + 1) / (TIM_Prescaler + 1)
     TIM_TimeBaseInit(TIM3, &TIM_TimeBaseInitStructure);
 
     TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
     TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
-    TIM_OCInitStructure.TIM_Pulse = 2;
+    TIM_OCInitStructure.TIM_Pulse = 1;
     TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
 
     TIM_OC1Init(TIM3, &TIM_OCInitStructure);
@@ -320,6 +322,11 @@ void BF3003_Pin_Init()
 	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStructure);
 
+
+	EXTI_InitStructurePCLK.EXTI_Line = EXTI_Line5;
+	EXTI_InitStructurePCLK.EXTI_Mode = EXTI_Mode_Interrupt;
+	EXTI_InitStructurePCLK.EXTI_Trigger = EXTI_Trigger_Falling;
+	
 	MY_NVIC_Init(0, 0, EXTI9_5_IRQn, 2);
 
     /* D0-D7 IO口初始化 */
@@ -338,7 +345,7 @@ void BF3003_WriteReg(uint8_t RegAddress, uint8_t Data)
 {
     SCCB_Start();
     SCCB_SendByte(BF3003_ADDRESS);
-    SCCB_ReceiveAck(); // SCCB_ReceiveAck()==0说明上一步执行成功，下面的两个也是
+    SCCB_ReceiveAck(); 
 
     SCCB_SendByte(RegAddress);
     SCCB_ReceiveAck();
@@ -359,10 +366,10 @@ uint8_t BF3003_ReadReg(uint8_t RegAddress)
 
     SCCB_Start();
     SCCB_SendByte(BF3003_ADDRESS);
-    SCCB_ReceiveAck(); // SCCB_ReceiveAck()==0说明上一步执行成功，下面的两个也是
+    SCCB_ReceiveAck(); 
     SCCB_SendByte(RegAddress);
     SCCB_ReceiveAck();
-    SCCB_Stop(); // 这里的STOP很必要！！！！是SCCB不同于I2C的地方！！！
+    SCCB_Stop(); 
 
     SCCB_Start();
     SCCB_SendByte(BF3003_ADDRESS | 0x01);
@@ -413,60 +420,33 @@ void BF3003_Handle(void)
 {
 	
 }
-/*
- * @brief    读取图像信息并发送至电脑显示
- * @param  无
- * @retval 无
- */
-
 void BF3003_FrameBegin()
 {
 	// printf("frame:%d %d\n",lineIdx, totalCount);
-	frameIdx = -1;
 	lineIdx = 0;
 	pixelIdx = 0;
-	totalCount = 0;
-}
-
-uint8_t pixelEnable;
-void BF3003_Pixel_Enable()
-{
-	EXTI_InitTypeDef   EXTI_InitStructure;
-	EXTI_InitStructure.EXTI_Line = EXTI_Line5;
-	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;
-	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-	EXTI_Init(&EXTI_InitStructure);
-}
-void BF3003_Pixel_Disable()
-{
-	EXTI_InitTypeDef   EXTI_InitStructure;
-	EXTI_InitStructure.EXTI_Line = EXTI_Line5;
-	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;
-	EXTI_InitStructure.EXTI_LineCmd = DISABLE;
-	EXTI_Init(&EXTI_InitStructure);
 }
 void BF3003_LineBegin()
 {
 	pixelIdx = 0;
-	BF3003_Pixel_Enable();
+	if(lineIdx<480)
+	{
+		EXTI_InitStructurePCLK.EXTI_LineCmd = ENABLE;
+		EXTI_Init(&EXTI_InitStructurePCLK);
+	}
 }
 
 void BF3003_ReadPixel()
 {
-	if(lineIdx<480)
+	if(pixelIdx<640)
 	{
-		if(pixelIdx>=640)
-		{
-			BF3003_Pixel_Disable();
-			lineIdx++;
-		}
-		else
-		{
-			frame[lineIdx&1][pixelIdx] = GPIOB->IDR >> 8;
-			pixelIdx++;
-			totalCount++;
-		}
+		frame[lineIdx&0b1][pixelIdx] = GPIOB->IDR >> 8;
+		pixelIdx++;
+	}
+	else
+	{
+		EXTI_InitStructurePCLK.EXTI_LineCmd = DISABLE;
+		EXTI_Init(&EXTI_InitStructurePCLK);
+		lineIdx++;
 	}
 }

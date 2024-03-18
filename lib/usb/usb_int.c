@@ -26,22 +26,12 @@ uint16_t SaveTState;
 #include "usb_desc.h"
 
 #define CAMERA_SIZ_STREAMHD			0
-extern uint8_t frame[2][640 * 1];
-extern int8_t frameIdx;
+extern uint8_t frame[2][640];
 extern uint16_t lineIdx;
 uint8_t sendbuf[PACKET_SIZE];			// 发送数据缓冲区
 uint32_t sendsize = 0;					// 已发送字节数
-uint16_t frameSize = 640*1;	
+uint16_t frameSize = 640;	
 uint16_t lastLineIdx;
-// int8_t lastFrameId = -1;
-void dataMemcpy(const uint8_t* src, uint8_t* dst, uint8_t len)
-{
-	uint8_t i = 0;
-	for (i = 0; i < len; ++i)
-	{
-		dst[i] = src[i];
-	}
-}
 void UsbCamera_SendImage(void)
 {
 	if(lineIdx<1)
@@ -64,7 +54,8 @@ void UsbCamera_SendImage(void)
 		return;
 	}
 	uint8_t datalen = 0;
-	frameIdx = 1-(lineIdx%2);
+	uint8_t frameIdx = (lineIdx&0b1);
+	frameIdx = frameIdx==0?1:(frameIdx-1);
 	if (sendsize==0)
 	{
 		datalen = PACKET_SIZE;
