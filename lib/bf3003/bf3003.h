@@ -32,6 +32,7 @@
 #define BF3003_DBLK_CNTL            0x28
 #define BF3003_EXHCH                0x2A
 #define BF3003_EXHCL                0x2B
+#define BF3003_HREF_CNTL            0xE2
 #define BF3003_DM_LNL               0x92
 #define BF3003_DM_LNH               0x93
 #define BF3003_DM_ROWL              0xE3

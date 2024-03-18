@@ -68,7 +68,6 @@ void UsbCamera_SendImage(void)
 	if (sendsize==0)
 	{
 		datalen = PACKET_SIZE;
-		// dataMemcpy(frame[frameIdx], sendbuf, datalen);
 		sendsize = datalen;
 		lastLineIdx = lineIdx;
 	} 
@@ -79,7 +78,6 @@ void UsbCamera_SendImage(void)
 		{
 			datalen = frameSize - sendsize;
 		}
-		// dataMemcpy(frame[frameIdx] + sendsize, sendbuf, datalen);
 		sendsize += datalen;
 	}
 	ToggleDTOG_RX(ENDP1); 

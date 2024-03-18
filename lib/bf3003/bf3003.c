@@ -145,8 +145,19 @@ uint8_t regs[REGS_COUNT][2] = {
 		1:disable
 	PLLCTL[6:0]: Reserved
 	*/
+	{BF3003_HREF_CNTL,0x06},
+	/*
+	HREF_CNTL[2:0]: 000:delay third,delay two pclk;
+		001:delay fourth,delay three pclk;
+		010:delay fifth,delay four pclk;
+		011:delay sixth,delay five pclk;
+		100:delay seventh,delay six pclk;
+		101:delay eighth,delay seven pclk;
+		110:delay ninth,delay eight pclk;
+		111:delay tenth,delay nine pclk;
+	*/
 	{BF3003_EXHCH,0x00},
-	{BF3003_EXHCL,0x00},
+	{BF3003_EXHCL,0x10},
 	/*
 	Dummy Pixel Insert MSB
 		Bit[7:4]: 4MSB for dummy pixel insert in horizontal direction
@@ -157,11 +168,11 @@ uint8_t regs[REGS_COUNT][2] = {
 	/*
 		Dummy line insert before active line low 8 bits 
 	*/
-	{BF3003_DM_ROWH, 0x0},
+	{BF3003_DM_ROWH, 0x00},
 	/*
 		Dummy line insert before active line high 8 bits 
 	*/
-	{BF3003_DM_LNL, 0x00},
+	{BF3003_DM_LNL, 0x20},
 	/*
 		insert the dummy line after active line(Dummy line low 8bits)
 		it's default value is 0x28;
@@ -309,7 +320,7 @@ void BF3003_Pin_Init()
 	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStructure);
 
-	MY_NVIC_Init(0, 1, EXTI9_5_IRQn, 2);
+	MY_NVIC_Init(0, 0, EXTI9_5_IRQn, 2);
 
     /* D0-D7 IO口初始化 */
     GPIO_InitStruct.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;

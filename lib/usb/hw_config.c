@@ -36,7 +36,6 @@ void Set_USBClock(void)
 *******************************************************************************/
 void Enter_LowPowerMode(void)
 {
-	printf("SUSPENDED\n");
 	/* Set the device state to suspend */
 	bDeviceState = SUSPENDED;
 	/* Request to enter STOP mode with regulator in low power mode */
@@ -52,7 +51,6 @@ void Enter_LowPowerMode(void)
 *******************************************************************************/
 void Leave_LowPowerMode(void)
 {
-	printf("leave SUSPENDED\n");
 	DEVICE_INFO *pInfo = &Device_Info;
 
 
@@ -76,7 +74,7 @@ void USB_Interrupts_Config(void)
 	EXTI->RTSR |= EXTI_RTSR_TR18;//line 18上事件上升降沿触发	 
 	MY_NVIC_Init(1, 0, USB_HP_CAN1_TX_IRQn, 2);//组2，优先级次之 
 	MY_NVIC_Init(1, 0, USB_LP_CAN1_RX0_IRQn, 2);//组2，优先级次之 
-	MY_NVIC_Init(0, 0, USBWakeUp_IRQn, 2);     //组2，优先级最高	 	 
+	MY_NVIC_Init(0, 1, USBWakeUp_IRQn, 2);     //组2，优先级最高	 	 
 }
 
 /*******************************************************************************
@@ -88,11 +86,11 @@ void USB_Interrupts_Config(void)
 *******************************************************************************/
 void Get_SerialNum(void)
 {
-	u32 Device_Serial0, Device_Serial1, Device_Serial2;
+	uint32_t Device_Serial0, Device_Serial1, Device_Serial2;
 
-	Device_Serial0 = *(u32*)(0x1FFFF7E8);
-	Device_Serial1 = *(u32*)(0x1FFFF7EC);
-	Device_Serial2 = *(u32*)(0x1FFFF7F0);
+	Device_Serial0 = *(uint32_t*)(0x1FFFF7E8);
+	Device_Serial1 = *(uint32_t*)(0x1FFFF7EC);
+	Device_Serial2 = *(uint32_t*)(0x1FFFF7F0);
 
 	if (Device_Serial0 != 0)
 	{

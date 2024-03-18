@@ -56,7 +56,6 @@ void USB_LP_CAN1_RX0_IRQHandler(void)
 *******************************************************************************/
 void USBWakeUp_IRQHandler(void)
 {
-    printf("wakeup\n");
 	EXTI->PR|=1<<18;  // 清除USB唤醒中断挂起位
 }
 
@@ -64,21 +63,21 @@ void EXTI9_5_IRQHandler(void)
 {
     if((EXTI->PR & EXTI_Line7) != RESET)
     {
-        EXTI->PR = EXTI_Line7;
+        EXTI->PR |= EXTI_Line7;
         //HREF
         BF3003_LineBegin();
         return;
     }
     if((EXTI->PR & EXTI_Line6) != RESET)
     {
-        EXTI->PR = EXTI_Line6;
+        EXTI->PR |= EXTI_Line6;
         //VSYNC
         BF3003_FrameBegin();
         return;
     }
     if((EXTI->PR & EXTI_Line5) != RESET)
     {
-        EXTI->PR = EXTI_Line5;
+        EXTI->PR |= EXTI_Line5;
         //PIXCLK
         BF3003_ReadPixel();
         return;
