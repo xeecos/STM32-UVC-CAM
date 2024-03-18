@@ -34,3 +34,5 @@
 .vscode
 .DS_Store
 node_modules
+*.jpeg
+*.jpg

@@ -32,6 +32,10 @@
 #define BF3003_DBLK_CNTL            0x28
 #define BF3003_EXHCH                0x2A
 #define BF3003_EXHCL                0x2B
+#define BF3003_DM_LNL               0x92
+#define BF3003_DM_LNH               0x93
+#define BF3003_DM_ROWL              0xE3
+#define BF3003_DM_ROWH              0xE4
 #define BF3003_TSLB                 0x3A
 #define BF3003_AE_MODE              0x80
 #define BF3003_AE_SPEED             0x81
@@ -40,12 +44,13 @@
 #define BF3003_SUBSAMPLE            0x4a
 #define BF3003_DICOM1               0x69
 #define BF3003_INT_MEAN_H           0X89
-#define BF3003_INT_TIM_MIN          0X8b
-#define BF3003_INT_TIM_HI           0X8c
-#define BF3003_INT_TIM_LO           0X8d
-#define BF3003_INT_TIM_MAX_HI       0X8e
-#define BF3003_INT_TIM_MAX_LO       0X8f
-
+#define BF3003_INT_MEAN_L           0X8A
+#define BF3003_INT_TIM_MIN          0X8B
+#define BF3003_INT_TIM_HI           0X8C
+#define BF3003_INT_TIM_LO           0X8D
+#define BF3003_INT_TIM_MAX_HI       0X8E
+#define BF3003_INT_TIM_MAX_LO       0X8F
+#define BF3003_LINE_CTR             0xF5 
 void BF3003_Init(void);
 void BF3003_Handle(void);
 void BF3003_GetPic(void);

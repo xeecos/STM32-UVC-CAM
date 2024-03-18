@@ -11,7 +11,7 @@
 #define BF3003_PID_BME              0xFC
 #define BF3003_VER_BME              0xFD
 
-#define REGS_COUNT	38
+#define REGS_COUNT	42
 
 uint8_t frame[2][640 * 1];
 int8_t frameIdx;
@@ -105,7 +105,7 @@ uint8_t regs[REGS_COUNT][2] = {
 		06h: G3HR5,B5G3L 07h: G3LR5,B5G3H
 		08h: G6B2H,B3LR5 09h: G6R2H,R3LB5
 	*/
-	{BF3003_COM8, 0b00001111},
+	{BF3003_COM8, 0b00001110},
 	/*
 		Auto mode Contrl
 		Bit[7:6] reserved
@@ -133,47 +133,76 @@ uint8_t regs[REGS_COUNT][2] = {
 		Bit[1]: VSYNC option, 0:active low, 1:active high.
 		Bit[0]: HSYNC option, 0:active high, 1:active low.
 	*/
-	{BF3003_VHREF, 0b10},
-	{BF3003_HSTART, 0x2},
+	{BF3003_VHREF, 0b01},
+	{BF3003_HSTART, 0x1},
 	{BF3003_HSTOP, 0xA0},
 	{BF3003_VSTART, 0x0},
 	{BF3003_VSTOP, 0x78},
-	{BF3003_PLLCTL, 0x2A},
-	{BF3003_EXHCH,0x02},
-	{BF3003_EXHCL,0xA0},
+	{BF3003_PLLCTL, 0b00101010},
+	/*
+	PLLCTL[7]: PLL Enable
+		0:enable
+		1:disable
+	PLLCTL[6:0]: Reserved
+	*/
+	{BF3003_EXHCH,0x00},
+	{BF3003_EXHCL,0x00},
+	/*
+	Dummy Pixel Insert MSB
+		Bit[7:4]: 4MSB for dummy pixel insert in horizontal direction
+	Dummy Pixel Insert LSB
+		8 LSB for dummy pixel insert in horizontal direction
+	*/
+	{BF3003_DM_ROWL, 0x00},
+	/*
+		Dummy line insert before active line low 8 bits 
+	*/
+	{BF3003_DM_ROWH, 0x0},
+	/*
+		Dummy line insert before active line high 8 bits 
+	*/
+	{BF3003_DM_LNL, 0x00},
+	/*
+		insert the dummy line after active line(Dummy line low 8bits)
+		it's default value is 0x28;
+	*/
+	{BF3003_DM_LNH, 0x0},
+	/*
+		insert the dummy line after active line(Dummy line high 8bits) 
+	*/
 	{BF3003_AE_MODE, 0b11000000},
 	/*
 	Bit[7]: AE mode select:
-	0: use Y (from color space module).
-	1: use rawdata (from gamma module), (when special effect in color interpolation module is selected,0x80[7] must set
+		0: use Y (from color space module).
+		1: use rawdata (from gamma module), (when special effect in color interpolation module is selected,0x80[7] must set
 	to be 1'b1)
 	Bit[6]: INT_TIM lower than INT_STEP_5060 or not:
-	0: limit int_tim>=step(no flicker)
-	1: int_tim can be less than 1*int_step(existing flicker).
+		0: limit int_tim>=step(no flicker)
+		1: int_tim can be less than 1*int_step(existing flicker).
 	Bit[5:4]: center window select:
 	vga and ntsc mode 00: 512*384(full) ,256*192(1/2sub when normal mode)
 	and ntsc have no sub 
-	01: 384*288(full) ,192*144(1/2sub when normal mode)
-	10 : 288*216(full) ,144*108(1/2sub when normal mode)
-	11: 216*160(full) ,108*80 (1/2sub when normal mode)
+		01: 384*288(full) ,192*144(1/2sub when normal mode)
+		10 : 288*216(full) ,144*108(1/2sub when normal mode)
+		11: 216*160(full) ,108*80 (1/2sub when normal mode)
 	pal mode 00: 512*448
-	01: 384*336
-	10: 288*256
-	11: 216*192
+		01: 384*336
+		10: 288*256
+		11: 216*192
 	Bit[3:1]: weight select: weight_sel region1 region2 region3 region4
-	000: 1/4 1/4 1/4 1/4
-	001: 1/2 1/4 1/8 1/8
-	010: 5/8 1/8 1/8 1/8
-	011: 3/8 3/8 1/8 1/8
-	100: 3/4 1/4 0 0
-	101: 5/8 3/8 0 0
-	110: 1/2 1/2 0 0
-	111: 1 0 0 0
+		000: 1/4 1/4 1/4 1/4
+		001: 1/2 1/4 1/8 1/8
+		010: 5/8 1/8 1/8 1/8
+		011: 3/8 3/8 1/8 1/8
+		100: 3/4 1/4 0 0
+		101: 5/8 3/8 0 0
+		110: 1/2 1/2 0 0
+		111: 1 0 0 0
 	Bit[0]: Banding filter value select
-	0: Select {0x89[5],0x9E[7:0]} as Banding Filter Value.
-	1: Select {0x89[4],0x9D[7:0]} as Banding Filter Value
+		0: Select {0x89[5],0x9E[7:0]} as Banding Filter Value.
+		1: Select {0x89[4],0x9D[7:0]} as Banding Filter Value
 	*/
-	{BF3003_TEST_MODE, 0b10100111},
+	{BF3003_TEST_MODE, 0b00000000},
 	/*
 	BIT[7] : 
 		1: test pattern enable
@@ -209,29 +238,17 @@ uint8_t regs[REGS_COUNT][2] = {
 	Bit[0]:RGB dither enable 
 	*/
 	{BF3003_INT_MEAN_H, 0x32},
+	{BF3003_INT_MEAN_L, 0xAA},
 	{BF3003_INT_TIM_MIN, 0x0},
 	{BF3003_INT_TIM_HI, 0x00},
-	{BF3003_INT_TIM_LO, 0x08},
+	{BF3003_INT_TIM_LO, 0x04},
 	//bf3003_write8(BF3003_INT_TIM_HI,coarse>>8);
 	// bf3003_write8(BF3003_INT_TIM_LO,coarse&0xff);
 	{BF3003_INT_TIM_MAX_HI, 0xff},
 	{BF3003_INT_TIM_MAX_LO, 0xff},
-	{0xF5, 0b110111},
+	{BF3003_LINE_CTR, 0b010110},
 	{0, 0},
 };
-/* @brief 下面几个函数主要是用于便捷读取串口电平 */
-uint8_t BF3003_VS(void)
-{
-    return GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_6);
-}
-uint8_t BF3003_HREF(void)
-{
-    return GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_7);
-}
-uint8_t BF3003_PCLK(void)
-{
-    return GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_5);
-}
 /*
  * @brief    BF3003引脚初始化函数，在BF3003_Init() 里触发，不需外部调用
  * @param  无
@@ -247,35 +264,35 @@ void BF3003_Pin_Init()
     GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOB, &GPIO_InitStruct);
 
+    /* PIXCLK VSYNC HREF 初始化 */
+    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IPU;  
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOB, &GPIO_InitStruct);
+
 	GPIO_PinRemapConfig(GPIO_PartialRemap_TIM3, ENABLE); 
     GPIO_PinRemapConfig(GPIO_Remap_SWJ_NoJTRST,ENABLE);
 
     TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
     TIM_OCInitTypeDef TIM_OCInitStructure;
 
-    TIM_TimeBaseInitStructure.TIM_Prescaler = 36 - 1;
+    TIM_TimeBaseInitStructure.TIM_Prescaler = 18 - 1;
     TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-    TIM_TimeBaseInitStructure.TIM_Period = 2 - 1;
+    TIM_TimeBaseInitStructure.TIM_Period = 4 - 1;
     TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     // 72000000  / (TIM_Period + 1) / (TIM_Prescaler + 1)
     TIM_TimeBaseInit(TIM3, &TIM_TimeBaseInitStructure);
 
     TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
     TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
-    TIM_OCInitStructure.TIM_Pulse = 1;
+    TIM_OCInitStructure.TIM_Pulse = 2;
     TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
 
     TIM_OC1Init(TIM3, &TIM_OCInitStructure);
 	TIM_OC1PreloadConfig(TIM3, TIM_OCPreload_Enable);
     TIM_Cmd(TIM3, ENABLE);
 
-    /* VSYNC HREF PIXCLK初始化 */
-    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
-    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN_FLOATING;  
-    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-	// GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource5);
+	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource5);//pclk
 	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource6);//vsync
 	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource7);//href
 
@@ -292,35 +309,13 @@ void BF3003_Pin_Init()
 	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStructure);
 
-	MY_NVIC_Init(2, 0, EXTI9_5_IRQn, 2);
+	MY_NVIC_Init(0, 1, EXTI9_5_IRQn, 2);
 
     /* D0-D7 IO口初始化 */
     GPIO_InitStruct.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
     GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN_FLOATING;
     GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOB, &GPIO_InitStruct);
-}
-uint8_t pixelEnable;
-void BF3003_Pixel_Enable()
-{
-	// EXTI_InitTypeDef   EXTI_InitStructure;
-	// EXTI_InitStructure.EXTI_Line = EXTI_Line5;
-	// EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	// EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
-	// EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-	// EXTI_Init(&EXTI_InitStructure);
-	pixelEnable = 1;
-}
-void BF3003_Pixel_Disable()
-{
-	// EXTI_InitTypeDef   EXTI_InitStructure;
-	// EXTI_InitStructure.EXTI_Line = EXTI_Line5;
-	// EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	// EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
-	// EXTI_InitStructure.EXTI_LineCmd = DISABLE;
-	// EXTI_Init(&EXTI_InitStructure);
-	lineIdx++;
-	pixelEnable = 0;
 }
 /*
  * @brief    BF3003写寄存器
@@ -405,7 +400,7 @@ void BF3003_Init(void)
 
 void BF3003_Handle(void)
 {
-    BF3003_GetPic();
+	
 }
 /*
  * @brief    读取图像信息并发送至电脑显示
@@ -422,42 +417,45 @@ void BF3003_FrameBegin()
 	totalCount = 0;
 }
 
+uint8_t pixelEnable;
+void BF3003_Pixel_Enable()
+{
+	EXTI_InitTypeDef   EXTI_InitStructure;
+	EXTI_InitStructure.EXTI_Line = EXTI_Line5;
+	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;
+	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+	EXTI_Init(&EXTI_InitStructure);
+}
+void BF3003_Pixel_Disable()
+{
+	EXTI_InitTypeDef   EXTI_InitStructure;
+	EXTI_InitStructure.EXTI_Line = EXTI_Line5;
+	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;
+	EXTI_InitStructure.EXTI_LineCmd = DISABLE;
+	EXTI_Init(&EXTI_InitStructure);
+}
 void BF3003_LineBegin()
 {
 	pixelIdx = 0;
-	pixelEnable = 1;
-	// BF3003_Pixel_Enable();
+	BF3003_Pixel_Enable();
 }
 
 void BF3003_ReadPixel()
 {
-	frame[lineIdx&1][pixelIdx] = GPIOB->IDR >> 8;
-	pixelIdx++;
-	totalCount++;
-	if(pixelIdx>=640)
+	if(lineIdx<480)
 	{
-		BF3003_Pixel_Disable();
-	}
-}
-void BF3003_GetPic(void)
-{
-	// printf("get pic finish\n");
-	if(pixelEnable)
-	{
-		// for(int j=0;j<480;j++)
+		if(pixelIdx>=640)
 		{
-			// pixelIdx = 0;
-			// for(int i=0;i<640;i++)
-			{
-				while(BF3003_PCLK()==0);
-				BF3003_ReadPixel();
-			}
-			// lineIdx++;
-			// while(BF3003_HREF()==0);
+			BF3003_Pixel_Disable();
+			lineIdx++;
 		}
-		// if(lineIdx>=480)
-		// {
-		// 	pixelEnable = 0;
-		// }
+		else
+		{
+			frame[lineIdx&1][pixelIdx] = GPIOB->IDR >> 8;
+			pixelIdx++;
+			totalCount++;
+		}
 	}
 }
