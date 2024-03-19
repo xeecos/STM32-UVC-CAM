@@ -26,83 +26,8 @@ uint16_t SaveTState;
 #include "usb_desc.h"
 
 #define CAMERA_SIZ_STREAMHD			0
-extern uint8_t frame[2][640];
-extern uint16_t lineIdx;
-uint8_t sendbuf[PACKET_SIZE];			// 发送数据缓冲区
-uint32_t sendsize = 0;					// 已发送字节数
-uint16_t frameSize = 640;	
-uint16_t lastLineIdx;
-void UsbCamera_SendImage(void)
-{
-	if(lineIdx<1)
-	{
-		sendsize = 0;
-		sendbuf[0] = 0xff;
-		sendbuf[1] = 0xff;
-		ToggleDTOG_RX(ENDP1); 
-		if (GetENDPOINT(ENDP1) & EP_DTOG_RX)
-		{
-			// User use buffer0
-			UserToPMABufferCopy(sendbuf, ENDP1_BUF0Addr, 2);
-			SetEPDblBuf0Count(ENDP1, EP_DBUF_IN, 2);
-		} else{
-			// User use buffer1
-			UserToPMABufferCopy(sendbuf, ENDP1_BUF1Addr, 2);
-			SetEPDblBuf1Count(ENDP1, EP_DBUF_IN, 2);
-		}
-		SetEPTxStatus(ENDP1, EP_TX_VALID);
-		return;
-	}
-	uint8_t datalen = 0;
-	uint8_t frameIdx = ((lineIdx-1)&0b1);
-	if (sendsize==0)
-	{
-		datalen = PACKET_SIZE;
-		sendsize = datalen;
-		lastLineIdx = lineIdx;
-	} 
-	else if(sendsize<frameSize)
-	{
-		datalen = PACKET_SIZE;
-		if (sendsize + datalen >= frameSize)
-		{
-			datalen = frameSize - sendsize;
-		}
-		sendsize += datalen;
-	}
-	ToggleDTOG_RX(ENDP1); 
-	if (GetENDPOINT(ENDP1) & EP_DTOG_RX)
-	{
-		// User use buffer0
-		UserToPMABufferCopy(frame[frameIdx] + sendsize - datalen, ENDP1_BUF0Addr, datalen);
-		SetEPDblBuf0Count(ENDP1, EP_DBUF_IN, datalen);
-	} else{
-		// User use buffer1
-		UserToPMABufferCopy(frame[frameIdx] + sendsize - datalen, ENDP1_BUF1Addr, datalen);
-		SetEPDblBuf1Count(ENDP1, EP_DBUF_IN, datalen);
-	}
-	SetEPTxStatus(ENDP1, EP_TX_VALID);		// 允许数据发送
-	if(sendsize>=frameSize)
-	{
-		if(lineIdx!=lastLineIdx)
-		{
-			sendsize = 0;
-		}
-	}
-}
-/* Extern variables ----------------------------------------------------------*/
-// extern void(*pEpInt_IN[7])(void);    /*  Handles IN  interrupts   */
-void (*pEpInt_IN[7])(void) =
-{
-	UsbCamera_SendImage,
-	EP2_IN_Callback,
-	EP3_IN_Callback,
-	EP4_IN_Callback,
-	EP5_IN_Callback,
-	EP6_IN_Callback,
-	EP7_IN_Callback,
-};
 
+extern void(*pEpInt_IN[7])(void);   /*  Handles OUT interrupts   */
 extern void(*pEpInt_OUT[7])(void);   /*  Handles OUT interrupts   */
 
 /* Private function prototypes -----------------------------------------------*/

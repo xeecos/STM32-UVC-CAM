@@ -27,6 +27,7 @@
 #define BF3003_DBLK_TARO            0x1F
 #define BF3003_DBLK_TARE            0x22
 #define BF3003_GREEN_GAIN           0x23
+#define BF3003_GLB_GAIN             0x87
 #define BF3003_GN_GAIN              0x6A
 #define BF3003_STEPO                0x27
 #define BF3003_DBLK_CNTL            0x28
@@ -55,6 +56,7 @@
 void BF3003_Init(void);
 void BF3003_Handle(void);
 void BF3003_SetExposure(uint16_t exposure);
+void BF3003_SetGain(uint8_t r,uint8_t g,uint8_t b);
 void BF3003_WriteReg(uint8_t RegAddress, uint8_t Data);
 uint8_t BF3003_ReadReg(uint8_t RegAddress);
 void BF3003_LineBegin();

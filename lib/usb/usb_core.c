@@ -15,6 +15,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usb_lib.h"
+#include "usb_desc.h"
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 #define ValBit(VAR,Place)    (VAR & (1 << Place))
@@ -993,15 +994,105 @@ void NOP_Process(void)
 *******************************************************************************/
 
 
+extern uint8_t frame[2][640];
+extern uint16_t lineIdx;
+uint8_t sendbuf[PACKET_SIZE];			// 发送数据缓冲区
+uint32_t sendsize = 0;					// 已发送字节数
+uint16_t frameSize = 640;	
+uint16_t lastLineIdx;
 void EP1_IN_Callback(void)
 {
+	if(lineIdx<1)
+	{
+		sendsize = 0;
+		sendbuf[0] = 0xff;
+		sendbuf[1] = 0xff;
+		ToggleDTOG_RX(ENDP1); 
+		if (GetENDPOINT(ENDP1) & EP_DTOG_RX)
+		{
+			// User use buffer0
+			UserToPMABufferCopy(sendbuf, ENDP1_BUF0Addr, 2);
+			SetEPDblBuf0Count(ENDP1, EP_DBUF_IN, 2);
+		} else{
+			// User use buffer1
+			UserToPMABufferCopy(sendbuf, ENDP1_BUF1Addr, 2);
+			SetEPDblBuf1Count(ENDP1, EP_DBUF_IN, 2);
+		}
+		SetEPTxStatus(ENDP1, EP_TX_VALID);
+		return;
+	}
+	uint8_t datalen = 0;
+	uint8_t frameIdx = ((lineIdx-1)&0b1);
+	if (sendsize==0)
+	{
+		datalen = PACKET_SIZE;
+		sendsize = datalen;
+		lastLineIdx = lineIdx;
+	} 
+	else if(sendsize<frameSize)
+	{
+		datalen = PACKET_SIZE;
+		if (sendsize + datalen >= frameSize)
+		{
+			datalen = frameSize - sendsize;
+		}
+		sendsize += datalen;
+	}
+	ToggleDTOG_RX(ENDP1); 
+	if (GetENDPOINT(ENDP1) & EP_DTOG_RX)
+	{
+		// User use buffer0
+		UserToPMABufferCopy(frame[frameIdx] + sendsize - datalen, ENDP1_BUF0Addr, datalen);
+		SetEPDblBuf0Count(ENDP1, EP_DBUF_IN, datalen);
+	} else{
+		// User use buffer1
+		UserToPMABufferCopy(frame[frameIdx] + sendsize - datalen, ENDP1_BUF1Addr, datalen);
+		SetEPDblBuf1Count(ENDP1, EP_DBUF_IN, datalen);
+	}
+	SetEPTxStatus(ENDP1, EP_TX_VALID);		// 允许数据发送
+	if(sendsize>=frameSize)
+	{
+		if(lineIdx!=lastLineIdx)
+		{
+			sendsize = 0;
+		}
+	}
 }
 
-uint8_t cmd[64];
+uint8_t commands[64];
 void EP2_OUT_Callback(void)
 {
-	PMAToUserBufferCopy(cmd, ENDP2_RXADDR, 64);
-	printf("EP2 OUT:%d %d %d\n",cmd[0],cmd[1],cmd[2]);
+	PMAToUserBufferCopy(commands, ENDP2_RXADDR, 64);
+	if(commands[0]==1)
+	{
+		switch(commands[1])
+		{
+			case 1:
+			{
+				//set exposure;
+				BF3003_SetExposure((commands[2]<<8)+commands[3]);
+			}
+			break;
+			case 2:
+			{
+				//set gain;
+				BF3003_SetGain(commands[2],commands[3],commands[4]);
+			}
+			break;
+			case 3:
+			{
+				//set global gain;
+				BF3003_SetGlobalGain(commands[2]);
+			}
+			break;
+			case 4:
+			{
+				//set reg;
+				BF3003_WriteReg(commands[2],commands[3]);
+			}
+			break;
+		}
+	}
 	SetEPRxValid(ENDP2);
 	// UserToPMABufferCopy
 }

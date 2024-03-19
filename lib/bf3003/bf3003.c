@@ -104,7 +104,7 @@ uint8_t regs[REGS_COUNT][2] = {
 		06h: G3HR5,B5G3L 07h: G3LR5,B5G3H
 		08h: G6B2H,B3LR5 09h: G6R2H,R3LB5
 	*/
-	{BF3003_COM8, 0b00001110},
+	{BF3003_COM8, 0b00011010},
 	/*
 		Auto mode Contrl
 		Bit[7:6] reserved
@@ -379,10 +379,23 @@ uint8_t BF3003_ReadReg(uint8_t RegAddress)
 }
 void BF3003_SetExposure(uint16_t exposure)
 {
+	printf("set exp:%d\n",exposure);
     uint8_t exposure_l = exposure & 0xff;
     uint8_t exposure_h = exposure >> 8;
     BF3003_WriteReg(BF3003_INT_TIM_LO, exposure_l);
     BF3003_WriteReg(BF3003_INT_TIM_HI, exposure_h);
+}
+void BF3003_SetGain(uint8_t r,uint8_t g,uint8_t b)
+{
+	printf("set gain:%d %d %d\n",r, g, b);
+	BF3003_WriteReg(BF3003_RED_GAIN, r);
+	BF3003_WriteReg(BF3003_GREEN_GAIN, g);
+	BF3003_WriteReg(BF3003_BLUE_GAIN, b);
+}
+void BF3003_SetGlobalGain(uint8_t gain)
+{
+	printf("global gain:%d\n",gain);
+	BF3003_WriteReg(BF3003_GLB_GAIN, gain);
 }
 /*
  * @brief    寄存器初始化

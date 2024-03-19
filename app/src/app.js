@@ -43,15 +43,18 @@ async function transfer()
         fs.writeFileSync("tmp.bmp",img.data);
         console.timeEnd("time");
     }
-    setInterval(()=>{
-        // web.controlTransferOut(2,Buffer.from([1,2,3])).then((res)=>{
-        //     console.log(res);
-        // });
-        web.transferOut(2,Buffer.from([1,2,3])).then((res)=>{
-            console.log(res);
-        });
-    },1000);
-    return;
+    // setInterval(()=>{
+    // },1000);
+    
+    web.transferOut(2,Buffer.from([1,1,0x0,0x10])).then((res)=>{
+    });
+    // web.transferOut(2,Buffer.from([1,2,0x1,0x1,0x1])).then((res)=>{
+    //     console.log(res);
+    // });
+    web.transferOut(2,Buffer.from([1,3,0x20])).then((res)=>{
+        console.log(res);
+    });
+    // return;
     epIn.startPoll(1,bufCount*64);
     // return;
     epIn.on("data", function(buffer) { 
