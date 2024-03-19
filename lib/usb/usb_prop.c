@@ -210,15 +210,17 @@ void UsbCamera_Reset(void)
 	SetEPDblBuffCount(ENDP1, EP_DBUF_OUT, PACKET_SIZE);
 	ClearDTOG_RX(ENDP1);
 	ClearDTOG_TX(ENDP1);
-	// SetEPDblBuf0Count(ENDP1, EP_DBUF_IN, 0);
-	// SetEPDblBuf1Count(ENDP1, EP_DBUF_IN, 0);
     ToggleDTOG_RX(ENDP1);
 	SetEPRxStatus(ENDP1, EP_RX_DIS);
 	SetEPTxStatus(ENDP1, EP_TX_VALID);
-	// SetEPTxStatus(ENDP1, EP_TX_NAK);
 
-	// SetEPTxValid(ENDP1);
-	SetEPRxValid(ENDP0);
+	/* Initialize Endpoint 2 */
+	SetEPType(ENDP2, EP_BULK);
+	SetEPRxAddr(ENDP2, ENDP2_RXADDR);
+	SetEPRxCount(ENDP2, PACKET_SIZE);
+    SetEPTxStatus(ENDP2, EP_TX_DIS);
+	SetEPRxValid(ENDP2);
+
 	/* Set this device to response on default address */
 	SetDeviceAddress(0);
 

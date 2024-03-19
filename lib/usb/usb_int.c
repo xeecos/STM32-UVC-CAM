@@ -54,8 +54,7 @@ void UsbCamera_SendImage(void)
 		return;
 	}
 	uint8_t datalen = 0;
-	uint8_t frameIdx = (lineIdx&0b1);
-	frameIdx = frameIdx==0?1:(frameIdx-1);
+	uint8_t frameIdx = ((lineIdx-1)&0b1);
 	if (sendsize==0)
 	{
 		datalen = PACKET_SIZE;
@@ -197,7 +196,6 @@ void CTR_LP(void)
 
 			/* process related endpoint register */
 			wEPVal = _GetENDPOINT(EPindex);
-			printf("CTR_LP:%x %d\n",wEPVal, EPindex);
 			if ((wEPVal & EP_CTR_RX) != 0)
 			{
 				/* clear int flag */
@@ -240,6 +238,8 @@ void CTR_HP(void)
 		EPindex = (uint8_t)(wIstr & ISTR_EP_ID);
 		/* process related endpoint register */
 		wEPVal = _GetENDPOINT(EPindex);
+		
+		// printf("CTR_HP:%x %d\n",wEPVal, EPindex);
 		if ((wEPVal & EP_CTR_RX) != 0)
 		{
 			/* clear int flag */

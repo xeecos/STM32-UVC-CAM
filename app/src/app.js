@@ -7,12 +7,18 @@ let data = Buffer.alloc(640*480*4);
 let device = findByIds(0x20B1, 0x1DE0);
 async function transfer()
 {
-    device.open();
+    let web = new WebUSBDevice(device);
+    web.open();
     device.interfaces[0].claim();
-    let endpoint = device.interfaces[0].endpoints[0];
+    device.interfaces[1].claim();
+    let epIn = device.interfaces[0].endpoints[0];
+    // let epOut = device.interfaces[0].endpoints[1];
+    // console.log(device.interfaces[0].endpoints);
     let image = [[],[]];
-    let start = false;
     let bufCount = 1;
+    let successCount = 0;
+    let failCount = 0;
+    let totalCount = 0;
     let line = 0;
     let cout = 0;
     let time = Date.now();
@@ -37,12 +43,18 @@ async function transfer()
         fs.writeFileSync("tmp.bmp",img.data);
         console.timeEnd("time");
     }
-    // encodeData();
-
-    endpoint.startPoll(1,bufCount*64);
-    let successCount = 0;
-    let failCount = 0;
-    endpoint.on("data", function(buffer) { 
+    setInterval(()=>{
+        // web.controlTransferOut(2,Buffer.from([1,2,3])).then((res)=>{
+        //     console.log(res);
+        // });
+        web.transferOut(2,Buffer.from([1,2,3])).then((res)=>{
+            console.log(res);
+        });
+    },1000);
+    return;
+    epIn.startPoll(1,bufCount*64);
+    // return;
+    epIn.on("data", function(buffer) { 
         // if(buffer.length==2)
         // {
         //     return;
@@ -66,7 +78,7 @@ async function transfer()
                 time = Date.now();
                 imageIdx = 1 - imageIdx;
 
-                if(line==480)
+                if(line>479)
                 {
                     successCount++;
                     encodeData();
@@ -80,15 +92,21 @@ async function transfer()
             start = true;
             line = 0;
             cout = 0;
+            totalCount = 0;
+            for(let i=0;i<640*480;i++)
+            {
+                image[imageIdx][i] = 0xff;
+            }
             return;
         }
         if(buffer.length>0)
         {
-            for(let i=0;i<64*bufCount;i++)
+            for(let i=0;i<buffer.length;i++)
             {
                 image[imageIdx][line*640+cout+i] = buffer[i];
+                totalCount++;
             }
-            cout+=64*bufCount;
+            cout+=buffer.length;
             if(cout>=640)
             {
                 cout = 0;

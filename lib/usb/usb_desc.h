@@ -51,7 +51,7 @@
 
 #define FRAME_INTERVEL          (10000000ul/IMG_MJPG_FRAMERATE)     //帧间间隔时间，单位100ns
 
-#define CAMERA_SIZ_CONFIG_DESC					25
+#define CAMERA_SIZ_CONFIG_DESC					41
 
 #define CAMERA_SIZ_DEVICE_DESC                  18
 #define CAMERA_SIZ_STRING_LANGID                4

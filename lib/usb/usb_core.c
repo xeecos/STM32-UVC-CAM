@@ -414,6 +414,7 @@ uint8_t *Standard_GetDescriptorData(uint16_t Length, ONE_DESCRIPTOR *pDesc)
 *******************************************************************************/
 void DataStageOut(void)
 {
+	printf("DataStageOut\n");
 	ENDPOINT_INFO *pEPinfo = &pInformation->Ctrl_Info;
 	uint32_t save_rLength;
 
@@ -994,5 +995,14 @@ void NOP_Process(void)
 
 void EP1_IN_Callback(void)
 {
+}
+
+uint8_t cmd[64];
+void EP2_OUT_Callback(void)
+{
+	PMAToUserBufferCopy(cmd, ENDP2_RXADDR, 64);
+	printf("EP2 OUT:%d %d %d\n",cmd[0],cmd[1],cmd[2]);
+	SetEPRxValid(ENDP2);
+	// UserToPMABufferCopy
 }
 /******************* (C) COPYRIGHT 2008 STMicroelectronics *****END OF FILE****/

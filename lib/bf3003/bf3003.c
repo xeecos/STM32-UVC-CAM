@@ -20,7 +20,7 @@ uint16_t lineIdx = 0;
 
 uint8_t regs[REGS_COUNT][2] = {
 	{BF3003_COM7, 0b10000000},
-	{BF3003_COM2, 0b00001111},
+	{BF3003_COM2, 0b00110000},
 	/*
 	Common control 2
 	Bit[7:6]: vclk output drive capability
@@ -104,7 +104,7 @@ uint8_t regs[REGS_COUNT][2] = {
 		06h: G3HR5,B5G3L 07h: G3LR5,B5G3H
 		08h: G6B2H,B3LR5 09h: G6R2H,R3LB5
 	*/
-	{BF3003_COM8, 0b00001111},
+	{BF3003_COM8, 0b00001110},
 	/*
 		Auto mode Contrl
 		Bit[7:6] reserved
@@ -144,7 +144,7 @@ uint8_t regs[REGS_COUNT][2] = {
 		1:disable
 	PLLCTL[6:0]: Reserved
 	*/
-	{BF3003_HREF_CNTL,0x06},
+	{BF3003_HREF_CNTL,0b111},
 	/*
 	HREF_CNTL[2:0]: 000:delay third,delay two pclk;
 		001:delay fourth,delay three pclk;
@@ -156,7 +156,7 @@ uint8_t regs[REGS_COUNT][2] = {
 		111:delay tenth,delay nine pclk;
 	*/
 	{BF3003_EXHCH,0x00},
-	{BF3003_EXHCL,0x40},
+	{BF3003_EXHCL,0x80},
 	/*
 	Dummy Pixel Insert MSB
 		Bit[7:4]: 4MSB for dummy pixel insert in horizontal direction
@@ -247,13 +247,11 @@ uint8_t regs[REGS_COUNT][2] = {
 	Bit[1]:U、V dither enable
 	Bit[0]:RGB dither enable 
 	*/
-	{BF3003_INT_MEAN_H, 0x32},
-	{BF3003_INT_MEAN_L, 0xAA},
-	{BF3003_INT_TIM_MIN, 0x0},
-	{BF3003_INT_TIM_HI, 0x00},
-	{BF3003_INT_TIM_LO, 0x04},
-	//bf3003_write8(BF3003_INT_TIM_HI,coarse>>8);
-	// bf3003_write8(BF3003_INT_TIM_LO,coarse&0xff);
+	{BF3003_INT_MEAN_H,  0x32},
+	{BF3003_INT_MEAN_L,  0xAA},
+	{BF3003_INT_TIM_MIN, 0x00},
+	{BF3003_INT_TIM_HI,  0x00},
+	{BF3003_INT_TIM_LO,  0x80},
 	{BF3003_INT_TIM_MAX_HI, 0xff},
 	{BF3003_INT_TIM_MAX_LO, 0xff},
 	{BF3003_LINE_CTR, 0b010110},
@@ -269,12 +267,11 @@ uint8_t regs[REGS_COUNT][2] = {
 EXTI_InitTypeDef   EXTI_InitStructurePCLK;
 void BF3003_Pin_Init()
 {
-
     GPIO_InitTypeDef GPIO_InitStruct;  
     /* XCLK初始化 */
     GPIO_InitStruct.GPIO_Pin = GPIO_Pin_4;
     GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF_PP;  
-    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_10MHz;
     GPIO_Init(GPIOB, &GPIO_InitStruct);
 
     /* PIXCLK VSYNC HREF 初始化 */
@@ -323,7 +320,7 @@ void BF3003_Pin_Init()
 	EXTI_Init(&EXTI_InitStructure);
 
 
-	EXTI_InitStructurePCLK.EXTI_Line = EXTI_Line5;
+	EXTI_InitStructurePCLK.EXTI_Line = EXTI_Line5;//pclk
 	EXTI_InitStructurePCLK.EXTI_Mode = EXTI_Mode_Interrupt;
 	EXTI_InitStructurePCLK.EXTI_Trigger = EXTI_Trigger_Falling;
 	
@@ -332,7 +329,7 @@ void BF3003_Pin_Init()
     /* D0-D7 IO口初始化 */
     GPIO_InitStruct.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
     GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_10MHz;
     GPIO_Init(GPIOB, &GPIO_InitStruct);
 }
 /*
@@ -380,6 +377,13 @@ uint8_t BF3003_ReadReg(uint8_t RegAddress)
 
     return Data;
 }
+void BF3003_SetExposure(uint16_t exposure)
+{
+    uint8_t exposure_l = exposure & 0xff;
+    uint8_t exposure_h = exposure >> 8;
+    BF3003_WriteReg(BF3003_INT_TIM_LO, exposure_l);
+    BF3003_WriteReg(BF3003_INT_TIM_HI, exposure_h);
+}
 /*
  * @brief    寄存器初始化
  */
@@ -395,14 +399,14 @@ void BF3003_Configure(void)
 		{
 			break;
 		}
-		Delay_Ms(1000);
+		Delay_Ms(100);
 	}
 	for (int i = 0; i < REGS_COUNT; i++)
 	{
 		if (regs[i][0] == 0)
 			break;
 		BF3003_WriteReg(regs[i][0], regs[i][1]);
-		Delay_Ms(10);
+		Delay_Ms(1);
 	}
 }
 /*
@@ -420,31 +424,31 @@ void BF3003_Handle(void)
 {
 	
 }
+int bufIdx = 0;
 void BF3003_FrameBegin()
 {
-	// printf("frame:%d %d\n",lineIdx, totalCount);
-	
+	printf("frame:%d\n",lineIdx);
 	lineIdx = 0;
 	pixelIdx = 0;
+	bufIdx = 1;
 }
 void BF3003_LineBegin()
 {
 	pixelIdx = 0;
+	bufIdx = 1 - bufIdx;
 	EXTI_InitStructurePCLK.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStructurePCLK);
 }
 
 void BF3003_ReadPixel()
 {
-	if(pixelIdx<640)
-	{
-		frame[lineIdx&0b1][pixelIdx] = GPIOB->IDR >> 8;
-		pixelIdx++;
-	}
-	else
+	frame[bufIdx][pixelIdx] = GPIOB->IDR >> 8;
+	pixelIdx++;
+	if(pixelIdx>639)
 	{
 		EXTI_InitStructurePCLK.EXTI_LineCmd = DISABLE;
 		EXTI_Init(&EXTI_InitStructurePCLK);
+		pixelIdx = 0;
 		lineIdx++;
 	}
 }

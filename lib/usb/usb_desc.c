@@ -36,7 +36,7 @@ const uint8_t Camera_ConfigDescriptor[CAMERA_SIZ_CONFIG_DESC] =
     USB_CONFIGURATION_DESCRIPTOR_TYPE,      /* bDescriptorType: Configuration */
     CAMERA_SIZ_CONFIG_DESC,                /* wTotalLength:no of returned bytes */
     0x00,
-    0x01,   /* bNumInterfaces: 1 interface for Game IO */
+    0x02,   /* bNumInterfaces: 1 interface for Game IO */
     0x01,   /* bConfigurationValue: Configuration value */
     USBD_IDX_CONFIG_STR,   /* iConfiguration: Index of string descriptor describing the configuration */
     0xE0,   /* bmAttributes: self powered */
@@ -63,15 +63,28 @@ const uint8_t Camera_ConfigDescriptor[CAMERA_SIZ_CONFIG_DESC] =
     0x40,                               /* wMaxPacketSize: */
     0x00,
     0x00,                                /* bInterval: ignore for Bulk transfer */
+
     
-    // /*Endpoint OUT Descriptor*/
-    // 0x07,   								/* bLength: Endpoint Descriptor size */
-    // USB_ENDPOINT_DESCRIPTOR_TYPE,      	/* bDescriptorType: Endpoint */
-    // 0x00,                        			  /* bEndpointAddress */
-    // 0x02,                              	/* bmAttributes: Bulk */
-    // 0x40,  								              /* wMaxPacketSize: */
-    // 0x00,
-    // 0x00,                              	/* bInterval: ignore for Bulk transfer */
+    /*Data class interface descriptor*/
+    0x09,   /* bLength: Endpoint Descriptor size */
+    USB_INTERFACE_DESCRIPTOR_TYPE,  /* bDescriptorType: */
+    0x01,   /* bInterfaceNumber: Number of Interface, zero based index of this interface */
+    0x00,   /* bAlternateSetting: Alternate setting */
+    0x01,   /* bNumEndpoints: Two endpoints used */
+    0x00,   /* bInterfaceClass: vendor */
+    0x00,   /* bInterfaceSubClass: */
+    0x00,   /* bInterfaceProtocol: */
+    0x00,   /* iInterface: */
+
+    /*Endpoint OUT Descriptor*/
+    0x07,   /* bLength: Endpoint Descriptor size */
+    USB_ENDPOINT_DESCRIPTOR_TYPE,       /* bDescriptorType: Endpoint */
+    0x02,                               /* bEndpointAddress */
+    0x02,                               /* bmAttributes: Control 0x0 Isochronous 0x1 Bulk 0x2 Interrupt 0x3*/
+    0x40,                               /* wMaxPacketSize: */
+    0x00,
+    0x00,                                /* bInterval: ignore for Bulk transfer */
+    
 };
 /* USB String Descriptors */
 const uint8_t Camera_StringLangID[CAMERA_SIZ_STRING_LANGID] =
@@ -146,8 +159,8 @@ const uint8_t USBD_WINUSB_OSFeatureDesc[USB_LEN_OS_FEATURE_DESC] =
 	0,             // interface no
 	0,             // reserved
 	'W', 'I', 'N', 'U', 'S', 'B', 0, 0, //  first ID
-    0,   0,   0,   0,   0,   0, 0, 0,  // second ID
-	0,   0,   0,   0,   0,   0 // reserved 6 bytes      
+    0, 0, 0, 0, 0, 0, 0, 0,  // second ID
+	0, 0, 0, 0, 0, 0 // reserved 6 bytes      
 };
 const uint8_t USBD_WINUSB_OSPropertyDesc[USB_LEN_OS_PROPERTY_DESC] =
 {
