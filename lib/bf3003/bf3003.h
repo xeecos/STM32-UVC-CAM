@@ -28,6 +28,8 @@
 #define BF3003_DBLK_TARE            0x22
 #define BF3003_GREEN_GAIN           0x23
 #define BF3003_GLB_GAIN             0x87
+#define BF3003_GLB_GAIN_MIN         0x82
+#define BF3003_GLB_GAIN_MAX         0x86
 #define BF3003_GN_GAIN              0x6A
 #define BF3003_STEPO                0x27
 #define BF3003_DBLK_CNTL            0x28

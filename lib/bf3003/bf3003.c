@@ -11,7 +11,7 @@
 #define BF3003_PID_BME              0xFC
 #define BF3003_VER_BME              0xFD
 
-#define REGS_COUNT	42
+#define REGS_COUNT	44
 
 uint8_t frame[2][640];
 uint16_t pixelIdx = 0;
@@ -104,7 +104,7 @@ uint8_t regs[REGS_COUNT][2] = {
 		06h: G3HR5,B5G3L 07h: G3LR5,B5G3H
 		08h: G6B2H,B3LR5 09h: G6R2H,R3LB5
 	*/
-	{BF3003_COM8, 0b00011010},
+	{BF3003_COM8, 0b00111010},
 	/*
 		Auto mode Contrl
 		Bit[7:6] reserved
@@ -251,10 +251,13 @@ uint8_t regs[REGS_COUNT][2] = {
 	{BF3003_INT_MEAN_L,  0xAA},
 	{BF3003_INT_TIM_MIN, 0x00},
 	{BF3003_INT_TIM_HI,  0x00},
-	{BF3003_INT_TIM_LO,  0x80},
-	{BF3003_INT_TIM_MAX_HI, 0xff},
-	{BF3003_INT_TIM_MAX_LO, 0xff},
+	{BF3003_INT_TIM_LO,  0x00},
+	{BF3003_INT_TIM_MAX_HI, 0xFF},
+	{BF3003_INT_TIM_MAX_LO, 0xFF},
 	{BF3003_LINE_CTR, 0b010110},
+	{BF3003_GLB_GAIN_MIN, 0x00},
+	{BF3003_GLB_GAIN_MAX, 0xFF},
+	{BF3003_GLB_GAIN, 0x10},
 	{0, 0},
 };
 /*
