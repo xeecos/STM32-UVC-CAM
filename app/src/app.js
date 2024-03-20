@@ -14,8 +14,6 @@ async function transfer()
     device.interfaces[0].claim();
     device.interfaces[1].claim();
     let epIn = device.interfaces[0].endpoints[0];
-    // let epOut = device.interfaces[0].endpoints[1];
-    // console.log(device.interfaces[0].endpoints);
     let image = [[],[]];
     let bufCount = 1;
     let successCount = 0;
@@ -27,11 +25,6 @@ async function transfer()
     let imageIdx = 0;
     let imageWidth = 320;
     let imageHeight = 240;
-    
-    for(let i=0,count=640*480*4;i<count;i++)
-    {
-        data[i] = 0xff;
-    }
     function encodeData()
     {
         let idx = 1-imageIdx;
@@ -53,12 +46,12 @@ async function transfer()
     }
     // setInterval(()=>{
     // },1000);
-    let imageX = (640-imageWidth)/2;
+    let imageX = (640-imageWidth)/2+6;
     let imageY = (480-imageHeight)/2;
     web.transferOut(2,Buffer.from([1,1,imageX>>8,imageX&0xff,imageY>>8,imageY&0xff,imageWidth>>8,imageWidth&0xff,imageHeight>>8,imageHeight&0xff])).then((res)=>{
         console.log(res);
     });
-    web.transferOut(2,Buffer.from([1,2,0x00,0x00])).then((res)=>{
+    web.transferOut(2,Buffer.from([1,2,0x00,imageWidth==640?0x80:0x00])).then((res)=>{
         console.log(res);
     });
     web.transferOut(2,Buffer.from([1,3,0x0,0x10])).then((res)=>{
@@ -70,7 +63,7 @@ async function transfer()
     web.transferOut(2,Buffer.from([1,5,0x20])).then((res)=>{
         console.log(res);
     });
-    web.transferOut(2,Buffer.from([1,7,16])).then((res)=>{
+    web.transferOut(2,Buffer.from([1,7,32])).then((res)=>{
         console.log(res);
     });
     web.transferOut(2,Buffer.from([1,8,1,1,0])).then((res)=>{
