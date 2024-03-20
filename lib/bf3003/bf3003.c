@@ -21,7 +21,7 @@ uint16_t lineIdx = 0;
 uint8_t skipFreq = 1;
 uint8_t regs[REGS_COUNT][2] = {
 	{BF3003_COM7, 0b10000000},
-	{BF3003_COM2, 0b00110000},
+	{BF3003_COM2, 0b00000011},
 	/*
 	Common control 2
 	Bit[7:6]: vclk output drive capability
@@ -60,7 +60,7 @@ uint8_t regs[REGS_COUNT][2] = {
 	Bit[0]:HREF ahead 0.5 clk(YUV MCLK,RawData PCLK) or not
 	0x0c[1:0]: Internal use only
 	*/
-	{BF3003_CLKRC, 0b00},
+	{BF3003_CLKRC, 0x8},
 	/*
 	Mclk_div control
 	Bit[7：2]: Internal use only
@@ -105,7 +105,7 @@ uint8_t regs[REGS_COUNT][2] = {
 		06h: G3HR5,B5G3L 07h: G3LR5,B5G3H
 		08h: G6B2H,B3LR5 09h: G6R2H,R3LB5
 	*/
-	{BF3003_COM8, 0b00101010},
+	{BF3003_COM8, 0b00010000},
 	/*
 		Auto mode Contrl
 		Bit[7:6] reserved
@@ -255,7 +255,7 @@ uint8_t regs[REGS_COUNT][2] = {
 	{BF3003_INT_TIM_LO,  0x00},
 	{BF3003_INT_TIM_MAX_HI, 0xFF},
 	{BF3003_INT_TIM_MAX_LO, 0xFF},
-	{BF3003_LINE_CTR, 0b010110},
+	{BF3003_LINE_CTR, 0x1},
 	{BF3003_GLB_GAIN_MIN, 0x00},
 	{BF3003_GLB_GAIN_MAX, 0xFF},
 	{BF3003_GLB_GAIN, 0x10},
@@ -289,18 +289,10 @@ void BF3003_Pin_Init()
 	GPIO_PinRemapConfig(GPIO_PartialRemap_TIM3, ENABLE); 
     GPIO_PinRemapConfig(GPIO_Remap_SWJ_NoJTRST,ENABLE);
 
-    TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
-    TIM_TimeBaseInitStructure.TIM_Prescaler = 36 - 1;
-    TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-    TIM_TimeBaseInitStructure.TIM_Period = 2 - 1;
-    TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
-    // 72000000  / (TIM_Period + 1) / (TIM_Prescaler + 1)
-    TIM_TimeBaseInit(TIM3, &TIM_TimeBaseInitStructure);
-
     TIM_OCInitTypeDef TIM_OCInitStructure;
     TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
     TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
-    TIM_OCInitStructure.TIM_Pulse = 1;
+    TIM_OCInitStructure.TIM_Pulse = 8;
     TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
 
     TIM_OC1Init(TIM3, &TIM_OCInitStructure);
@@ -422,22 +414,26 @@ void BF3003_Start()
 {
 	EXTI_InitStructureVSYNC.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStructureVSYNC);
+	EXTI_InitStructureHREF.EXTI_LineCmd = ENABLE;
+	EXTI_Init(&EXTI_InitStructureHREF);
+	_BF3003_SetFrequency(1);
 }
 void BF3003_Stop()
 {
 	EXTI_InitStructureVSYNC.EXTI_LineCmd = DISABLE;
 	EXTI_Init(&EXTI_InitStructureVSYNC);
+	EXTI_InitStructureHREF.EXTI_LineCmd = DISABLE;
+	EXTI_Init(&EXTI_InitStructureHREF);
+	
 }
 int bufIdx = 0;
 void BF3003_FrameBegin()
 {
 	// printf("frame:%d\n",lineIdx);
-	_BF3003_SetFrequency(skipFreq);
+	if(skipFreq>1)_BF3003_SetFrequency(skipFreq);
 	lineIdx = 0;
 	pixelIdx = 0;
 	bufIdx = 1;
-	EXTI_InitStructureHREF.EXTI_LineCmd = ENABLE;
-	EXTI_Init(&EXTI_InitStructureHREF);
 }
 void BF3003_LineBegin()
 {
@@ -458,12 +454,7 @@ void BF3003_ReadPixel()
 		EXTI_Init(&EXTI_InitStructurePCLK);
 		pixelIdx = 0;
 		lineIdx++;
-		if(lineIdx>=frameHeight)
-		{
-			EXTI_InitStructureHREF.EXTI_LineCmd = DISABLE;
-			EXTI_Init(&EXTI_InitStructureHREF);
-		}
-		_BF3003_SetFrequency(skipFreq);
+		if(skipFreq>1)_BF3003_SetFrequency(skipFreq);
 	}
 }
 
@@ -528,9 +519,9 @@ void BF3003_SetFrequency(uint8_t freq)
 void _BF3003_SetFrequency(uint8_t freq)
 {
     TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
-    TIM_TimeBaseInitStructure.TIM_Prescaler = 36/freq - 1;
+    TIM_TimeBaseInitStructure.TIM_Prescaler = 72/freq - 1;
     TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-    TIM_TimeBaseInitStructure.TIM_Period = 2 - 1;
+    TIM_TimeBaseInitStructure.TIM_Period = 16 - 1;
     TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     // 72000000  / (TIM_Period + 1) / (TIM_Prescaler + 1)
     TIM_TimeBaseInit(TIM3, &TIM_TimeBaseInitStructure);

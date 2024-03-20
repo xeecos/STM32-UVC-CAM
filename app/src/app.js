@@ -23,8 +23,8 @@ async function transfer()
     let cout = 0;
     let time = Date.now();
     let imageIdx = 0;
-    let imageWidth = 160;
-    let imageHeight = 120;
+    let imageWidth = 640;
+    let imageHeight = 480;
     for(let i=0,count=640*480*4;i<count;i++)
     {
         data[i] = 0xff;
@@ -55,7 +55,7 @@ async function transfer()
     web.transferOut(2,Buffer.from([1,2,0x00,0x00])).then((res)=>{
         console.log(res);
     });
-    web.transferOut(2,Buffer.from([1,3,0x0,0x20])).then((res)=>{
+    web.transferOut(2,Buffer.from([1,3,0x0,0x10])).then((res)=>{
         console.log(res);
     });
     web.transferOut(2,Buffer.from([1,4,0x15,0x15,0x15])).then((res)=>{
@@ -64,7 +64,7 @@ async function transfer()
     web.transferOut(2,Buffer.from([1,5,0x20])).then((res)=>{
         console.log(res);
     });
-    web.transferOut(2,Buffer.from([1,7,2])).then((res)=>{
+    web.transferOut(2,Buffer.from([1,7,16])).then((res)=>{
         console.log(res);
     });
     web.transferOut(2,Buffer.from([1,8,0,0,0])).then((res)=>{
