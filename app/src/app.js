@@ -1,6 +1,8 @@
 const { findByIds,WebUSBDevice ,usb} = require('usb');
 const bmp = require('bmp-js');
 const fs = require("fs")
+const Demosaic = require('demosaic');
+ 
 
 let data = Buffer.alloc(640*480*4);
 
@@ -23,8 +25,9 @@ async function transfer()
     let cout = 0;
     let time = Date.now();
     let imageIdx = 0;
-    let imageWidth = 640;
-    let imageHeight = 480;
+    let imageWidth = 320;
+    let imageHeight = 240;
+    
     for(let i=0,count=640*480*4;i<count;i++)
     {
         data[i] = 0xff;
@@ -32,13 +35,16 @@ async function transfer()
     function encodeData()
     {
         let idx = 1-imageIdx;
+        
+        let rgb = Demosaic.nearestNeighbour({data: Buffer.from(image[idx]), height:imageHeight, width:imageWidth, bayer:Demosaic.Bayer.RGGB});
+        
         for(let i=0,count=imageWidth*imageHeight;i<count;i++)
         {
-            let g = image[idx][i]&0xff;
+            // let g = image[idx][i]&0xff;
             let n = i<<2;
-            data[n+1] = g;
-            data[n+2] = g;
-            data[n+3] = g;
+            data[n+1] = rgb[i*3];
+            data[n+2] = rgb[i*3+1];
+            data[n+3] = rgb[i*3+2];
         }
         console.time("time");
         let img = bmp.encode({data,width:imageWidth,height:imageHeight});
@@ -58,7 +64,7 @@ async function transfer()
     web.transferOut(2,Buffer.from([1,3,0x0,0x10])).then((res)=>{
         console.log(res);
     });
-    web.transferOut(2,Buffer.from([1,4,0x15,0x15,0x15])).then((res)=>{
+    web.transferOut(2,Buffer.from([1,4,0x15,0x12,0x17])).then((res)=>{
         console.log(res);
     });
     web.transferOut(2,Buffer.from([1,5,0x20])).then((res)=>{
@@ -67,7 +73,7 @@ async function transfer()
     web.transferOut(2,Buffer.from([1,7,16])).then((res)=>{
         console.log(res);
     });
-    web.transferOut(2,Buffer.from([1,8,0,0,0])).then((res)=>{
+    web.transferOut(2,Buffer.from([1,8,1,1,0])).then((res)=>{
         console.log(res);
     });
     web.transferOut(2,Buffer.from([1,0,0x1])).then((res)=>{
