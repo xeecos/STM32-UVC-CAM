@@ -12,7 +12,8 @@
 #define BF3003_VER_BME              0xFD
 
 #define REGS_COUNT	44
-
+uint16_t frameWidth = 640;
+uint16_t frameHeight = 480;
 uint8_t frame[2][640];
 uint16_t pixelIdx = 0;
 uint32_t totalCount = 0;
@@ -132,7 +133,7 @@ uint8_t regs[REGS_COUNT][2] = {
 		Bit[1]: VSYNC option, 0:active low, 1:active high.
 		Bit[0]: HSYNC option, 0:active high, 1:active low.
 	*/
-	{BF3003_VHREF, 0b01},
+	{BF3003_VHREF, 0b0100},
 	{BF3003_HSTART, 0x1},
 	{BF3003_HSTOP, 0xA0},
 	{BF3003_VSTART, 0x0},
@@ -268,27 +269,27 @@ uint8_t regs[REGS_COUNT][2] = {
 
 
 EXTI_InitTypeDef   EXTI_InitStructurePCLK;
+EXTI_InitTypeDef   EXTI_InitStructureHREF;
+EXTI_InitTypeDef   EXTI_InitStructureVSYNC;
 void BF3003_Pin_Init()
 {
     GPIO_InitTypeDef GPIO_InitStruct;  
     /* XCLK初始化 */
     GPIO_InitStruct.GPIO_Pin = GPIO_Pin_4;
     GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF_PP;  
-    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_10MHz;
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOB, &GPIO_InitStruct);
 
     /* PIXCLK VSYNC HREF 初始化 */
     GPIO_InitStruct.GPIO_Pin = GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
     GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IPU;  
-    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_10MHz;
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 	GPIO_PinRemapConfig(GPIO_PartialRemap_TIM3, ENABLE); 
     GPIO_PinRemapConfig(GPIO_Remap_SWJ_NoJTRST,ENABLE);
 
     TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
-    TIM_OCInitTypeDef TIM_OCInitStructure;
-
     TIM_TimeBaseInitStructure.TIM_Prescaler = 36 - 1;
     TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
     TIM_TimeBaseInitStructure.TIM_Period = 2 - 1;
@@ -296,6 +297,7 @@ void BF3003_Pin_Init()
     // 72000000  / (TIM_Period + 1) / (TIM_Prescaler + 1)
     TIM_TimeBaseInit(TIM3, &TIM_TimeBaseInitStructure);
 
+    TIM_OCInitTypeDef TIM_OCInitStructure;
     TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
     TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
     TIM_OCInitStructure.TIM_Pulse = 1;
@@ -309,19 +311,14 @@ void BF3003_Pin_Init()
 	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource6);//vsync
 	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource7);//href
 
-	EXTI_InitTypeDef   EXTI_InitStructure;
-	EXTI_InitStructure.EXTI_Line = EXTI_Line7;//href
-	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
-	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-	EXTI_Init(&EXTI_InitStructure);
 
-	EXTI_InitStructure.EXTI_Line = EXTI_Line6;//vsync
-	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;
-	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-	EXTI_Init(&EXTI_InitStructure);
+	EXTI_InitStructureVSYNC.EXTI_Line = EXTI_Line6;//vsync
+	EXTI_InitStructureVSYNC.EXTI_Mode = EXTI_Mode_Interrupt;
+	EXTI_InitStructureVSYNC.EXTI_Trigger = EXTI_Trigger_Falling;
 
+	EXTI_InitStructureHREF.EXTI_Line = EXTI_Line7;//href
+	EXTI_InitStructureHREF.EXTI_Mode = EXTI_Mode_Interrupt;
+	EXTI_InitStructureHREF.EXTI_Trigger = EXTI_Trigger_Rising;
 
 	EXTI_InitStructurePCLK.EXTI_Line = EXTI_Line5;//pclk
 	EXTI_InitStructurePCLK.EXTI_Mode = EXTI_Mode_Interrupt;
@@ -332,7 +329,7 @@ void BF3003_Pin_Init()
     /* D0-D7 IO口初始化 */
     GPIO_InitStruct.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
     GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_10MHz;
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOB, &GPIO_InitStruct);
 }
 /*
@@ -380,26 +377,7 @@ uint8_t BF3003_ReadReg(uint8_t RegAddress)
 
     return Data;
 }
-void BF3003_SetExposure(uint16_t exposure)
-{
-	printf("set exp:%d\n",exposure);
-    uint8_t exposure_l = exposure & 0xff;
-    uint8_t exposure_h = exposure >> 8;
-    BF3003_WriteReg(BF3003_INT_TIM_LO, exposure_l);
-    BF3003_WriteReg(BF3003_INT_TIM_HI, exposure_h);
-}
-void BF3003_SetGain(uint8_t r,uint8_t g,uint8_t b)
-{
-	printf("set gain:%d %d %d\n",r, g, b);
-	BF3003_WriteReg(BF3003_RED_GAIN, r);
-	BF3003_WriteReg(BF3003_GREEN_GAIN, g);
-	BF3003_WriteReg(BF3003_BLUE_GAIN, b);
-}
-void BF3003_SetGlobalGain(uint8_t gain)
-{
-	printf("global gain:%d\n",gain);
-	BF3003_WriteReg(BF3003_GLB_GAIN, gain);
-}
+
 /*
  * @brief    寄存器初始化
  */
@@ -440,18 +418,36 @@ void BF3003_Handle(void)
 {
 	
 }
+void BF3003_Start()
+{
+	EXTI_InitStructureVSYNC.EXTI_LineCmd = ENABLE;
+	EXTI_Init(&EXTI_InitStructureVSYNC);
+}
+void BF3003_Stop()
+{
+	EXTI_InitStructureVSYNC.EXTI_LineCmd = DISABLE;
+	EXTI_Init(&EXTI_InitStructureVSYNC);
+}
 int bufIdx = 0;
 void BF3003_FrameBegin()
 {
-	printf("frame:%d\n",lineIdx);
+	// printf("frame:%d\n",lineIdx);
 	lineIdx = 0;
 	pixelIdx = 0;
 	bufIdx = 1;
+	
+	EXTI_InitStructureHREF.EXTI_LineCmd = ENABLE;
+	EXTI_Init(&EXTI_InitStructureHREF);
 }
 void BF3003_LineBegin()
 {
 	pixelIdx = 0;
 	bufIdx = 1 - bufIdx;
+	// for(pixelIdx=0;pixelIdx<frameWidth;pixelIdx++)
+	// {
+	// 	BF3003_ReadPixel();
+	// }
+	// lineIdx++;
 	EXTI_InitStructurePCLK.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStructurePCLK);
 }
@@ -460,11 +456,66 @@ void BF3003_ReadPixel()
 {
 	frame[bufIdx][pixelIdx] = GPIOB->IDR >> 8;
 	pixelIdx++;
-	if(pixelIdx>639)
+	if(pixelIdx>frameWidth-1)
 	{
 		EXTI_InitStructurePCLK.EXTI_LineCmd = DISABLE;
 		EXTI_Init(&EXTI_InitStructurePCLK);
 		pixelIdx = 0;
 		lineIdx++;
+		if(lineIdx>=frameHeight)
+		{
+			EXTI_InitStructureHREF.EXTI_LineCmd = DISABLE;
+			EXTI_Init(&EXTI_InitStructureHREF);
+		}
 	}
+}
+
+void BF3003_SetFramesize(uint16_t framesize)
+{
+
+}
+void BF3003_SetWindow(uint16_t x,uint16_t y,uint16_t w,uint16_t h)
+{
+	BF3003_WriteReg(BF3003_VHREF, (((x+w)&0b11)<<6)+(((x)&0b11)<<4)+(((y+h)&0b11)<<2)+(y&0b11));
+	BF3003_WriteReg(BF3003_HSTART, x>>2);
+	BF3003_WriteReg(BF3003_HSTOP, (x+w)>>2);
+	BF3003_WriteReg(BF3003_VSTART, y>>2);
+	BF3003_WriteReg(BF3003_VSTOP, (y+h)>>2);
+	frameWidth = w;
+	frameHeight = h;
+}
+void BF3003_SetDummy(uint16_t dummy)
+{
+	BF3003_WriteReg(BF3003_EXHCH, dummy>>8);
+	BF3003_WriteReg(BF3003_EXHCL, dummy&0xff);
+}
+void BF3003_SetExposure(uint16_t exposure)
+{
+	printf("set exp:%d\n",exposure);
+    uint8_t exposure_l = exposure & 0xff;
+    uint8_t exposure_h = exposure >> 8;
+    BF3003_WriteReg(BF3003_INT_TIM_LO, exposure_l);
+    BF3003_WriteReg(BF3003_INT_TIM_HI, exposure_h);
+}
+void BF3003_SetGain(uint8_t r,uint8_t g,uint8_t b)
+{
+	printf("set gain:%d %d %d\n",r, g, b);
+	BF3003_WriteReg(BF3003_RED_GAIN, r);
+	BF3003_WriteReg(BF3003_GREEN_GAIN, g);
+	BF3003_WriteReg(BF3003_BLUE_GAIN, b);
+}
+void BF3003_SetGlobalGain(uint8_t gain)
+{
+	printf("global gain:%d\n",gain);
+	BF3003_WriteReg(BF3003_GLB_GAIN, gain);
+}
+void BF3003_SetFrequency(uint8_t freq)
+{
+    TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
+    TIM_TimeBaseInitStructure.TIM_Prescaler = 36/freq - 1;
+    TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
+    TIM_TimeBaseInitStructure.TIM_Period = 2 - 1;
+    TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
+    // 72000000  / (TIM_Period + 1) / (TIM_Prescaler + 1)
+    TIM_TimeBaseInit(TIM3, &TIM_TimeBaseInitStructure);
 }

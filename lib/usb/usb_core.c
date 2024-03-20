@@ -996,9 +996,10 @@ void NOP_Process(void)
 
 extern uint8_t frame[2][640];
 extern uint16_t lineIdx;
+extern uint16_t frameWidth;	
+extern uint16_t frameHeight;	
 uint8_t sendbuf[PACKET_SIZE];			// 发送数据缓冲区
 uint32_t sendsize = 0;					// 已发送字节数
-uint16_t frameSize = 640;	
 uint16_t lastLineIdx;
 void EP1_IN_Callback(void)
 {
@@ -1029,12 +1030,12 @@ void EP1_IN_Callback(void)
 		sendsize = datalen;
 		lastLineIdx = lineIdx;
 	} 
-	else if(sendsize<frameSize)
+	else if(sendsize<frameWidth)
 	{
 		datalen = PACKET_SIZE;
-		if (sendsize + datalen >= frameSize)
+		if (sendsize + datalen >= frameWidth)
 		{
-			datalen = frameSize - sendsize;
+			datalen = frameWidth - sendsize;
 		}
 		sendsize += datalen;
 	}
@@ -1050,7 +1051,7 @@ void EP1_IN_Callback(void)
 		SetEPDblBuf1Count(ENDP1, EP_DBUF_IN, datalen);
 	}
 	SetEPTxStatus(ENDP1, EP_TX_VALID);		// 允许数据发送
-	if(sendsize>=frameSize)
+	if(sendsize>=frameWidth)
 	{
 		if(lineIdx!=lastLineIdx)
 		{
@@ -1067,28 +1068,58 @@ void EP2_OUT_Callback(void)
 	{
 		switch(commands[1])
 		{
+			
+			case 0:
+			{
+				//on/off;
+				if(commands[2]==1)
+				{
+					BF3003_Start();
+				}
+				else
+				{
+					BF3003_Stop();
+				}
+			}
+			break;
 			case 1:
+			{
+				BF3003_SetWindow((commands[2]<<8)+commands[3],(commands[4]<<8)+commands[5],(commands[6]<<8)+commands[7],(commands[8]<<8)+commands[9]);
+			}
+			break;
+			case 2:
+			{
+				BF3003_SetDummy((commands[2]<<8)+commands[3]);
+			}
+			break;
+			case 3:
 			{
 				//set exposure;
 				BF3003_SetExposure((commands[2]<<8)+commands[3]);
 			}
 			break;
-			case 2:
+			case 4:
 			{
 				//set gain;
 				BF3003_SetGain(commands[2],commands[3],commands[4]);
 			}
 			break;
-			case 3:
+			case 5:
 			{
 				//set global gain;
 				BF3003_SetGlobalGain(commands[2]);
 			}
 			break;
-			case 4:
+			case 6:
 			{
 				//set reg;
 				BF3003_WriteReg(commands[2],commands[3]);
+			}
+			break;
+			case 7:
+			{
+				//set freq;
+				BF3003_SetFrequency(commands[2]);
 			}
 			break;
 		}

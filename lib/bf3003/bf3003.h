@@ -57,8 +57,14 @@
 #define BF3003_LINE_CTR             0xF5 
 void BF3003_Init(void);
 void BF3003_Handle(void);
+void BF3003_Start();
+void BF3003_Stop();
+void BF3003_SetFramesize(uint16_t framesize);
+void BF3003_SetWindow(uint16_t x,uint16_t y,uint16_t w,uint16_t h);
 void BF3003_SetExposure(uint16_t exposure);
 void BF3003_SetGain(uint8_t r,uint8_t g,uint8_t b);
+void BF3003_SetDummy(uint16_t dummy);
+void BF3003_SetFrequency(uint8_t freq);
 void BF3003_WriteReg(uint8_t RegAddress, uint8_t Data);
 uint8_t BF3003_ReadReg(uint8_t RegAddress);
 void BF3003_LineBegin();
