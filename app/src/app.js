@@ -2,6 +2,8 @@ const bmp = require('bmp-js');
 const fs = require("fs")
 const Demosaic = require('demosaic');
 const BF3003 = require("./bf3003");
+// const Image = require("./jpeg.node");
+
 
 BF3003.setup().then(
     (res)=>
@@ -12,7 +14,11 @@ BF3003.setup().then(
             let width = BF3003.width;
             let height = BF3003.height;
             if(res.line!=height)return;
-            let rgb = Demosaic.nearestNeighbour({data: Buffer.from(res.data), height, width, bayer:Demosaic.Bayer.RGGB});
+            console.time("time");
+            // const rgbBuffer = Buffer.alloc(width * height * 3);
+            // Image.demosaic(Buffer.from(res.data), width * height, rgbBuffer, 1, width, height);
+            let rgb = Demosaic.bilinear({data: Buffer.from(res.data), height, width, bayer:Demosaic.Bayer.RGGB});
+            console.timeEnd("time");
             for(let i=0,count=width*height;i<count;i++)
             {
                 let n = i<<2;
@@ -21,10 +27,8 @@ BF3003.setup().then(
                 data[n+2] = rgb[i*3+1];
                 data[n+3] = rgb[i*3+2];
             }
-            console.time("time");
             let img = bmp.encode({data,width,height});
             fs.writeFileSync("tmp.bmp",img.data);
-            console.timeEnd("time");
         });
 
         BF3003.start();
