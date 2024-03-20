@@ -18,7 +18,7 @@ uint8_t frame[2][640];
 uint16_t pixelIdx = 0;
 uint32_t totalCount = 0;
 uint16_t lineIdx = 0;
-
+uint8_t skipFreq = 1;
 uint8_t regs[REGS_COUNT][2] = {
 	{BF3003_COM7, 0b10000000},
 	{BF3003_COM2, 0b00110000},
@@ -432,22 +432,18 @@ int bufIdx = 0;
 void BF3003_FrameBegin()
 {
 	// printf("frame:%d\n",lineIdx);
+	_BF3003_SetFrequency(skipFreq);
 	lineIdx = 0;
 	pixelIdx = 0;
 	bufIdx = 1;
-	
 	EXTI_InitStructureHREF.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStructureHREF);
 }
 void BF3003_LineBegin()
 {
+	_BF3003_SetFrequency(1);
 	pixelIdx = 0;
 	bufIdx = 1 - bufIdx;
-	// for(pixelIdx=0;pixelIdx<frameWidth;pixelIdx++)
-	// {
-	// 	BF3003_ReadPixel();
-	// }
-	// lineIdx++;
 	EXTI_InitStructurePCLK.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStructurePCLK);
 }
@@ -460,6 +456,9 @@ void BF3003_ReadPixel()
 	{
 		EXTI_InitStructurePCLK.EXTI_LineCmd = DISABLE;
 		EXTI_Init(&EXTI_InitStructurePCLK);
+		
+		_BF3003_SetFrequency(skipFreq);
+
 		pixelIdx = 0;
 		lineIdx++;
 		if(lineIdx>=frameHeight)
@@ -470,10 +469,6 @@ void BF3003_ReadPixel()
 	}
 }
 
-void BF3003_SetFramesize(uint16_t framesize)
-{
-
-}
 void BF3003_SetWindow(uint16_t x,uint16_t y,uint16_t w,uint16_t h)
 {
 	BF3003_WriteReg(BF3003_VHREF, (((x+w)&0b11)<<6)+(((x)&0b11)<<4)+(((y+h)&0b11)<<2)+(y&0b11));
@@ -510,6 +505,10 @@ void BF3003_SetGlobalGain(uint8_t gain)
 	BF3003_WriteReg(BF3003_GLB_GAIN, gain);
 }
 void BF3003_SetFrequency(uint8_t freq)
+{
+	skipFreq = freq;
+}
+void _BF3003_SetFrequency(uint8_t freq)
 {
     TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
     TIM_TimeBaseInitStructure.TIM_Prescaler = 36/freq - 1;
