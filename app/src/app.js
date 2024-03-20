@@ -23,8 +23,8 @@ async function transfer()
     let cout = 0;
     let time = Date.now();
     let imageIdx = 0;
-    let imageWidth = 320;
-    let imageHeight = 240;
+    let imageWidth = 640;
+    let imageHeight = 480;
     function encodeData()
     {
         let idx = 1-imageIdx;
@@ -63,7 +63,7 @@ async function transfer()
     web.transferOut(2,Buffer.from([1,5,0x20])).then((res)=>{
         console.log(res);
     });
-    web.transferOut(2,Buffer.from([1,7,32])).then((res)=>{
+    web.transferOut(2,Buffer.from([1,7,16])).then((res)=>{
         console.log(res);
     });
     web.transferOut(2,Buffer.from([1,8,1,1,0])).then((res)=>{
