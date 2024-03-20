@@ -105,7 +105,7 @@ uint8_t regs[REGS_COUNT][2] = {
 		06h: G3HR5,B5G3L 07h: G3LR5,B5G3H
 		08h: G6B2H,B3LR5 09h: G6R2H,R3LB5
 	*/
-	{BF3003_COM8, 0b00111010},
+	{BF3003_COM8, 0b00101010},
 	/*
 		Auto mode Contrl
 		Bit[7:6] reserved
@@ -441,11 +441,11 @@ void BF3003_FrameBegin()
 }
 void BF3003_LineBegin()
 {
-	_BF3003_SetFrequency(1);
 	pixelIdx = 0;
 	bufIdx = 1 - bufIdx;
 	EXTI_InitStructurePCLK.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStructurePCLK);
+	_BF3003_SetFrequency(1);
 }
 
 void BF3003_ReadPixel()
@@ -456,9 +456,6 @@ void BF3003_ReadPixel()
 	{
 		EXTI_InitStructurePCLK.EXTI_LineCmd = DISABLE;
 		EXTI_Init(&EXTI_InitStructurePCLK);
-		
-		_BF3003_SetFrequency(skipFreq);
-
 		pixelIdx = 0;
 		lineIdx++;
 		if(lineIdx>=frameHeight)
@@ -466,6 +463,7 @@ void BF3003_ReadPixel()
 			EXTI_InitStructureHREF.EXTI_LineCmd = DISABLE;
 			EXTI_Init(&EXTI_InitStructureHREF);
 		}
+		_BF3003_SetFrequency(skipFreq);
 	}
 }
 
@@ -484,6 +482,15 @@ void BF3003_SetDummy(uint16_t dummy)
 	BF3003_WriteReg(BF3003_EXHCH, dummy>>8);
 	BF3003_WriteReg(BF3003_EXHCL, dummy&0xff);
 }
+
+void BF3003_SetMode(uint8_t gain, uint8_t whitebalance, uint8_t exposure)
+{
+	uint8_t value = 0b00010000;
+	value |= (gain?0b100:0b0);
+	value |= (whitebalance?0b10:0b0);
+	value |= (exposure?0b1:0b0);
+	BF3003_WriteReg(BF3003_COM8, value);
+}
 void BF3003_SetExposure(uint16_t exposure)
 {
 	printf("set exp:%d\n",exposure);
@@ -496,7 +503,17 @@ void BF3003_SetGain(uint8_t r,uint8_t g,uint8_t b)
 {
 	printf("set gain:%d %d %d\n",r, g, b);
 	BF3003_WriteReg(BF3003_RED_GAIN, r);
-	BF3003_WriteReg(BF3003_GREEN_GAIN, g);
+	BF3003_WriteReg(BF3003_GREEN_GAIN, (g&0b111)+((g&0b111)<<4));
+	/*GreenGain[2:0]:
+		bit[2:0]: for odd column (used as GreenOgain[2:0])
+		bit[6:4]: for even column (used as GreenEgain[2:0])
+		bit[7]:choose RGB from colorcorrection or
+		colorinterpolation module
+	*/
+	BF3003_WriteReg(BF3003_GN_GAIN, g>>3);
+	/*
+		bit[2:0]G channel Gain (bit2~bit0 is used as GreenGain[5:3]). 
+	*/
 	BF3003_WriteReg(BF3003_BLUE_GAIN, b);
 }
 void BF3003_SetGlobalGain(uint8_t gain)

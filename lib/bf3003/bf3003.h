@@ -3,8 +3,6 @@
 
 #define BF3003_PID_BME              0xfc
 #define BF3003_VER_BME              0xfd
-#define BF3003_BLUE_GAIN            0x01
-#define BF3003_RED_GAIN             0x02
 #define BF3003_VHREF                0x03
 #define BF3003_OFFSET_4x_DOWN       0x04
 #define BF3003_LOFFN1E              0x05
@@ -26,11 +24,17 @@
 #define BF3003_MVFP                 0x1E
 #define BF3003_DBLK_TARO            0x1F
 #define BF3003_DBLK_TARE            0x22
+#define BF3003_BLUE_GAIN            0x01
+#define BF3003_RED_GAIN             0x02
 #define BF3003_GREEN_GAIN           0x23
+#define BF3003_GN_GAIN              0x6A
+#define BF3003_BLUE_GAIN_LOW        0xA2
+#define BF3003_BLUE_GAIN_HIGH       0xA3
+#define BF3003_RED_GAIN_LOW         0xA4
+#define BF3003_REDE_GAIN_HIGH       0xA5
 #define BF3003_GLB_GAIN             0x87
 #define BF3003_GLB_GAIN_MIN         0x82
 #define BF3003_GLB_GAIN_MAX         0x86
-#define BF3003_GN_GAIN              0x6A
 #define BF3003_STEPO                0x27
 #define BF3003_DBLK_CNTL            0x28
 #define BF3003_EXHCH                0x2A
@@ -60,6 +64,7 @@ void BF3003_Handle(void);
 void BF3003_Start();
 void BF3003_Stop();
 void BF3003_SetWindow(uint16_t x,uint16_t y,uint16_t w,uint16_t h);
+void BF3003_SetMode(uint8_t gain, uint8_t whitebalance, uint8_t exposure);
 void BF3003_SetExposure(uint16_t exposure);
 void BF3003_SetGain(uint8_t r,uint8_t g,uint8_t b);
 void BF3003_SetDummy(uint16_t dummy);

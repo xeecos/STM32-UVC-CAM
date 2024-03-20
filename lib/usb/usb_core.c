@@ -1122,6 +1122,12 @@ void EP2_OUT_Callback(void)
 				BF3003_SetFrequency(commands[2]);
 			}
 			break;
+			case 8:
+			{
+				// set auto mode;
+				BF3003_SetMode(commands[2],commands[3],commands[4]);
+			}
+			break;
 		}
 	}
 	SetEPRxValid(ENDP2);

@@ -58,13 +58,16 @@ async function transfer()
     web.transferOut(2,Buffer.from([1,3,0x0,0x20])).then((res)=>{
         console.log(res);
     });
-    web.transferOut(2,Buffer.from([1,4,0x15,0x19,0x15])).then((res)=>{
+    web.transferOut(2,Buffer.from([1,4,0x15,0x15,0x15])).then((res)=>{
         console.log(res);
     });
-    web.transferOut(2,Buffer.from([1,5,0x10])).then((res)=>{
+    web.transferOut(2,Buffer.from([1,5,0x20])).then((res)=>{
         console.log(res);
     });
-    web.transferOut(2,Buffer.from([1,7,4])).then((res)=>{
+    web.transferOut(2,Buffer.from([1,7,2])).then((res)=>{
+        console.log(res);
+    });
+    web.transferOut(2,Buffer.from([1,8,0,0,0])).then((res)=>{
         console.log(res);
     });
     web.transferOut(2,Buffer.from([1,0,0x1])).then((res)=>{
