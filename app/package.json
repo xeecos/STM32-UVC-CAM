@@ -11,6 +11,7 @@
   "dependencies": {
     "bmp-js": "^0.1.0",
     "demosaic": "^1.0.0",
+    "jpeg-js": "^0.4.4",
     "usb": "^2.12.1"
   }
 }
