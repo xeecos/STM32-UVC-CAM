@@ -23,7 +23,7 @@ class BF3003
         await this.setMode(1,1,1);
         await this.setDummy(this._width==640?0x40:0x00);
         await this.setExposure(0x10);
-        await this.setFrequency(16);
+        await this.setFrequency(24);
 
         let debug = {time:Date.now(),successCount:0,failCount:0,enable:true};
 
