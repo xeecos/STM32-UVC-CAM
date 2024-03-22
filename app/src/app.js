@@ -3,7 +3,6 @@ const jpeg = require("jpeg-js");
 const fs = require("fs")
 const Demosaic = require('demosaic');
 const BF3003 = require("./bf3003");
-
 BF3003.setup().then(
     (res)=>
     {
@@ -15,7 +14,6 @@ BF3003.setup().then(
             if(res.line!=height)return;
             console.time("time");
             let rgb = Demosaic.bilinear({data: Buffer.from(res.data), height, width, bayer:Demosaic.Bayer.RGGB});
-            console.timeEnd("time");
             for(let i=0,count=width*height;i<count;i++)
             {
                 let n = i<<2;
@@ -24,8 +22,9 @@ BF3003.setup().then(
                 data[n+2] = rgb[i*3+1];
                 data[n+3] = rgb[i*3+2];
             }
-            let img = bmp.encode({data,width,height});
-            // let img = jpeg.encode({data,width,height},80);
+            console.timeEnd("time");
+            // let img = bmp.encode({data,width,height});
+            let img = jpeg.encode({data,width,height},80);
             fs.writeFileSync("tmp.jpg",img.data);
         });
 

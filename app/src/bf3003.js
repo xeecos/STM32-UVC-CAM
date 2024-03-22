@@ -9,7 +9,7 @@ class BF3003
         this._epOut = 2;
         this._emitter = new EventEmitter();
     }
-    async setup()
+    async setup(width=640,height=480)
     {
         let device = findByIds(0x20B1, 0x1DE0);
         if(!device)return 1;
@@ -19,11 +19,11 @@ class BF3003
         device.interfaces[0].claim();
         device.interfaces[1].claim();
         
-        await this.setFrameSize(640,480);
+        await this.setFrameSize(width,height);
         await this.setMode(1,1,1);
-        await this.setDummy(this._width==640?0x80:0x00);
+        await this.setDummy(this._width==640?0x40:0x00);
         await this.setExposure(0x10);
-        await this.setFrequency(32);
+        await this.setFrequency(16);
 
         let debug = {time:Date.now(),successCount:0,failCount:0,enable:true};
 
