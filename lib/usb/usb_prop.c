@@ -204,7 +204,7 @@ void UsbCamera_Reset(void)
 	SetEPRxValid(ENDP0);
 
 	/* Initialize Endpoint 1 */
-	SetEPType(ENDP1, EP_BULK);
+	SetEPType(ENDP1, EP_ISOCHRONOUS);
 	SetEPDoubleBuff(ENDP1);
 	SetEPDblBuffAddr(ENDP1, ENDP1_BUF0Addr, ENDP1_BUF1Addr);
 	SetEPDblBuffCount(ENDP1, EP_DBUF_OUT, PACKET_SIZE);

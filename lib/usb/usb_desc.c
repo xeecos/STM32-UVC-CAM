@@ -80,7 +80,7 @@ const uint8_t Camera_ConfigDescriptor[CAMERA_SIZ_CONFIG_DESC] =
     0x07,   /* bLength: Endpoint Descriptor size */
     USB_ENDPOINT_DESCRIPTOR_TYPE,       /* bDescriptorType: Endpoint */
     0x02,                               /* bEndpointAddress */
-    0x02,                               /* bmAttributes: Control 0x0 Isochronous 0x1 Bulk 0x2 Interrupt 0x3*/
+    0x01,                               /* bmAttributes: Control 0x0 Isochronous 0x1 Bulk 0x2 Interrupt 0x3*/
     0x40,                               /* wMaxPacketSize: */
     0x00,
     0x00,                                /* bInterval: ignore for Bulk transfer */
