@@ -16,7 +16,8 @@ int main()
     GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOA, &GPIO_InitStruct);
     GPIO_WriteBit(GPIOA, GPIO_Pin_4, Bit_RESET);
-    MY_NVIC_PriorityGroupConfig(2);
+    // MY_NVIC_PriorityGroupConfig(2);
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
     Delay_Init();
     Usart_Init();
     BF3003_Init();

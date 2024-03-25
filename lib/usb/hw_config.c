@@ -72,9 +72,20 @@ void USB_Interrupts_Config(void)
 {
 	EXTI->IMR |= EXTI_RTSR_TR18;//  开启线18上的中断
 	EXTI->RTSR |= EXTI_RTSR_TR18;//line 18上事件上升降沿触发	 
-	MY_NVIC_Init(1, 0, USB_HP_CAN1_TX_IRQn, 2);//组2，优先级次之 
-	MY_NVIC_Init(0, 1, USB_LP_CAN1_RX0_IRQn, 2);//组2，优先级次之 
-	MY_NVIC_Init(0, 1, USBWakeUp_IRQn, 2);     //组2，优先级最高	 	 
+	// MY_NVIC_Init(0, 1, USB_HP_CAN1_TX_IRQn, 2);//组2，优先级次之 
+	// MY_NVIC_Init(1, 0, USB_LP_CAN1_RX0_IRQn, 2);//组2，优先级次之 
+	// MY_NVIC_Init(0, 1, USBWakeUp_IRQn, 2);     //组2，优先级最高	
+	NVIC_InitTypeDef nvic_init;
+    nvic_init.NVIC_IRQChannel = USB_LP_CAN1_RX0_IRQn;
+    nvic_init.NVIC_IRQChannelPreemptionPriority = 0;
+    nvic_init.NVIC_IRQChannelSubPriority = 0;
+    nvic_init.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&nvic_init);
+    nvic_init.NVIC_IRQChannel = USB_HP_CAN1_TX_IRQn;
+    nvic_init.NVIC_IRQChannelSubPriority = 1;
+    NVIC_Init(&nvic_init);
+    nvic_init.NVIC_IRQChannel = USBWakeUp_IRQn;
+    NVIC_Init(&nvic_init); 	 
 }
 
 /*******************************************************************************
