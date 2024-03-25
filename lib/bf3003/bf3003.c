@@ -288,8 +288,9 @@ void BF3003_Pin_Init()
 
 	GPIO_PinRemapConfig(GPIO_PartialRemap_TIM3, ENABLE); 
     GPIO_PinRemapConfig(GPIO_Remap_SWJ_NoJTRST,ENABLE);
-
-    TIM_OCInitTypeDef TIM_OCInitStructure;
+    GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable,ENABLE);
+    
+	TIM_OCInitTypeDef TIM_OCInitStructure;
     TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
     TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
     TIM_OCInitStructure.TIM_Pulse = 8;
@@ -302,7 +303,6 @@ void BF3003_Pin_Init()
 	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource5);//pclk
 	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource6);//vsync
 	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource7);//href
-
 
 	EXTI_InitStructureVSYNC.EXTI_Line = EXTI_Line6;//vsync
 	EXTI_InitStructureVSYNC.EXTI_Mode = EXTI_Mode_Interrupt;
@@ -385,7 +385,7 @@ void BF3003_Configure(void)
 		{
 			break;
 		}
-		Delay_Ms(100);
+		Delay_Ms(1000);
 	}
 	for (int i = 0; i < REGS_COUNT; i++)
 	{

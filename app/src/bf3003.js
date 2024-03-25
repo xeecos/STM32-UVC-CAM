@@ -20,6 +20,7 @@ class BF3003
         device.interfaces[1].claim();
         
         await this.setFrameSize(width,height);
+        console.log(1);
         await this.setMode(1,1,1);
         await this.setDummy(this._width==640?0x40:0x00);
         await this.setExposure(0x10);

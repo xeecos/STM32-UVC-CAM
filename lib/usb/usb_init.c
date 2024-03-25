@@ -46,6 +46,14 @@ USER_STANDARD_REQUESTS  *pUser_Standard_Requests;
 //初始化USB
 void USB_Init(void)
 {
+	
+	GPIO_InitTypeDef  GPIO_InitStructure;  
+	
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11 | GPIO_Pin_12;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+
     Set_USBClock();
     USB_Interrupts_Config();
 	pInformation = &Device_Info;

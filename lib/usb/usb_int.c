@@ -41,15 +41,36 @@ extern void(*pEpInt_OUT[7])(void);   /*  Handles OUT interrupts   */
 * Output         : None.
 * Return         : None.
 *******************************************************************************/
+
+int bit_4 = 1;
+	
 void CTR_LP(void)
 {
+    GPIO_WriteBit(GPIOA, GPIO_Pin_4, 1);
 	uint32_t wEPVal = 0;
 	/* stay in loop while pending ints */
 	while (((wIstr = _GetISTR()) & ISTR_CTR) != 0)
 	{
+		for(uint32_t i=0;i<8;i++)
+		{
+			uint32_t nstr = _GetENDPOINT(i);
+			if(nstr & (EP_CTR_RX|EP_CTR_TX))
+			{
+				EPindex = i;
+				if(nstr & EP_CTR_RX)
+				{
+					wIstr |= ISTR_DIR;
+				}
+				if(nstr & EP_CTR_TX)
+				{
+					wIstr &= ISTR_DIR;
+				}
+				break;
+			}
+		}
 		_SetISTR((uint16_t)CLR_CTR); /* clear CTR flag */
 		/* extract highest priority endpoint number */
-		EPindex = (uint8_t)(wIstr & ISTR_EP_ID);
+		// EPindex = (uint8_t)(wIstr & ISTR_EP_ID);
 		if (EPindex == 0)
 		{
 			/* Decode and service control endpoint interrupt */
@@ -154,10 +175,27 @@ void CTR_LP(void)
 *******************************************************************************/
 void CTR_HP(void)
 {
+    GPIO_WriteBit(GPIOA, GPIO_Pin_4, 0);
 	uint32_t wEPVal = 0;
-
 	while (((wIstr = _GetISTR()) & ISTR_CTR) != 0)
 	{
+		// for(uint32_t i=0;i<8;i++)
+		// {
+		// 	uint32_t nstr = _GetENDPOINT(i);
+		// 	if(nstr & (EP_CTR_RX|EP_CTR_TX))
+		// 	{
+		// 		EPindex = i;
+		// 		if(nstr & EP_CTR_RX)
+		// 		{
+		// 			wIstr |= ISTR_DIR;
+		// 		}
+		// 		if(nstr & EP_CTR_TX)
+		// 		{
+		// 			wIstr &= ISTR_DIR;
+		// 		}
+		// 		break;
+		// 	}
+		// }
 		_SetISTR((uint16_t)CLR_CTR); /* clear CTR flag */
 		/* extract highest priority endpoint number */
 		EPindex = (uint8_t)(wIstr & ISTR_EP_ID);

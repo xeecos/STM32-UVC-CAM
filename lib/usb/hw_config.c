@@ -20,13 +20,6 @@
 #include "usb_desc.h"
 #include "usb_pwr.h"
 
-//配置USB时钟,USBclk=48Mhz
-void Set_USBClock(void)
-{
-	RCC->CFGR &= ~RCC_CFGR_USBPRE; //USBclk=PLLclk/1.5=48Mhz	    
-	RCC->APB1ENR |= RCC_APB1ENR_USBEN; //USB时钟使能					 
-}
-
 /*******************************************************************************
 * Function Name  : Enter_LowPowerMode.
 * Description    : Power-off system clocks and power while entering suspend mode.
@@ -65,6 +58,13 @@ void Leave_LowPowerMode(void)
 	}
 }
 
+
+//配置USB时钟,USBclk=48Mhz
+void Set_USBClock(void)
+{
+	RCC->CFGR &= ~RCC_CFGR_USBPRE; //USBclk=PLLclk/1.5=48Mhz	    
+	RCC->APB1ENR |= RCC_APB1ENR_USBEN; //USB时钟使能					 
+}
 
 
 //USB中断配置
