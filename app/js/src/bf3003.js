@@ -20,11 +20,10 @@ class BF3003
         device.interfaces[1].claim();
         
         await this.setFrameSize(width,height);
-        console.log(1);
-        await this.setMode(1,1,1);
-        await this.setDummy(this._width==640?0x40:0x00);
-        await this.setExposure(0x10);
-        await this.setFrequency(24);
+        await this.setMode(1,1,0);
+        await this.setDummy(this._width==640?0x80:0x00);
+        await this.setExposure(0x1ff);
+        await this.setFrequency(16);
 
         let debug = {time:Date.now(),successCount:0,failCount:0,enable:true};
 
