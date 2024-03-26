@@ -271,6 +271,7 @@ uint8_t regs[REGS_COUNT][2] = {
 EXTI_InitTypeDef   EXTI_InitStructurePCLK;
 EXTI_InitTypeDef   EXTI_InitStructureHREF;
 EXTI_InitTypeDef   EXTI_InitStructureVSYNC;
+DMA_InitTypeDef    DMA_InitStructure;
 void BF3003_Pin_Init()
 {
     GPIO_InitTypeDef GPIO_InitStruct;  
@@ -328,6 +329,24 @@ void BF3003_Pin_Init()
     GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN_FLOATING;
     GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+	// DMA_Cmd(DMA1_Channel1, DISABLE);    // 关DMA通道
+    // DMA_DeInit(DMA1_Channel1);                                 // 恢复缺省值
+    // DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)(&GPIOB->IDR);// 设置串口发送数据寄存器
+    // DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)frame[0];         // 设置发送缓冲区首地址
+    // DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralSRC;                      // 设置外设寄存器 -> 内存缓冲区
+    // DMA_InitStructure.DMA_BufferSize = 640;                     // 需要发送的字节数，这里其实可以设置为0，因为在实际要发送的时候，会重新设置次值
+    // DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;        // 外设地址不做增加调整，调整不调整是DMA自动实现的
+    // DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;                 // 内存缓冲区地址增加调整
+    // DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte; // 外设数据宽度8位，1个字节
+    // DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;         // 内存数据宽度8位，1个字节
+    // DMA_InitStructure.DMA_Mode = DMA_Mode_Normal;                           // 单次传输模式
+    // DMA_InitStructure.DMA_Priority = DMA_Priority_VeryHigh;                 // 优先级设置
+    // DMA_InitStructure.DMA_M2M = DMA_M2M_Disable;                            // 关闭内存到内存的DMA模式
+    // DMA_Init(DMA1_Channel1, &DMA_InitStructure);               // 写入配置
+    // DMA_ClearFlag(DMA1_Channel1);                                 // 清除DMA所有标志
+	// DMA_Cmd(DMA1_Channel1, DISABLE); // 关闭DMA
+    // DMA_ITConfig(DMA1_Channel1, DMA_IT_TC, ENABLE);
 }
 /*
  * @brief    BF3003写寄存器
@@ -449,7 +468,6 @@ void BF3003_LineBegin()
 	EXTI_Init(&EXTI_InitStructurePCLK);
 	_BF3003_SetFrequency(1);
 }
-
 void BF3003_ReadPixel()
 {
 	frame[bufIdx][pixelIdx] = GPIOB->IDR >> 8;

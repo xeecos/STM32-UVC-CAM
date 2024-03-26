@@ -61,19 +61,19 @@ void USBWakeUp_IRQHandler(void)
 
 void EXTI9_5_IRQHandler(void)
 {
-    if((EXTI->PR & EXTI_Line5) != RESET)
+    if((EXTI->PR & EXTI_Line5) == EXTI_Line5)
     {
         EXTI->PR |= EXTI_Line5;
         //PIXCLK
         BF3003_ReadPixel();
     }
-    if((EXTI->PR & EXTI_Line7) != RESET)
+    if((EXTI->PR & EXTI_Line7) == EXTI_Line7)
     {
         EXTI->PR |= EXTI_Line7;
         //HREF
         BF3003_LineBegin();
     }
-    if((EXTI->PR & EXTI_Line6) != RESET)
+    if((EXTI->PR & EXTI_Line6) == EXTI_Line6)
     {
         EXTI->PR |= EXTI_Line6;
         //VSYNC
