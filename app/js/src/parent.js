@@ -23,7 +23,7 @@ worker.onmessage =  (res)=>{
     let line = res.data.line;
     if(line!=height)return;
     console.time("time");
-    let rgb = Demosaic.bilinear({data: Buffer.from(buf), width, height, bayer:Demosaic.Bayer.RGGB});
+    let rgb = Demosaic.bilinear({data: Buffer.from(buf), width, height, bayer:Demosaic.Bayer.BGGR});
     let imageData = ctx.getImageData((640-width)/2, (480-height)/2, width, height);
     for(let i=0,count=width*height;i<count;i++)
     {
