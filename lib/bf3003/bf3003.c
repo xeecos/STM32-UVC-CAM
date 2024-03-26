@@ -316,7 +316,12 @@ void BF3003_Pin_Init()
 	EXTI_InitStructurePCLK.EXTI_Mode = EXTI_Mode_Interrupt;
 	EXTI_InitStructurePCLK.EXTI_Trigger = EXTI_Trigger_Falling;
 	
-	MY_NVIC_Init(0, 0, EXTI9_5_IRQn, 2);
+	NVIC_InitTypeDef nvic;
+    nvic.NVIC_IRQChannel = EXTI9_5_IRQn;
+    nvic.NVIC_IRQChannelPreemptionPriority = 0;
+    nvic.NVIC_IRQChannelSubPriority = 0;
+    nvic.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&nvic);
 
     /* D0-D7 IO口初始化 */
     GPIO_InitStruct.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;

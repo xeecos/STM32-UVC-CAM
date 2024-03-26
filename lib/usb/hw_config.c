@@ -62,30 +62,35 @@ void Leave_LowPowerMode(void)
 //配置USB时钟,USBclk=48Mhz
 void Set_USBClock(void)
 {
-	RCC->CFGR &= ~RCC_CFGR_USBPRE; //USBclk=PLLclk/1.5=48Mhz	    
-	RCC->APB1ENR |= RCC_APB1ENR_USBEN; //USB时钟使能					 
+	RCC_USBCLKConfig(RCC_USBCLKSource_PLLCLK_1Div5);//USBclk=PLLclk/1.5=48Mhz
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USB, ENABLE);	 //USB时钟使能	
 }
 
 
 //USB中断配置
 void USB_Interrupts_Config(void)
 {
-	EXTI->IMR |= EXTI_RTSR_TR18;//  开启线18上的中断
-	EXTI->RTSR |= EXTI_RTSR_TR18;//line 18上事件上升降沿触发	 
-	// MY_NVIC_Init(0, 1, USB_HP_CAN1_TX_IRQn, 2);//组2，优先级次之 
-	// MY_NVIC_Init(1, 0, USB_LP_CAN1_RX0_IRQn, 2);//组2，优先级次之 
-	// MY_NVIC_Init(0, 1, USBWakeUp_IRQn, 2);     //组2，优先级最高	
-	NVIC_InitTypeDef nvic_init;
-    nvic_init.NVIC_IRQChannel = USB_LP_CAN1_RX0_IRQn;
-    nvic_init.NVIC_IRQChannelPreemptionPriority = 0;
-    nvic_init.NVIC_IRQChannelSubPriority = 0;
-    nvic_init.NVIC_IRQChannelCmd = ENABLE;
-    NVIC_Init(&nvic_init);
-    nvic_init.NVIC_IRQChannel = USB_HP_CAN1_TX_IRQn;
-    nvic_init.NVIC_IRQChannelSubPriority = 1;
-    NVIC_Init(&nvic_init);
-    nvic_init.NVIC_IRQChannel = USBWakeUp_IRQn;
-    NVIC_Init(&nvic_init); 	 
+	EXTI_InitTypeDef   EXTI_InitStructure;
+	EXTI_InitStructure.EXTI_Line = EXTI_Line18;//line 18上事件上升降沿触发
+	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
+	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+	EXTI_Init(&EXTI_InitStructure);
+
+	NVIC_InitTypeDef nvic;
+    nvic.NVIC_IRQChannel = USB_LP_CAN1_RX0_IRQn;
+    nvic.NVIC_IRQChannelPreemptionPriority = 0;
+    nvic.NVIC_IRQChannelSubPriority = 1;
+    nvic.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&nvic);
+    nvic.NVIC_IRQChannel = USB_HP_CAN1_TX_IRQn;
+    nvic.NVIC_IRQChannelPreemptionPriority = 1;
+    nvic.NVIC_IRQChannelSubPriority = 0;
+    NVIC_Init(&nvic);
+    nvic.NVIC_IRQChannel = USBWakeUp_IRQn;
+    nvic.NVIC_IRQChannelPreemptionPriority = 0;
+    nvic.NVIC_IRQChannelSubPriority = 1;
+    NVIC_Init(&nvic); 	 
 }
 
 /*******************************************************************************
@@ -97,28 +102,28 @@ void USB_Interrupts_Config(void)
 *******************************************************************************/
 void Get_SerialNum(void)
 {
-	uint32_t Device_Serial0, Device_Serial1, Device_Serial2;
+	uint32_t Device_Serial0;//, Device_Serial1, Device_Serial2;
 
 	Device_Serial0 = *(uint32_t*)(0x1FFFF7E8);
-	Device_Serial1 = *(uint32_t*)(0x1FFFF7EC);
-	Device_Serial2 = *(uint32_t*)(0x1FFFF7F0);
+	// Device_Serial1 = *(uint32_t*)(0x1FFFF7EC);
+	// Device_Serial2 = *(uint32_t*)(0x1FFFF7F0);
 
 	if (Device_Serial0 != 0)
 	{
 		Camera_StringSerial[2] = (uint8_t)(Device_Serial0 & 0x000000FF);
 		Camera_StringSerial[4] = (uint8_t)((Device_Serial0 & 0x0000FF00) >> 8);
 		Camera_StringSerial[6] = (uint8_t)((Device_Serial0 & 0x00FF0000) >> 16);
-		Camera_StringSerial[8] = (uint8_t)((Device_Serial0 & 0xFF000000) >> 24);
+		// Camera_StringSerial[8] = (uint8_t)((Device_Serial0 & 0xFF000000) >> 24);
 
-		Camera_StringSerial[10] = (uint8_t)(Device_Serial1 & 0x000000FF);
-		Camera_StringSerial[12] = (uint8_t)((Device_Serial1 & 0x0000FF00) >> 8);
-		Camera_StringSerial[14] = (uint8_t)((Device_Serial1 & 0x00FF0000) >> 16);
-		Camera_StringSerial[16] = (uint8_t)((Device_Serial1 & 0xFF000000) >> 24);
+		// Camera_StringSerial[10] = (uint8_t)(Device_Serial1 & 0x000000FF);
+		// Camera_StringSerial[12] = (uint8_t)((Device_Serial1 & 0x0000FF00) >> 8);
+		// Camera_StringSerial[14] = (uint8_t)((Device_Serial1 & 0x00FF0000) >> 16);
+		// Camera_StringSerial[16] = (uint8_t)((Device_Serial1 & 0xFF000000) >> 24);
 
-		Camera_StringSerial[18] = (uint8_t)(Device_Serial2 & 0x000000FF);
-		Camera_StringSerial[20] = (uint8_t)((Device_Serial2 & 0x0000FF00) >> 8);
-		Camera_StringSerial[22] = (uint8_t)((Device_Serial2 & 0x00FF0000) >> 16);
-		Camera_StringSerial[24] = (uint8_t)((Device_Serial2 & 0xFF000000) >> 24);
+		// Camera_StringSerial[18] = (uint8_t)(Device_Serial2 & 0x000000FF);
+		// Camera_StringSerial[20] = (uint8_t)((Device_Serial2 & 0x0000FF00) >> 8);
+		// Camera_StringSerial[22] = (uint8_t)((Device_Serial2 & 0x00FF0000) >> 16);
+		// Camera_StringSerial[24] = (uint8_t)((Device_Serial2 & 0xFF000000) >> 24);
 	}
 }
 

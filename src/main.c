@@ -19,7 +19,7 @@ int main()
     // MY_NVIC_PriorityGroupConfig(2);
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
     Delay_Init();
-    Usart_Init();
+    Usart_Init(115200);
     BF3003_Init();
     USB_Init();
     while (1) 
