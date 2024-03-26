@@ -42,11 +42,9 @@ extern void(*pEpInt_OUT[7])(void);   /*  Handles OUT interrupts   */
 * Return         : None.
 *******************************************************************************/
 
-int bit_4 = 1;
 	
 void CTR_LP(void)
 {
-    GPIO_WriteBit(GPIOA, GPIO_Pin_4, 1);
 	uint32_t wEPVal = 0;
 	/* stay in loop while pending ints */
 	while (((wIstr = _GetISTR()) & ISTR_CTR) != 0)
@@ -142,6 +140,7 @@ void CTR_LP(void)
 
 			/* process related endpoint register */
 			wEPVal = _GetENDPOINT(EPindex);
+			// printf("wEPVal:%x\n",wEPVal);
 			if ((wEPVal & EP_CTR_RX) != 0)
 			{
 				/* clear int flag */
@@ -175,7 +174,6 @@ void CTR_LP(void)
 *******************************************************************************/
 void CTR_HP(void)
 {
-    GPIO_WriteBit(GPIOA, GPIO_Pin_4, 0);
 	uint32_t wEPVal = 0;
 	while (((wIstr = _GetISTR()) & ISTR_CTR) != 0)
 	{

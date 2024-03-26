@@ -1,13 +1,20 @@
 const { findByIds, WebUSBDevice } = require('usb');
 const EventEmitter = require('node:events');
+class Utils
+{
+    static async delay(ms)
+    {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+}
 class BF3003
 {
     constructor()
     {
         this._width = 640;
         this._height = 480;
-        this._epOut = 2;
         this._emitter = new EventEmitter();
+        this._epOut = 2;
     }
     async setup(width=640,height=480)
     {
@@ -17,15 +24,16 @@ class BF3003
         this._usb.open();
 
         device.interfaces[0].claim();
-        device.interfaces[1].claim();
-        
+        if(this._epOut>0)
+        {
+            device.interfaces[1].claim();
+        }
         await this.setFrameSize(width,height);
-        console.log(1);
         await this.setMode(1,1,1);
         await this.setDummy(this._width==640?0x40:0x00);
         await this.setExposure(0x10);
         await this.setFrequency(24);
-
+        await Utils.delay(100);
         let debug = {time:Date.now(),successCount:0,failCount:0,enable:true};
 
         let line = 0;
@@ -34,7 +42,6 @@ class BF3003
         let lineCount = 0;
 
         let epIn = device.interfaces[0].endpoints[0];
-        epIn.startPoll(1,64);
         epIn.on("data", (buffer)=>{ 
             if(buffer.length==2)
             {
@@ -95,12 +102,22 @@ class BF3003
     {
         this._emitter.on(type, callback);
     }
+    transferOut(data)
+    {
+        return new Promise(resolve=>
+        {
+            if(this._epOut<0) return resolve(0);
+            this._usb.transferOut(this._epOut,data).then((res)=>{
+                resolve(res);
+            });
+        })
+    }
     setWindow(x,y,w,h)
     {
         return new Promise(resolve=>{
             this._width = w;
             this._height = h;
-            this._usb.transferOut(this._epOut,Buffer.from([1,1,x>>8,x&0xff,y>>8,y&0xff,w>>8,w&0xff,h>>8,h&0xff])).then((res)=>{
+            this.transferOut(Buffer.from([1,1,x>>8,x&0xff,y>>8,y&0xff,w>>8,w&0xff,h>>8,h&0xff])).then((res)=>{
                 resolve(res);
             });
         })
@@ -108,7 +125,7 @@ class BF3003
     setDummy(dummy=0x0)
     {
         return new Promise(resolve=>{
-            this._usb.transferOut(this._epOut,Buffer.from([1,2,0x00,dummy])).then((res)=>{
+            this.transferOut(Buffer.from([1,2,0x00,dummy])).then((res)=>{
                 resolve(res);
             });
         })
@@ -122,7 +139,7 @@ class BF3003
     setExposure(exp=0x10)
     {
         return new Promise(resolve=>{
-            this._usb.transferOut(this._epOut,Buffer.from([1,3,exp>>8,exp&0xff])).then((res)=>{
+            this.transferOut(Buffer.from([1,3,exp>>8,exp&0xff])).then((res)=>{
                 resolve(res);
             });
         })
@@ -130,7 +147,7 @@ class BF3003
     setGain(red=0x15, green=0x12, blue=0x17)
     {
         return new Promise(resolve=>{
-            this._usb.transferOut(this._epOut,Buffer.from([1,4,red,green,blue])).then((res)=>{
+            this.transferOut(Buffer.from([1,4,red,green,blue])).then((res)=>{
                 resolve(res);
             });
         })
@@ -138,7 +155,7 @@ class BF3003
     setMode(gain=0,colorbalance=0,exposure=0)
     {
         return new Promise(resolve=>{
-            this._usb.transferOut(this._epOut,Buffer.from([1, 8, gain, colorbalance, exposure])).then((res)=>{
+            this.transferOut(Buffer.from([1, 8, gain, colorbalance, exposure])).then((res)=>{
                 resolve(res);
             })
         });
@@ -146,7 +163,7 @@ class BF3003
     setFrequency(freq=16)
     {
         return new Promise(resolve=>{
-            this._usb.transferOut(this._epOut,Buffer.from([1,7,freq])).then((res)=>{
+            this.transferOut(Buffer.from([1,7,freq])).then((res)=>{
                 resolve(res);
             });
         })
@@ -155,7 +172,7 @@ class BF3003
     {
         return new Promise(resolve=>{
             console.log("start")
-            this._usb.transferOut(this._epOut, Buffer.from([1,0,0x1])).then((res)=>{
+            this.transferOut(Buffer.from([1,0,0x1])).then((res)=>{
                 resolve(res);
             });
         });
@@ -163,9 +180,17 @@ class BF3003
     stop()
     {
         return new Promise(resolve=>{
-            this._usb.transferOut(this._epOut, Buffer.from([1,0,0x0])).then((res)=>{
+            this.transferOut(Buffer.from([1,0,0x0])).then((res)=>{
                 resolve(res);
             });
+        });
+    }
+    startTransfer()
+    {
+        return new Promise(async resolve=>{
+            await Utils.delay(100);
+            let epIn = this._usb.device.interfaces[0].endpoints[0];
+            epIn.startPoll(1,64);
         });
     }
 }

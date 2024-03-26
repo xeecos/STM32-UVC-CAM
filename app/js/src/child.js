@@ -16,6 +16,8 @@ onmessage = (res)=>{
             }
             postMessage({ line:res.line, width, height });
         });
-        BF3003.start();
+        BF3003.start().then(res=>{
+            BF3003.startTransfer();
+        });
     });
 }

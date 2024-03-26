@@ -187,6 +187,7 @@ void UsbCamera_init(void)
 *******************************************************************************/
 void UsbCamera_Reset(void)
 {
+	// printf("USB Reset\n");
 	/* Set Usb device as not configured state */
 	pInformation->Current_Configuration = 0;
 
@@ -204,7 +205,7 @@ void UsbCamera_Reset(void)
 	SetEPRxValid(ENDP0);
 
 	/* Initialize Endpoint 1 */
-	SetEPType(ENDP1, EP_ISOCHRONOUS);
+	SetEPType(ENDP1, EP_BULK);
 	SetEPDoubleBuff(ENDP1);
 	SetEPDblBuffAddr(ENDP1, ENDP1_BUF0Addr, ENDP1_BUF1Addr);
 	SetEPDblBuffCount(ENDP1, EP_DBUF_OUT, PACKET_SIZE);

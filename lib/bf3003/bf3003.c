@@ -385,7 +385,7 @@ void BF3003_Configure(void)
 		{
 			break;
 		}
-		Delay_Ms(1000);
+		Delay_Ms(100);
 	}
 	for (int i = 0; i < REGS_COUNT; i++)
 	{
@@ -412,6 +412,7 @@ void BF3003_Handle(void)
 }
 void BF3003_Start()
 {
+	printf("bf3003 start\n");
 	EXTI_InitStructureVSYNC.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStructureVSYNC);
 	EXTI_InitStructureHREF.EXTI_LineCmd = ENABLE;
@@ -429,7 +430,7 @@ void BF3003_Stop()
 int bufIdx = 0;
 void BF3003_FrameBegin()
 {
-	// printf("frame:%d\n",lineIdx);
+	printf("frame:%d\n",lineIdx);
 	if(skipFreq>1)_BF3003_SetFrequency(skipFreq);
 	lineIdx = 0;
 	pixelIdx = 0;
@@ -460,6 +461,7 @@ void BF3003_ReadPixel()
 
 void BF3003_SetWindow(uint16_t x,uint16_t y,uint16_t w,uint16_t h)
 {
+	printf("set window:%d, %d, %d, %d\n",x, y, w, h);
 	BF3003_WriteReg(BF3003_VHREF, (((x+w)&0b11)<<6)+(((x)&0b11)<<4)+(((y+h)&0b11)<<2)+(y&0b11));
 	BF3003_WriteReg(BF3003_HSTART, x>>2);
 	BF3003_WriteReg(BF3003_HSTOP, (x+w)>>2);
@@ -470,12 +472,14 @@ void BF3003_SetWindow(uint16_t x,uint16_t y,uint16_t w,uint16_t h)
 }
 void BF3003_SetDummy(uint16_t dummy)
 {
+	printf("set dummy:%d\n",dummy);
 	BF3003_WriteReg(BF3003_EXHCH, dummy>>8);
 	BF3003_WriteReg(BF3003_EXHCL, dummy&0xff);
 }
 
 void BF3003_SetMode(uint8_t gain, uint8_t whitebalance, uint8_t exposure)
 {
+	printf("set mode:%d, %d, %d\n",gain, whitebalance, exposure);
 	uint8_t value = 0b00010000;
 	value |= (gain?0b100:0b0);
 	value |= (whitebalance?0b10:0b0);
@@ -514,6 +518,7 @@ void BF3003_SetGlobalGain(uint8_t gain)
 }
 void BF3003_SetFrequency(uint8_t freq)
 {
+	printf("set freq:%d\n",freq);
 	skipFreq = freq;
 }
 void _BF3003_SetFrequency(uint8_t freq)

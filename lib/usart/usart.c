@@ -58,9 +58,17 @@ void USART1_IRQHandler(void)
 }
 void Usart_Init()
 {
+	
+	GPIO_InitTypeDef  GPIO_InitStructure;  
+	
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9 | GPIO_Pin_10;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+
 	uint16_t mantissa;
 	uint16_t fraction;	   
-	float temp = (float)(72*1000000)/(115200*16);//得到USARTDIV
+	float temp = (float)(8*9*1000000)/(115200*16);//得到USARTDIV
 	mantissa = temp;				 //得到整数部分
 	fraction = (temp-mantissa)*16; //得到小数部分	 
     mantissa <<= 4;
