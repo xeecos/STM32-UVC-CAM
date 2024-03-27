@@ -59,10 +59,12 @@ void Leave_LowPowerMode(void)
 }
 
 
+#define RCC_USBCLKSource_PLLCLK_Div3    ((uint8_t)0x02)
 //配置USB时钟,USBclk=48Mhz
 void Set_USBClock(void)
 {
-	RCC_USBCLKConfig(RCC_USBCLKSource_PLLCLK_1Div5);//USBclk=PLLclk/1.5=48Mhz
+    RCC->CFGR &= ~( ( uint32_t )3 << 22 );
+    RCC->CFGR |= RCC_USBCLKSource_PLLCLK_Div3 << 22;
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USB, ENABLE);	 //USB时钟使能	
 }
 
@@ -84,7 +86,7 @@ void USB_Interrupts_Config(void)
     nvic.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&nvic);
     nvic.NVIC_IRQChannel = USB_HP_CAN1_TX_IRQn;
-    nvic.NVIC_IRQChannelPreemptionPriority = 1;
+    nvic.NVIC_IRQChannelPreemptionPriority = 0;
     nvic.NVIC_IRQChannelSubPriority = 0;
     NVIC_Init(&nvic);
     nvic.NVIC_IRQChannel = USBWakeUp_IRQn;

@@ -47,7 +47,7 @@ void SetSysClockToHSE(void)
     // RCC->CR |= RCC_CR_HSEON;
     
     RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL));
-    RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC | RCC_CFGR_PLLMULL9);
+    RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC | RCC_CFGR_PLLMULL18);
     /* Wait till PLL is ready */
     /* Enable PLL */
     RCC->CR |= RCC_CR_PLLON;

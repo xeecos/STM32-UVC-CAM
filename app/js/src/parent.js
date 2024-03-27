@@ -21,7 +21,7 @@ worker.onmessage =  (res)=>{
     
     let width = res.data.width, height = res.data.height;
     let line = res.data.line;
-    if(line!=height)return;
+    // if(line!=height)return;
     console.time("time");
     let rgb = Demosaic.bilinear({data: Buffer.from(buf), width, height, bayer:Demosaic.Bayer.BGGR});
     let imageData = ctx.getImageData((640-width)/2, (480-height)/2, width, height);

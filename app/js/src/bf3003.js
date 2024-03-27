@@ -29,9 +29,9 @@ class BF3003
             device.interfaces[1].claim();
         }
         await this.setFrameSize(width,height);
-        await this.setMode(1,1,1);
-        await this.setDummy(this._width==640?0x40:0x00);
-        await this.setExposure(0x10);
+        await this.setMode(1,1,0);
+        await this.setDummy(this._width==640?0x80:0x00);
+        await this.setExposure(0x2ff);
         await this.setFrequency(1);
         // await Utils.delay(100);
         let debug = {time:Date.now(),successCount:0,failCount:0,enable:true};
@@ -108,6 +108,7 @@ class BF3003
         {
             if(this._epOut<0) return resolve(0);
             this._usb.transferOut(this._epOut,data).then((res)=>{
+                console.log(res)
                 resolve(res);
             });
         })

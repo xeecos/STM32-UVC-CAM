@@ -7,7 +7,7 @@
 int main()
 {
     SetSysClockToHSE();
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1|RCC_APB2Periph_GPIOA|RCC_APB2Periph_GPIOB|RCC_APB2Periph_AFIO, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA|RCC_APB2Periph_GPIOB|RCC_APB2Periph_AFIO, ENABLE);
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2|RCC_APB1Periph_TIM3|RCC_APB1Periph_TIM4, ENABLE);
     
     GPIO_InitTypeDef GPIO_InitStruct;  
@@ -22,11 +22,10 @@ int main()
     Usart_Init(115200);
     BF3003_Init();
     USB_Init();
-    // uint32_t i = 0x12345678;
+    // BF3003_Start();
     while (1) 
     {
-        // printf("%x\n",*((uint8_t*)(&i)+1));
-        Delay_Ms(1000);
-        BF3003_Handle();
+        // Delay_Ms(1000);
+        // BF3003_Handle();
     }
 }
