@@ -299,6 +299,9 @@ void BF3003_Pin_Init()
 
     TIM_OC1Init(TIM3, &TIM_OCInitStructure);
 	TIM_OC1PreloadConfig(TIM3, TIM_OCPreload_Enable);
+	
+	_BF3003_SetFrequency(1);
+
     TIM_Cmd(TIM3, ENABLE);
 
 	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource5);//pclk
@@ -441,7 +444,7 @@ void BF3003_Start()
 	EXTI_Init(&EXTI_InitStructureVSYNC);
 	EXTI_InitStructureHREF.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStructureHREF);
-	_BF3003_SetFrequency(1);
+	_BF3003_UpdateFrequency(1);
 }
 void BF3003_Stop()
 {
@@ -455,7 +458,7 @@ int bufIdx = 0;
 void BF3003_FrameBegin()
 {
 	printf("frame:%d\n",lineIdx);
-	if(skipFreq>1)_BF3003_SetFrequency(skipFreq);
+	if(skipFreq>1)_BF3003_UpdateFrequency(skipFreq);
 	lineIdx = 0;
 	pixelIdx = 0;
 	bufIdx = 1;
@@ -466,7 +469,6 @@ void BF3003_LineBegin()
 	bufIdx = 1 - bufIdx;
 	EXTI_InitStructurePCLK.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStructurePCLK);
-	_BF3003_SetFrequency(1);
 }
 void BF3003_ReadPixel()
 {
@@ -478,7 +480,7 @@ void BF3003_ReadPixel()
 		EXTI_Init(&EXTI_InitStructurePCLK);
 		pixelIdx = 0;
 		lineIdx++;
-		if(skipFreq>1)_BF3003_SetFrequency(skipFreq);
+		if(skipFreq>1)_BF3003_UpdateFrequency(skipFreq);
 	}
 }
 
@@ -539,12 +541,12 @@ void BF3003_SetGlobalGain(uint8_t gain)
 	printf("global gain:%d\n",gain);
 	BF3003_WriteReg(BF3003_GLB_GAIN, gain);
 }
-void BF3003_SetFrequency(uint8_t freq)
+void BF3003_SetFrequency(uint16_t freq)
 {
 	printf("set freq:%d\n",freq);
 	skipFreq = freq;
 }
-void _BF3003_SetFrequency(uint8_t freq)
+void _BF3003_SetFrequency(uint16_t freq)
 {
     TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
     TIM_TimeBaseInitStructure.TIM_Prescaler = 72/freq - 1;
@@ -553,4 +555,8 @@ void _BF3003_SetFrequency(uint8_t freq)
     TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     // 72000000  / (TIM_Period + 1) / (TIM_Prescaler + 1)
     TIM_TimeBaseInit(TIM3, &TIM_TimeBaseInitStructure);
+}
+void _BF3003_UpdateFrequency(uint16_t freq)
+{
+	TIM_PrescalerConfig(TIM3,72/freq - 1,TIM_PSCReloadMode_Immediate);
 }
