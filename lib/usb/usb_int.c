@@ -140,7 +140,7 @@ void CTR_LP(void)
 
 			/* process related endpoint register */
 			wEPVal = _GetENDPOINT(EPindex);
-			// printf("wEPVal:%x\n",wEPVal);
+			// printf("wEPVal:%d %x\n",EPindex, wEPVal);
 			if ((wEPVal & EP_CTR_RX) != 0)
 			{
 				/* clear int flag */

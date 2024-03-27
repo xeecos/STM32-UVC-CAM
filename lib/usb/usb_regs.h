@@ -245,7 +245,11 @@ enum EP_BUF_NUM
     /* toggle second bit ?  */         \
     if((EPTX_DTOG2 & wState)!= 0)      \
       _wRegVal ^= EPTX_DTOG2;        \
-    _SetENDPOINT(bEpNum, _wRegVal);    \
+    _SetENDPOINT(bEpNum, _wRegVal|EP_CTR_RX|EP_CTR_TX);    \
+    while((_GetENDPOINT(bEpNum) & EPTX_STAT) != wState)\
+    {\
+      _SetENDPOINT(bEpNum, (_wRegVal | EP_CTR_RX | EP_CTR_TX ));\
+    }\
 	  } /* _SetEPTxStatus */
 
 /*******************************************************************************

@@ -167,14 +167,17 @@ void UsbCamera_init(void)
 	/* Connect the device */
 	PowerOn();
 	/* USB interrupts initialization */
+	for(int i=0;i<8;i++)
+	{
+		_SetENDPOINT(i, _GetENDPOINT(i) & 0x7F7F & EPREG_MASK);
+	}
 	/* clear pending interrupts */
-	_SetISTR(0);
+	_SetISTR(0x00ff);
 	wInterrupt_Mask = IMR_MSK;
 	/* set interrupts mask */
 	_SetCNTR(wInterrupt_Mask);
 
 	bDeviceState = UNCONNECTED;
-	
 	printf("USB INIT\n");
 }
 
@@ -187,7 +190,7 @@ void UsbCamera_init(void)
 *******************************************************************************/
 void UsbCamera_Reset(void)
 {
-	// printf("USB Reset\n");
+	printf("USB Reset\n");
 	/* Set Usb device as not configured state */
 	pInformation->Current_Configuration = 0;
 
@@ -206,12 +209,14 @@ void UsbCamera_Reset(void)
 
 	/* Initialize Endpoint 1 */
 	SetEPType(ENDP1, EP_BULK);
-	SetEPDoubleBuff(ENDP1);
-	SetEPDblBuffAddr(ENDP1, ENDP1_BUF0Addr, ENDP1_BUF1Addr);
-	SetEPDblBuffCount(ENDP1, EP_DBUF_OUT, PACKET_SIZE);
-	ClearDTOG_RX(ENDP1);
-	ClearDTOG_TX(ENDP1);
-    ToggleDTOG_RX(ENDP1);
+	// SetEPDoubleBuff(ENDP1);
+	// SetEPDblBuffAddr(ENDP1, ENDP1_BUF0Addr, ENDP1_BUF1Addr);
+	// SetEPDblBuffCount(ENDP1, EP_DBUF_OUT, PACKET_SIZE);
+	// ClearDTOG_RX(ENDP1);
+	// ClearDTOG_TX(ENDP1);
+    // ToggleDTOG_RX(ENDP1);
+	SetEPTxAddr(ENDP1, ENDP1_TXADDR);
+	SetEPTxCount(ENDP1, PACKET_SIZE);
 	SetEPRxStatus(ENDP1, EP_RX_DIS);
 	SetEPTxStatus(ENDP1, EP_TX_VALID);
 

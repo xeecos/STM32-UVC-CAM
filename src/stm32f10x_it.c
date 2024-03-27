@@ -32,7 +32,7 @@
 *******************************************************************************/
 void USB_HP_CAN1_TX_IRQHandler(void)
 {
-  CTR_HP();
+    CTR_HP();
 }
 
 /*******************************************************************************
@@ -45,7 +45,7 @@ void USB_HP_CAN1_TX_IRQHandler(void)
 *******************************************************************************/
 void USB_LP_CAN1_RX0_IRQHandler(void)
 {
-  USB_Istr();
+    USB_Istr();
 }   
 /*******************************************************************************
 * Function Name  : USBWakeUp_IRQHandler
@@ -61,19 +61,19 @@ void USBWakeUp_IRQHandler(void)
 
 void EXTI9_5_IRQHandler(void)
 {
-    if((EXTI->PR & EXTI_Line5) == EXTI_Line5)
+    if((EXTI->PR & EXTI_Line5) != RESET)
     {
         EXTI->PR |= EXTI_Line5;
         //PIXCLK
         BF3003_ReadPixel();
     }
-    if((EXTI->PR & EXTI_Line7) == EXTI_Line7)
+    if((EXTI->PR & EXTI_Line7) != RESET)
     {
         EXTI->PR |= EXTI_Line7;
         //HREF
         BF3003_LineBegin();
     }
-    if((EXTI->PR & EXTI_Line6) == EXTI_Line6)
+    if((EXTI->PR & EXTI_Line6) != RESET)
     {
         EXTI->PR |= EXTI_Line6;
         //VSYNC

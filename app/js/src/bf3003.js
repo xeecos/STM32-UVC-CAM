@@ -32,7 +32,7 @@ class BF3003
         await this.setMode(1,1,1);
         await this.setDummy(this._width==640?0x40:0x00);
         await this.setExposure(0x10);
-        await this.setFrequency(24);
+        await this.setFrequency(1);
         // await Utils.delay(100);
         let debug = {time:Date.now(),successCount:0,failCount:0,enable:true};
 
@@ -190,7 +190,8 @@ class BF3003
         return new Promise(async resolve=>{
             await Utils.delay(100);
             let epIn = this._usb.device.interfaces[0].endpoints[0];
-            epIn.startPoll(1,64);
+            epIn.startPoll(1,128);
+            resolve();
         });
     }
 }

@@ -102,10 +102,10 @@ void EXTI_Init(EXTI_InitTypeDef* EXTI_InitStruct)
   uint32_t tmp = 0;
 
   /* Check the parameters */
-  assert_param(IS_EXTI_MODE(EXTI_InitStruct->EXTI_Mode));
-  assert_param(IS_EXTI_TRIGGER(EXTI_InitStruct->EXTI_Trigger));
-  assert_param(IS_EXTI_LINE(EXTI_InitStruct->EXTI_Line));  
-  assert_param(IS_FUNCTIONAL_STATE(EXTI_InitStruct->EXTI_LineCmd));
+  // assert_param(IS_EXTI_MODE(EXTI_InitStruct->EXTI_Mode));
+  // assert_param(IS_EXTI_TRIGGER(EXTI_InitStruct->EXTI_Trigger));
+  // assert_param(IS_EXTI_LINE(EXTI_InitStruct->EXTI_Line));  
+  // assert_param(IS_FUNCTIONAL_STATE(EXTI_InitStruct->EXTI_LineCmd));
 
   tmp = (uint32_t)EXTI_BASE;
      
