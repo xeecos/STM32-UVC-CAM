@@ -21,6 +21,7 @@ uint32_t totalCount = 0;
 int16_t lineIdx = 0;
 uint16_t skipFreq = 15;
 uint16_t baseFreq = 15;
+uint16_t currentFreq = 0;
 uint8_t regs[REGS_COUNT][2] = {
 	{BF3003_COM7, 0b10000000},
 	{BF3003_COM2, 0b11001111},
@@ -550,25 +551,29 @@ void BF3003_SetFrequency(uint16_t freqDiv, uint16_t skipDiv)
 }
 void _BF3003_SetFrequency(uint16_t freqDiv)
 {
-	TIM_Cmd(TIM3, DISABLE); 
+	if(currentFreq!=freqDiv)
+	{
+		currentFreq = freqDiv;
+		TIM_Cmd(TIM3, DISABLE); 
 
-    TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
-    TIM_TimeBaseStructure.TIM_Prescaler = freqDiv - 1;
-    TIM_TimeBaseStructure.TIM_Period = 2 - 1;
-    TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-    TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
-    // 72000000  / (TIM_Period + 1) / (TIM_Prescaler + 1)
-    TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure);
-	TIM_Cmd(TIM3, ENABLE); 
-	#ifdef DMA_ENABLE
-    TIM_TimeBaseStructure.TIM_Prescaler = freqDiv*8 - 1;
-    TIM_TimeBaseStructure.TIM_Period = 2 - 1;
-    TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-    TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
-	TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
-	TIM_DMACmd(TIM2, TIM_DMA_Update, ENABLE); 
-    TIM_Cmd(TIM2, ENABLE);    
-	#endif   
+		TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
+		TIM_TimeBaseStructure.TIM_Prescaler = freqDiv - 1;
+		TIM_TimeBaseStructure.TIM_Period = 2 - 1;
+		TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+		TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
+		// 72000000  / (TIM_Period + 1) / (TIM_Prescaler + 1)
+		TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure);
+		TIM_Cmd(TIM3, ENABLE); 
+		#ifdef DMA_ENABLE
+		TIM_TimeBaseStructure.TIM_Prescaler = freqDiv*8 - 1;
+		TIM_TimeBaseStructure.TIM_Period = 2 - 1;
+		TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+		TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
+		TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
+		TIM_DMACmd(TIM2, TIM_DMA_Update, ENABLE); 
+		TIM_Cmd(TIM2, ENABLE);    
+		#endif   
+	}
 }
 void _BF3003_UpdateFrequency(uint16_t freq)
 {
