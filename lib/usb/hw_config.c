@@ -63,8 +63,7 @@ void Leave_LowPowerMode(void)
 //配置USB时钟,USBclk=48Mhz
 void Set_USBClock(void)
 {
-    RCC->CFGR &= ~( ( uint32_t )3 << 22 );
-    RCC->CFGR |= RCC_USBCLKSource_PLLCLK_Div3 << 22;
+	RCC_USBCLKConfig(RCC_USBCLKSource_PLLCLK_1Div5);
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USB, ENABLE);	 //USB时钟使能	
 }
 
@@ -82,7 +81,7 @@ void USB_Interrupts_Config(void)
 	// NVIC_InitTypeDef nvic;
     // nvic.NVIC_IRQChannel = USB_LP_CAN1_RX0_IRQn;
     // nvic.NVIC_IRQChannelPreemptionPriority = 0;
-    // nvic.NVIC_IRQChannelSubPriority = 1;
+    // nvic.NVIC_IRQChannelSubPriority = 0;
     // nvic.NVIC_IRQChannelCmd = ENABLE;
     // NVIC_Init(&nvic);
     // nvic.NVIC_IRQChannel = USB_HP_CAN1_TX_IRQn;
@@ -91,12 +90,12 @@ void USB_Interrupts_Config(void)
     // NVIC_Init(&nvic);
     // nvic.NVIC_IRQChannel = USBWakeUp_IRQn;
     // nvic.NVIC_IRQChannelPreemptionPriority = 0;
-    // nvic.NVIC_IRQChannelSubPriority = 1;
+    // nvic.NVIC_IRQChannelSubPriority = 0;
     // NVIC_Init(&nvic); 	 
 	
-	MY_NVIC_Init(1, 0, USB_HP_CAN1_TX_IRQn, 2);
-	MY_NVIC_Init(0, 1, USB_LP_CAN1_RX0_IRQn, 2);
-	MY_NVIC_Init(1, 0, USBWakeUp_IRQn, 2);
+	MY_NVIC_Init(1, 1, USB_HP_CAN1_TX_IRQn, 2);
+	MY_NVIC_Init(1, 0, USB_LP_CAN1_RX0_IRQn, 2);
+	MY_NVIC_Init(0, 1, USBWakeUp_IRQn, 2);
 }
 
 /*******************************************************************************

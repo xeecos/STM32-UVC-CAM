@@ -63,7 +63,7 @@ uint8_t regs[REGS_COUNT][2] = {
 	Bit[0]:HREF ahead 0.5 clk(YUV MCLK,RawData PCLK) or not
 	0x0c[1:0]: Internal use only
 	*/
-	{BF3003_CLKRC, 0b1010},
+	{BF3003_CLKRC, 0b1001},
 	/*
 	Mclk_div control
 	Bit[7：2]: Internal use only
@@ -306,6 +306,12 @@ void BF3003_Pin_Init()
 	EXTI_InitStructureHREF.EXTI_Mode = EXTI_Mode_Interrupt;
 	EXTI_InitStructureHREF.EXTI_Trigger = EXTI_Trigger_Rising;
 
+	// NVIC_InitTypeDef nvic;
+    // nvic.NVIC_IRQChannel = EXTI9_5_IRQn;
+    // nvic.NVIC_IRQChannelPreemptionPriority = 0;
+    // nvic.NVIC_IRQChannelSubPriority = 0;
+    // nvic.NVIC_IRQChannelCmd = ENABLE;
+    // NVIC_Init(&nvic); 	 
 	MY_NVIC_Init(0, 0, EXTI9_5_IRQn, 2);
     /* D0-D7 IO口初始化 */
     GPIO_InitStruct.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
@@ -462,6 +468,20 @@ void BF3003_LineBegin()
 	pixelIdx = 0;
 	bufIdx = 1 - bufIdx;
 	#ifdef DMA_ENABLE
+	__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+	__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+	__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+	__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+	__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+	__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+	__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+	__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+	__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+	__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+	__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+	__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+	__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+	__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
 	DMA1_Channel2->CCR &= ~DMA_CCR1_EN;
 	DMA1_Channel2->CMAR = (uint32_t)frame[bufIdx]; 
 	DMA1_Channel2->CNDTR = frameWidth;
@@ -475,7 +495,7 @@ void BF3003_LineBegin()
 }
 void BF3003_ReadPixel()
 {
-	frame[bufIdx][pixelIdx] = GPIOB->IDR>>8;//(pixelIdx>>5)<<3
+	frame[bufIdx][pixelIdx] = GPIOB->IDR>>8;//(pixelIdx>>5)<<3;//
 	pixelIdx++;
 	if(pixelIdx>frameWidth-1)
 	{
@@ -564,7 +584,7 @@ void _BF3003_SetFrequency(uint16_t freqDiv)
 		TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure);
 		TIM_Cmd(TIM3, ENABLE); 
 		#ifdef DMA_ENABLE
-		TIM_TimeBaseStructure.TIM_Prescaler = freqDiv*8 - 1;
+		TIM_TimeBaseStructure.TIM_Prescaler = freqDiv*4 - 1;
 		TIM_TimeBaseStructure.TIM_Period = 2 - 1;
 		TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
 		TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;

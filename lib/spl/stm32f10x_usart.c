@@ -234,7 +234,7 @@ void USART_Init(USART_TypeDef* USARTx, USART_InitTypeDef* USART_InitStruct)
   RCC_GetClocksFreq(&RCC_ClocksStatus);
   if (usartxbase == USART1_BASE)
   {
-    apbclock = 144000000;//RCC_ClocksStatus.PCLK2_Frequency;
+    apbclock = RCC_ClocksStatus.PCLK2_Frequency;
   }
   else
   {

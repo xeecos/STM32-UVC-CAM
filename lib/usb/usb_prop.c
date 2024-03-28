@@ -167,12 +167,6 @@ void UsbCamera_init(void)
 	/* Connect the device */
 	PowerOn();
 	/* USB interrupts initialization */
-	for(int i=0;i<8;i++)
-	{
-		_SetENDPOINT(i, _GetENDPOINT(i) & 0x7F7F & EPREG_MASK);
-	}
-	/* clear pending interrupts */
-	_SetISTR(0x00ff);
 	wInterrupt_Mask = IMR_MSK;
 	/* set interrupts mask */
 	_SetCNTR(wInterrupt_Mask);

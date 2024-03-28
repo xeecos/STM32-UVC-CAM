@@ -24,8 +24,8 @@
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 /* Exported define -----------------------------------------------------------*/
-#define USB_DBUF_ENABLE
-// #define DMA_ENABLE
+// #define USB_DBUF_ENABLE
+#define DMA_ENABLE
 
 #ifdef __cplusplus
 extern "C" {

@@ -30,8 +30,8 @@ class BF3003
         }
         await this.setFrameSize(width,height);
         await this.setMode(1,1,0);
-        await this.setDummy(this._width==640?0x0:0x0);
-        await this.setExposure(0x10);
+        await this.setDummy(this._width==640?0x00:0x0);
+        await this.setExposure(0x20);
         await this.setFrequency(15,15);
         let debug = {time:Date.now(),successCount:0,failCount:0,enable:true};
 
@@ -51,7 +51,7 @@ class BF3003
             //     now = Date.now();
             //     cc = 0;
             // }
-            // console.log("n:"+buffer.length+" ,");
+            // // console.log("n:"+buffer.length+" ,");
             // return;
             if(buffer.length==2)
             {
