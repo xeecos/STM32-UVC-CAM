@@ -555,7 +555,6 @@ void _BF3003_SetFrequency(uint16_t freqDiv)
 	{
 		currentFreq = freqDiv;
 		TIM_Cmd(TIM3, DISABLE); 
-
 		TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
 		TIM_TimeBaseStructure.TIM_Prescaler = freqDiv - 1;
 		TIM_TimeBaseStructure.TIM_Period = 2 - 1;
@@ -575,7 +574,11 @@ void _BF3003_SetFrequency(uint16_t freqDiv)
 		#endif   
 	}
 }
-void _BF3003_UpdateFrequency(uint16_t freq)
+void _BF3003_UpdateFrequency(uint16_t freqDiv)
 {
-	TIM_PrescalerConfig(TIM3,36/freq - 1,TIM_PSCReloadMode_Immediate);
+	if(currentFreq!=freqDiv)
+	{
+		currentFreq = freqDiv;
+		TIM_PrescalerConfig(TIM3, freqDiv - 1, TIM_PSCReloadMode_Immediate);
+	}
 }
