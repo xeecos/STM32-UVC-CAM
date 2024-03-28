@@ -22,7 +22,7 @@ worker.onmessage =  (res)=>{
     let width = res.data.width, height = res.data.height;
     let line = res.data.line;
     // if(line!=height)return;
-    console.time("time");
+    // console.time("time");
     let rgb = Demosaic.bilinear({data: Buffer.from(buf), width, height, bayer:Demosaic.Bayer.GBRG});
     let imageData = ctx.getImageData((640-width)/2, (480-height)/2, width, height);
     for(let i=0,count=width*height;i<count;i++)
@@ -37,5 +37,5 @@ worker.onmessage =  (res)=>{
     // let img = bmp.encode({data,width,height});
     // let img = jpeg.encode({data,width,height},80);
     // fs.writeFileSync("tmp.jpg",img.data);
-    console.timeEnd("time");
+    // console.timeEnd("time");
 };

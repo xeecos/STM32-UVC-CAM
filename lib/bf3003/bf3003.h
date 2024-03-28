@@ -68,7 +68,7 @@ void BF3003_SetMode(uint8_t gain, uint8_t whitebalance, uint8_t exposure);
 void BF3003_SetExposure(uint16_t exposure);
 void BF3003_SetGain(uint8_t r,uint8_t g,uint8_t b);
 void BF3003_SetDummy(uint16_t dummy);
-void BF3003_SetFrequency(uint16_t freq);
+void BF3003_SetFrequency(uint16_t freqDiv, uint16_t skipDiv);
 void _BF3003_SetFrequency(uint16_t freq);
 void _BF3003_UpdateFrequency(uint16_t freq);
 void BF3003_WriteReg(uint8_t RegAddress, uint8_t Data);

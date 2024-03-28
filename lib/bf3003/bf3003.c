@@ -19,7 +19,8 @@ uint8_t frame[2][640];
 uint16_t pixelIdx = 0;
 uint32_t totalCount = 0;
 uint16_t lineIdx = 0;
-uint8_t skipFreq = 1;
+uint16_t skipFreq = 15;
+uint16_t baseFreq = 15;
 uint8_t regs[REGS_COUNT][2] = {
 	{BF3003_COM7, 0b10000000},
 	{BF3003_COM2, 0b11001111},
@@ -427,7 +428,7 @@ void BF3003_Start()
 	EXTI_Init(&EXTI_InitStructureVSYNC);
 	EXTI_InitStructureHREF.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStructureHREF);
-	_BF3003_SetFrequency(1);
+	_BF3003_SetFrequency(baseFreq);
 }
 void BF3003_Stop()
 {
@@ -441,7 +442,7 @@ int bufIdx = 0;
 void BF3003_FrameBegin()
 {
 	// printf("frame:%d\n",lineIdx);
-	if(skipFreq>1&&frameWidth<640)_BF3003_SetFrequency(skipFreq);
+	if(frameWidth<640)_BF3003_SetFrequency(skipFreq);
 	lineIdx = 0;
 	pixelIdx = 0;
 	bufIdx = 1;
@@ -458,14 +459,14 @@ void BF3003_LineBegin()
 	#else
 	uint32_t tmp = (uint32_t)EXTI_BASE;
     *(__IO uint32_t *) tmp |= EXTI_Line5;
-	_BF3003_SetFrequency(1);
+	_BF3003_SetFrequency(baseFreq);
 	#endif
 	pixelIdx = 0;
 	bufIdx = 1 - bufIdx;
 }
 void BF3003_ReadPixel()
 {
-	frame[bufIdx][pixelIdx] = GPIOB->IDR>>8;
+	frame[bufIdx][pixelIdx] = GPIOB->IDR>>8;//(pixelIdx>>5)<<3
 	pixelIdx++;
 	if(pixelIdx>frameWidth-1)
 	{
@@ -473,7 +474,7 @@ void BF3003_ReadPixel()
 		*(__IO uint32_t *) tmp &= ~EXTI_Line5;
 		pixelIdx = 0;
 		lineIdx++;
-		if(skipFreq>1)_BF3003_SetFrequency(skipFreq);
+		_BF3003_SetFrequency(skipFreq);
 	}
 }
 
@@ -534,12 +535,13 @@ void BF3003_SetGlobalGain(uint8_t gain)
 	printf("global gain:%d\n",gain);
 	BF3003_WriteReg(BF3003_GLB_GAIN, gain);
 }
-void BF3003_SetFrequency(uint16_t freq)
+void BF3003_SetFrequency(uint16_t freqDiv, uint16_t skipDiv)
 {
-	printf("set freq:%d\n",freq);
-	skipFreq = freq;
+	printf("set freq:%d\n",freqDiv);
+	baseFreq = freqDiv;
+	skipFreq = skipDiv;
 }
-void _BF3003_SetFrequency(uint16_t freq)
+void _BF3003_SetFrequency(uint16_t freqDiv)
 {
 	TIM_Cmd(TIM3, DISABLE); 
 	TIM_OCInitTypeDef TIM_OCInitStructure;
@@ -551,7 +553,7 @@ void _BF3003_SetFrequency(uint16_t freq)
 	TIM_OC1PreloadConfig(TIM3, TIM_OCPreload_Enable);
 
     TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
-    TIM_TimeBaseStructure.TIM_Prescaler = 15/freq - 1;
+    TIM_TimeBaseStructure.TIM_Prescaler = freqDiv - 1;
     TIM_TimeBaseStructure.TIM_Period = 2 - 1;
     TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
     TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
@@ -559,7 +561,7 @@ void _BF3003_SetFrequency(uint16_t freq)
     TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure);
 	TIM_Cmd(TIM3, ENABLE); 
 	#ifdef DMA_ENABLE
-    TIM_TimeBaseStructure.TIM_Prescaler = 16/freq - 1;
+    TIM_TimeBaseStructure.TIM_Prescaler = freqDiv - 1;
     TIM_TimeBaseStructure.TIM_Period = 18 - 1;
     TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
     TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;

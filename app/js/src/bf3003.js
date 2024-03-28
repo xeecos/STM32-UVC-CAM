@@ -30,10 +30,9 @@ class BF3003
         }
         await this.setFrameSize(width,height);
         await this.setMode(1,1,0);
-        await this.setDummy(this._width==640?0x80:0x40);
-        await this.setExposure(0x40);
-        await this.setFrequency(1);
-        // await Utils.delay(100);
+        await this.setDummy(this._width==640?0x0:0x0);
+        await this.setExposure(0x20);
+        await this.setFrequency(15,8);
         let debug = {time:Date.now(),successCount:0,failCount:0,enable:true};
 
         let line = 0;
@@ -46,13 +45,13 @@ class BF3003
         let now = Date.now();
         epIn.on("data", (buffer)=>{ 
             // cc += buffer.length;
-            // if(cc>300*1024)
+            // if(cc>1024*1024)
             // {
-            //     console.log("time:",Date.now()-now);
+            //     console.log("time:",Date.now()-now,1000/(Date.now()-now));
             //     now = Date.now();
             //     cc = 0;
             // }
-            // // console.log("n:"+buffer.length+" ,");
+            // console.log("n:"+buffer.length+" ,");
             // return;
             if(buffer.length==2)
             {
@@ -74,7 +73,7 @@ class BF3003
                         {
                             debug.failCount++;
                         }
-                        console.log("percent:",(debug.successCount/(debug.successCount+debug.failCount)*100).toFixed(2),"success:", debug.successCount, " fail:", debug.failCount);
+                        // console.log("percent:",(debug.successCount/(debug.successCount+debug.failCount)*100).toFixed(2),"success:", debug.successCount, " fail:", debug.failCount);
                     }
                 }
                 line = 0;
@@ -182,10 +181,10 @@ class BF3003
             })
         });
     }
-    setFrequency(freq=16)
+    setFrequency(freqBase=8,freqSkip=8)
     {
         return new Promise(resolve=>{
-            this.transferOut(Buffer.from([1,7,freq])).then((res)=>{
+            this.transferOut(Buffer.from([1,7,freqBase, freqSkip])).then((res)=>{
                 resolve(res);
             });
         })
@@ -212,7 +211,7 @@ class BF3003
         return new Promise(async resolve=>{
             await Utils.delay(100);
             let epIn = this._usb.device.interfaces[0].endpoints[0];
-            epIn.startPoll(1,640);
+            epIn.startPoll(1,6400);
             resolve();
         });
     }

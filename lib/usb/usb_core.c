@@ -1131,7 +1131,7 @@ void EP2_OUT_Callback(void)
 			case 7:
 			{
 				//set freq;
-				BF3003_SetFrequency(commands[2]);
+				BF3003_SetFrequency(commands[2],commands[3]);
 			}
 			break;
 			case 8:
