@@ -18,7 +18,7 @@ uint16_t frameHeight = 480;
 uint8_t frame[2][640];
 uint16_t pixelIdx = 0;
 uint32_t totalCount = 0;
-uint16_t lineIdx = 0;
+int16_t lineIdx = 0;
 uint16_t skipFreq = 15;
 uint16_t baseFreq = 15;
 uint8_t regs[REGS_COUNT][2] = {
@@ -458,20 +458,19 @@ void BF3003_FrameBegin()
 }
 void BF3003_LineBegin()
 {
+	pixelIdx = 0;
+	bufIdx = 1 - bufIdx;
 	#ifdef DMA_ENABLE
-	__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
 	DMA1_Channel2->CCR &= ~DMA_CCR1_EN;
 	DMA1_Channel2->CMAR = (uint32_t)frame[bufIdx]; 
-	DMA1_Channel2->CNDTR = 640;
+	DMA1_Channel2->CNDTR = frameWidth;
 	DMA1_Channel2->CCR |= DMA_CCR1_EN;
-	lineIdx++;
 	#else
 	uint32_t tmp = (uint32_t)EXTI_BASE;
     *(__IO uint32_t *) tmp |= EXTI_Line5;
 	_BF3003_SetFrequency(baseFreq);
 	#endif
-	pixelIdx = 0;
-	bufIdx = 1 - bufIdx;
+	lineIdx++;
 }
 void BF3003_ReadPixel()
 {
@@ -482,7 +481,6 @@ void BF3003_ReadPixel()
 		uint32_t tmp = (uint32_t)EXTI_BASE;
 		*(__IO uint32_t *) tmp &= ~EXTI_Line5;
 		pixelIdx = 0;
-		lineIdx++;
 		_BF3003_SetFrequency(skipFreq);
 	}
 }

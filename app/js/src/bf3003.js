@@ -128,7 +128,6 @@ class BF3003
         {
             if(this._epOut<0) return resolve(0);
             this._usb.transferOut(this._epOut,data).then((res)=>{
-                console.log(res)
                 resolve(res);
             });
         })

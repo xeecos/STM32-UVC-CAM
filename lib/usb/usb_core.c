@@ -995,7 +995,7 @@ void NOP_Process(void)
 
 
 extern uint8_t frame[2][640];
-extern uint16_t lineIdx;
+extern int16_t lineIdx;
 extern uint16_t frameWidth;	
 extern uint16_t frameHeight;	
 uint8_t sendbuf[PACKET_SIZE];			// 发送数据缓冲区
@@ -1003,7 +1003,7 @@ uint32_t sendsize = 0;					// 已发送字节数
 uint16_t lastLineIdx;
 void EP1_IN_Callback(void)
 {
-	if(lineIdx<1)
+	if(lineIdx<2)
 	{
 		sendsize = 0;
 		sendbuf[0] = 0xff;
@@ -1028,22 +1028,25 @@ void EP1_IN_Callback(void)
 		SetEPTxStatus(ENDP1, EP_TX_VALID);
 		return;
 	}
-	uint8_t datalen = 0;
-	uint8_t frameIdx = ((lineIdx-1)&0b1);
-	if (sendsize==0)
+	uint16_t datalen = 0;
+	uint8_t frameIdx = (lineIdx&0b1);
+	if(lineIdx<=frameHeight+2)
 	{
-		datalen = PACKET_SIZE;
-		sendsize = datalen;
-		lastLineIdx = lineIdx;
-	} 
-	else if(sendsize<frameWidth)
-	{
-		datalen = PACKET_SIZE;
-		if (sendsize + datalen >= frameWidth)
+		if (sendsize==0)
 		{
-			datalen = frameWidth - sendsize;
+			datalen = PACKET_SIZE;
+			sendsize = datalen;
+			lastLineIdx = lineIdx;
+		} 
+		else if(sendsize<frameWidth)
+		{
+			datalen = PACKET_SIZE;
+			if (sendsize + datalen >= frameWidth)
+			{
+				datalen = frameWidth - sendsize;
+			}
+			sendsize += datalen;
 		}
-		sendsize += datalen;
 	}
 	
 	#ifdef USB_DBUF_ENABLE
@@ -1068,6 +1071,11 @@ void EP1_IN_Callback(void)
 		if(lineIdx!=lastLineIdx)
 		{
 			sendsize = 0;
+		}
+		if(lineIdx>=frameHeight)
+		{
+			sendsize = 0;
+			lineIdx++;
 		}
 	}
 }
