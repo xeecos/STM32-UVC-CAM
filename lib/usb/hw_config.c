@@ -79,20 +79,24 @@ void USB_Interrupts_Config(void)
 	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStructure);
 
-	NVIC_InitTypeDef nvic;
-    nvic.NVIC_IRQChannel = USB_LP_CAN1_RX0_IRQn;
-    nvic.NVIC_IRQChannelPreemptionPriority = 0;
-    nvic.NVIC_IRQChannelSubPriority = 1;
-    nvic.NVIC_IRQChannelCmd = ENABLE;
-    NVIC_Init(&nvic);
-    nvic.NVIC_IRQChannel = USB_HP_CAN1_TX_IRQn;
-    nvic.NVIC_IRQChannelPreemptionPriority = 0;
-    nvic.NVIC_IRQChannelSubPriority = 0;
-    NVIC_Init(&nvic);
-    nvic.NVIC_IRQChannel = USBWakeUp_IRQn;
-    nvic.NVIC_IRQChannelPreemptionPriority = 0;
-    nvic.NVIC_IRQChannelSubPriority = 1;
-    NVIC_Init(&nvic); 	 
+	// NVIC_InitTypeDef nvic;
+    // nvic.NVIC_IRQChannel = USB_LP_CAN1_RX0_IRQn;
+    // nvic.NVIC_IRQChannelPreemptionPriority = 0;
+    // nvic.NVIC_IRQChannelSubPriority = 1;
+    // nvic.NVIC_IRQChannelCmd = ENABLE;
+    // NVIC_Init(&nvic);
+    // nvic.NVIC_IRQChannel = USB_HP_CAN1_TX_IRQn;
+    // nvic.NVIC_IRQChannelPreemptionPriority = 0;
+    // nvic.NVIC_IRQChannelSubPriority = 0;
+    // NVIC_Init(&nvic);
+    // nvic.NVIC_IRQChannel = USBWakeUp_IRQn;
+    // nvic.NVIC_IRQChannelPreemptionPriority = 0;
+    // nvic.NVIC_IRQChannelSubPriority = 1;
+    // NVIC_Init(&nvic); 	 
+	
+	MY_NVIC_Init(1, 0, USB_HP_CAN1_TX_IRQn, 2);
+	MY_NVIC_Init(0, 1, USB_LP_CAN1_RX0_IRQn, 2);
+	MY_NVIC_Init(1, 0, USBWakeUp_IRQn, 2);
 }
 
 /*******************************************************************************

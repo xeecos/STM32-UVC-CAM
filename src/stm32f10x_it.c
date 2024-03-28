@@ -61,12 +61,14 @@ void USBWakeUp_IRQHandler(void)
 
 void EXTI9_5_IRQHandler(void)
 {
+    #ifndef DMA_ENABLE
     if((EXTI->PR & EXTI_Line5) != RESET)
     {
         EXTI->PR |= EXTI_Line5;
         //PIXCLK
         BF3003_ReadPixel();
     }
+    #endif
     if((EXTI->PR & EXTI_Line7) != RESET)
     {
         EXTI->PR |= EXTI_Line7;

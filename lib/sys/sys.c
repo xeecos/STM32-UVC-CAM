@@ -35,16 +35,13 @@ void SetSysClockToHSE(void)
     #endif
 
     RCC->CFGR &= ~RCC_CFGR_PLLMULL; //Clear
-    // RCC->CFGR &= ~RCC_CFGR_USBPRE; //USBclk=PLLclk/1.5=48Mhz
     
     /* HCLK = SYSCLK */
     RCC->CFGR |= (uint32_t)RCC_CFGR_HPRE_DIV1; 
     /* PCLK2 = HCLK */
     RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE2_DIV1; 
-    /* PCLK1 = HCLK / 2 */
-    RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE1_DIV2;
-
-    // RCC->CR |= RCC_CR_HSEON;
+    /* PCLK1 = HCLK */
+    RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE1_DIV1;
     
     RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL));
     RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC | RCC_CFGR_PLLMULL18);
@@ -69,6 +66,42 @@ void SetSysClockToHSE(void)
 
 
 
+//设置NVIC分组
+//NVIC_Group:NVIC分组 0~4 总共5组 		   
+void MY_NVIC_PriorityGroupConfig(uint8_t NVIC_Group)	 
+{ 
+	uint32_t temp,temp1;	  
+	temp1=(~NVIC_Group)&0x07;//取后三位
+	temp1<<=8;
+	temp=SCB->AIRCR;  //读取先前的设置
+	temp&=0X0000F8FF; //清空先前分组
+	temp|=0X05FA0000; //写入钥匙
+	temp|=temp1;	   
+	SCB->AIRCR=temp;  //设置分组	    	  				   
+}
+//设置NVIC 
+//NVIC_PreemptionPriority:抢占优先级
+//NVIC_SubPriority       :响应优先级
+//NVIC_Channel           :中断编号
+//NVIC_Group             :中断分组 0~4
+//注意优先级不能超过设定的组的范围!否则会有意想不到的错误
+//组划分:
+//组0:0位抢占优先级,4位响应优先级
+//组1:1位抢占优先级,3位响应优先级
+//组2:2位抢占优先级,2位响应优先级
+//组3:3位抢占优先级,1位响应优先级
+//组4:4位抢占优先级,0位响应优先级
+//NVIC_SubPriority和NVIC_PreemptionPriority的原则是,数值越小,越优先	   
+void MY_NVIC_Init(uint8_t NVIC_PreemptionPriority,uint8_t NVIC_SubPriority,uint8_t NVIC_Channel,uint8_t NVIC_Group)	 
+{ 
+	uint32_t temp;	
+	temp = NVIC_PreemptionPriority<<(4-NVIC_Group);	  
+	temp |= NVIC_SubPriority&(0x0f>>NVIC_Group);
+	temp &= 0xf;//取低四位  
+	if(NVIC_Channel<32)NVIC->ISER[0] |= 1<<NVIC_Channel;//使能中断位(要清除的话,相反操作就OK)
+	else NVIC->ISER[1] |= 1<<(NVIC_Channel-32);    
+	NVIC->IP[NVIC_Channel] |= temp<<4;//设置响应优先级和抢断优先级   	    	  				   
+}
 
 
 

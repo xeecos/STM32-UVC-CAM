@@ -209,14 +209,17 @@ void UsbCamera_Reset(void)
 
 	/* Initialize Endpoint 1 */
 	SetEPType(ENDP1, EP_BULK);
-	// SetEPDoubleBuff(ENDP1);
-	// SetEPDblBuffAddr(ENDP1, ENDP1_BUF0Addr, ENDP1_BUF1Addr);
-	// SetEPDblBuffCount(ENDP1, EP_DBUF_OUT, PACKET_SIZE);
-	// ClearDTOG_RX(ENDP1);
-	// ClearDTOG_TX(ENDP1);
-    // ToggleDTOG_RX(ENDP1);
+	#ifdef USB_DBUF_ENABLE
+	SetEPDoubleBuff(ENDP1);
+	SetEPDblBuffAddr(ENDP1, ENDP1_BUF0Addr, ENDP1_BUF1Addr);
+	SetEPDblBuffCount(ENDP1, EP_DBUF_OUT, PACKET_SIZE);
+	ClearDTOG_RX(ENDP1);
+	ClearDTOG_TX(ENDP1);
+    ToggleDTOG_RX(ENDP1);
+	#else
 	SetEPTxAddr(ENDP1, ENDP1_TXADDR);
 	SetEPTxCount(ENDP1, PACKET_SIZE);
+	#endif
 	SetEPRxStatus(ENDP1, EP_RX_DIS);
 	SetEPTxStatus(ENDP1, EP_TX_VALID);
 

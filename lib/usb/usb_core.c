@@ -1009,19 +1009,22 @@ void EP1_IN_Callback(void)
 		sendbuf[0] = 0xff;
 		sendbuf[1] = 0xff;
 		
+		#ifdef USB_DBUF_ENABLE
+		ToggleDTOG_RX(ENDP1); 
+		if (GetENDPOINT(ENDP1) & EP_DTOG_RX)
+		{
+			// User use buffer0
+			UserToPMABufferCopy(sendbuf, ENDP1_BUF0Addr, 2);
+			SetEPDblBuf0Count(ENDP1, EP_DBUF_IN, 2);
+		} else{
+			// User use buffer1
+			UserToPMABufferCopy(sendbuf, ENDP1_BUF1Addr, 2);
+			SetEPDblBuf1Count(ENDP1, EP_DBUF_IN, 2);
+		}
+		#else
 		UserToPMABufferCopy(sendbuf, ENDP1_TXADDR, 2);
 		SetEPTxCount(ENDP1, 2);
-		// ToggleDTOG_RX(ENDP1); 
-		// if (GetENDPOINT(ENDP1) & EP_DTOG_RX)
-		// {
-		// 	// User use buffer0
-		// 	UserToPMABufferCopy(sendbuf, ENDP1_BUF0Addr, 2);
-		// 	SetEPDblBuf0Count(ENDP1, EP_DBUF_IN, 2);
-		// } else{
-		// 	// User use buffer1
-		// 	UserToPMABufferCopy(sendbuf, ENDP1_BUF1Addr, 2);
-		// 	SetEPDblBuf1Count(ENDP1, EP_DBUF_IN, 2);
-		// }
+		#endif
 		SetEPTxStatus(ENDP1, EP_TX_VALID);
 		return;
 	}
@@ -1043,19 +1046,22 @@ void EP1_IN_Callback(void)
 		sendsize += datalen;
 	}
 	
+	#ifdef USB_DBUF_ENABLE
+	ToggleDTOG_RX(ENDP1); 
+	if (GetENDPOINT(ENDP1) & EP_DTOG_RX)
+	{
+		// User use buffer0
+		UserToPMABufferCopy(frame[frameIdx] + sendsize - datalen, ENDP1_BUF0Addr, datalen);
+		SetEPDblBuf0Count(ENDP1, EP_DBUF_IN, datalen);
+	} else{
+		// User use buffer1
+		UserToPMABufferCopy(frame[frameIdx] + sendsize - datalen, ENDP1_BUF1Addr, datalen);
+		SetEPDblBuf1Count(ENDP1, EP_DBUF_IN, datalen);
+	}
+	#else
 	UserToPMABufferCopy(frame[frameIdx] + sendsize - datalen, ENDP1_TXADDR, datalen);
 	SetEPTxCount(ENDP1, datalen);
-	// ToggleDTOG_RX(ENDP1); 
-	// if (GetENDPOINT(ENDP1) & EP_DTOG_RX)
-	// {
-	// 	// User use buffer0
-	// 	UserToPMABufferCopy(frame[frameIdx] + sendsize - datalen, ENDP1_BUF0Addr, datalen);
-	// 	SetEPDblBuf0Count(ENDP1, EP_DBUF_IN, datalen);
-	// } else{
-	// 	// User use buffer1
-	// 	UserToPMABufferCopy(frame[frameIdx] + sendsize - datalen, ENDP1_BUF1Addr, datalen);
-	// 	SetEPDblBuf1Count(ENDP1, EP_DBUF_IN, datalen);
-	// }
+	#endif
 	SetEPTxStatus(ENDP1, EP_TX_VALID);		// 允许数据发送
 	if(sendsize>=frameWidth)
 	{

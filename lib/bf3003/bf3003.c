@@ -4,6 +4,7 @@
 #include "delay.h"
 #include "usart.h"
 #include "bf3003.h"
+#include "hw_config.h"
 
 /* 0xDC --- 写地址   ***   0XDD ---读地址 */
 #define BF3003_ADDRESS      	    0xDC
@@ -21,7 +22,7 @@ uint16_t lineIdx = 0;
 uint8_t skipFreq = 1;
 uint8_t regs[REGS_COUNT][2] = {
 	{BF3003_COM7, 0b10000000},
-	{BF3003_COM2, 0b00000000},
+	{BF3003_COM2, 0b11001111},
 	/*
 	Common control 2
 	Bit[7:6]: vclk output drive capability
@@ -60,7 +61,7 @@ uint8_t regs[REGS_COUNT][2] = {
 	Bit[0]:HREF ahead 0.5 clk(YUV MCLK,RawData PCLK) or not
 	0x0c[1:0]: Internal use only
 	*/
-	{BF3003_CLKRC, 0b1001},
+	{BF3003_CLKRC, 0b1010},
 	/*
 	Mclk_div control
 	Bit[7：2]: Internal use only
@@ -271,7 +272,6 @@ uint8_t regs[REGS_COUNT][2] = {
 EXTI_InitTypeDef   EXTI_InitStructurePCLK;
 EXTI_InitTypeDef   EXTI_InitStructureHREF;
 EXTI_InitTypeDef   EXTI_InitStructureVSYNC;
-DMA_InitTypeDef    DMA_InitStructure;
 void BF3003_Pin_Init()
 {
     GPIO_InitTypeDef GPIO_InitStruct;  
@@ -282,7 +282,7 @@ void BF3003_Pin_Init()
     GPIO_Init(GPIOB, &GPIO_InitStruct);
 
     /* PIXCLK VSYNC HREF 初始化 */
-    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7;
+    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
     GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IPU;  
     GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOB, &GPIO_InitStruct);
@@ -291,18 +291,8 @@ void BF3003_Pin_Init()
     GPIO_PinRemapConfig(GPIO_Remap_SWJ_NoJTRST,ENABLE);
     GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable,ENABLE);
     
-	TIM_OCInitTypeDef TIM_OCInitStructure;
-    TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
-    TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
-    TIM_OCInitStructure.TIM_Pulse = 1;
-    TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
 
-    TIM_OC1Init(TIM3, &TIM_OCInitStructure);
-	TIM_OC1PreloadConfig(TIM3, TIM_OCPreload_Enable);
-
-    TIM_Cmd(TIM3, ENABLE);
-
-	// GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource5);//pclk
+	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource5);//pclk
 	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource6);//vsync
 	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource7);//href
 
@@ -314,29 +304,14 @@ void BF3003_Pin_Init()
 	EXTI_InitStructureHREF.EXTI_Mode = EXTI_Mode_Interrupt;
 	EXTI_InitStructureHREF.EXTI_Trigger = EXTI_Trigger_Rising;
 
-	// EXTI_InitStructurePCLK.EXTI_Line = EXTI_Line5;//pclk
-	// EXTI_InitStructurePCLK.EXTI_Mode = EXTI_Mode_Interrupt;
-	// EXTI_InitStructurePCLK.EXTI_Trigger = EXTI_Trigger_Rising;
-	// EXTI_InitStructurePCLK.EXTI_LineCmd = ENABLE;
-	// EXTI_Init(&EXTI_InitStructurePCLK);
-	// EXTI_InitStructurePCLK.EXTI_LineCmd = DISABLE;
-	// EXTI_Init(&EXTI_InitStructurePCLK);
-	
-	NVIC_InitTypeDef nvic;
-    nvic.NVIC_IRQChannel = EXTI9_5_IRQn;
-    nvic.NVIC_IRQChannelPreemptionPriority = 0;
-    nvic.NVIC_IRQChannelSubPriority = 0;
-    nvic.NVIC_IRQChannelCmd = ENABLE;
-    NVIC_Init(&nvic);
-
+	MY_NVIC_Init(0, 0, EXTI9_5_IRQn, 2);
     /* D0-D7 IO口初始化 */
     GPIO_InitStruct.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
     GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN_FLOATING;
     GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
-	
+	#ifdef DMA_ENABLE
+	DMA_InitTypeDef    DMA_InitStructure;
     DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)((uint8_t*)(&GPIOB->IDR)+1);// 设置发送缓冲区首地址
     DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)frame[0];         
     DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralSRC;                 // 设置外设寄存器 -> 内存缓冲区
@@ -347,11 +322,17 @@ void BF3003_Pin_Init()
     DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;         // 内存数据宽度8位，1个字节
     DMA_InitStructure.DMA_Mode = DMA_Mode_Normal;                           // 单次传输模式
     DMA_InitStructure.DMA_Priority = DMA_Priority_VeryHigh;                 // 优先级设置
-    DMA_InitStructure.DMA_M2M = DMA_M2M_Disable;     
-    DMA_Init(DMA1_Channel7, &DMA_InitStructure);     
-    DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)frame[1];         
-    DMA_Init(DMA1_Channel2, &DMA_InitStructure);           
-	
+    DMA_InitStructure.DMA_M2M = DMA_M2M_Disable;         
+    DMA_Init(DMA1_Channel2, &DMA_InitStructure);    
+	#else
+	EXTI_InitStructurePCLK.EXTI_Line = EXTI_Line5;//pclk
+	EXTI_InitStructurePCLK.EXTI_Mode = EXTI_Mode_Interrupt;
+	EXTI_InitStructurePCLK.EXTI_Trigger = EXTI_Trigger_Falling;
+	EXTI_InitStructurePCLK.EXTI_LineCmd = ENABLE;
+	EXTI_Init(&EXTI_InitStructurePCLK);
+	EXTI_InitStructurePCLK.EXTI_LineCmd = DISABLE;
+	EXTI_Init(&EXTI_InitStructurePCLK);       
+	#endif
 }
 /*
  * @brief    BF3003写寄存器
@@ -460,34 +441,31 @@ int bufIdx = 0;
 void BF3003_FrameBegin()
 {
 	// printf("frame:%d\n",lineIdx);
-	// if(skipFreq>1)_BF3003_SetFrequency(skipFreq);
+	if(skipFreq>1&&frameWidth<640)_BF3003_SetFrequency(skipFreq);
 	lineIdx = 0;
 	pixelIdx = 0;
 	bufIdx = 1;
 }
 void BF3003_LineBegin()
 {
-	// uint32_t tmp = (uint32_t)EXTI_BASE;
-    // *(__IO uint32_t *) tmp |= EXTI_Line5;
+	#ifdef DMA_ENABLE
+	__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+	DMA1_Channel2->CCR &= ~DMA_CCR1_EN;
+	DMA1_Channel2->CMAR = (uint32_t)frame[bufIdx]; 
+	DMA1_Channel2->CNDTR = 640;
+	DMA1_Channel2->CCR |= DMA_CCR1_EN;
+	lineIdx++;
+	#else
+	uint32_t tmp = (uint32_t)EXTI_BASE;
+    *(__IO uint32_t *) tmp |= EXTI_Line5;
+	_BF3003_SetFrequency(1);
+	#endif
 	pixelIdx = 0;
 	bufIdx = 1 - bufIdx;
-	if(bufIdx==0)
-	{
-		DMA1_Channel7->CCR &= ~DMA_CCR1_EN;
-		DMA1_Channel7->CNDTR = 640;
-		DMA1_Channel7->CCR |= DMA_CCR1_EN;
-	}
-	else
-	{
-		DMA1_Channel2->CCR &= ~DMA_CCR1_EN;
-		DMA1_Channel2->CNDTR = 640;
-		DMA1_Channel2->CCR |= DMA_CCR1_EN;
-	}
-	lineIdx++;
 }
 void BF3003_ReadPixel()
 {
-	// frame[bufIdx][pixelIdx] = GPIOB->IDR>>8;
+	frame[bufIdx][pixelIdx] = GPIOB->IDR>>8;
 	pixelIdx++;
 	if(pixelIdx>frameWidth-1)
 	{
@@ -563,26 +541,34 @@ void BF3003_SetFrequency(uint16_t freq)
 }
 void _BF3003_SetFrequency(uint16_t freq)
 {
+	TIM_Cmd(TIM3, DISABLE); 
+	TIM_OCInitTypeDef TIM_OCInitStructure;
+    TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
+    TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
+    TIM_OCInitStructure.TIM_Pulse = 1;
+    TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
+    TIM_OC1Init(TIM3, &TIM_OCInitStructure);
+	TIM_OC1PreloadConfig(TIM3, TIM_OCPreload_Enable);
+
     TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
-    TIM_TimeBaseStructure.TIM_Prescaler = 18/freq - 1;
+    TIM_TimeBaseStructure.TIM_Prescaler = 15/freq - 1;
     TIM_TimeBaseStructure.TIM_Period = 2 - 1;
     TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
     TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     // 72000000  / (TIM_Period + 1) / (TIM_Prescaler + 1)
     TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure);
-    TIM_TimeBaseStructure.TIM_Prescaler = 72/freq - 1;
-    TIM_TimeBaseStructure.TIM_Period = 2 - 1;
+	TIM_Cmd(TIM3, ENABLE); 
+	#ifdef DMA_ENABLE
+    TIM_TimeBaseStructure.TIM_Prescaler = 16/freq - 1;
+    TIM_TimeBaseStructure.TIM_Period = 18 - 1;
+    TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+    TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
-	TIM_TimeBaseInit(TIM4, &TIM_TimeBaseStructure);
-	
 	TIM_DMACmd(TIM2, TIM_DMA_Update, ENABLE); 
-	// TIM_DMACmd(TIM3, TIM_DMA_Update, ENABLE); 
-	TIM_DMACmd(TIM4, TIM_DMA_Update, ENABLE); 
-
     TIM_Cmd(TIM2, ENABLE);    
-    TIM_Cmd(TIM4, ENABLE);    
+	#endif   
 }
 void _BF3003_UpdateFrequency(uint16_t freq)
 {
-	TIM_PrescalerConfig(TIM3,8/freq - 1,TIM_PSCReloadMode_Immediate);
+	TIM_PrescalerConfig(TIM3,36/freq - 1,TIM_PSCReloadMode_Immediate);
 }

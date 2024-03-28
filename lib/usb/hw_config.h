@@ -24,11 +24,8 @@
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 /* Exported define -----------------------------------------------------------*/
-#define DOWN            1
-#define LEFT            2
-#define RIGHT           3
-#define UP              4
-#define CURSOR_STEP     30
+#define USB_DBUF_ENABLE
+// #define DMA_ENABLE
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,9 +37,7 @@ void Enter_LowPowerMode(void);
 void Leave_LowPowerMode(void);
 void USB_Interrupts_Config(void);
 void USB_Cable_Config (FunctionalState NewState);
-//void UsbCamera_StreamStart(void);
 void USB_Port_Set(FunctionalState NewState, FunctionalState Pin_In_IPU);
-uint8_t JoyState(void);
 void Get_SerialNum(void);
 
 #ifdef __cplusplus

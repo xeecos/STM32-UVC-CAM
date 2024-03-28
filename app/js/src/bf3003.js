@@ -30,8 +30,8 @@ class BF3003
         }
         await this.setFrameSize(width,height);
         await this.setMode(1,1,0);
-        await this.setDummy(this._width==640?0x80:0x00);
-        await this.setExposure(0x2ff);
+        await this.setDummy(this._width==640?0x80:0x40);
+        await this.setExposure(0x40);
         await this.setFrequency(1);
         // await Utils.delay(100);
         let debug = {time:Date.now(),successCount:0,failCount:0,enable:true};
@@ -42,7 +42,18 @@ class BF3003
         let lineCount = 0;
 
         let epIn = device.interfaces[0].endpoints[0];
+        let cc = 0;
+        let now = Date.now();
         epIn.on("data", (buffer)=>{ 
+            // cc += buffer.length;
+            // if(cc>300*1024)
+            // {
+            //     console.log("time:",Date.now()-now);
+            //     now = Date.now();
+            //     cc = 0;
+            // }
+            // // console.log("n:"+buffer.length+" ,");
+            // return;
             if(buffer.length==2)
             {
                 if(line>1)
@@ -72,16 +83,26 @@ class BF3003
             }
             if(buffer.length>0)
             {
-                for(let i=0;i<buffer.length;i++)
+                // for(let i=0;i<buffer.length;i++)
+                // {
+                //     imageBuf[imageIdx][line*this._width+lineCount+i] = buffer[i];
+                // }
+                // lineCount+=buffer.length;
+                // if(lineCount>=this._width)
+                // {
+                //     lineCount = 0;
+                //     line++;
+                // }
+                let n = buffer.length / this._width;
+                for(let j=0;j<n;j++)
                 {
-                    imageBuf[imageIdx][line*this._width+lineCount+i] = buffer[i];
+                    for(let i=0;i<this._width;i++)
+                    {
+                        imageBuf[imageIdx][(line+j)*this._width+lineCount+i] = buffer[i+j*this._width];
+                    }
                 }
-                lineCount+=buffer.length;
-                if(lineCount>=this._width)
-                {
-                    lineCount = 0;
-                    line++;
-                }
+                lineCount = 0;
+                line+=n;
             }
         });
         return 0;
@@ -191,7 +212,7 @@ class BF3003
         return new Promise(async resolve=>{
             await Utils.delay(100);
             let epIn = this._usb.device.interfaces[0].endpoints[0];
-            epIn.startPoll(1,128);
+            epIn.startPoll(1,640);
             resolve();
         });
     }
