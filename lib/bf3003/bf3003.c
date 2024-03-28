@@ -311,6 +311,15 @@ void BF3003_Pin_Init()
     GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN_FLOATING;
     GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+	TIM_OCInitTypeDef TIM_OCInitStructure;
+    TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
+    TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
+    TIM_OCInitStructure.TIM_Pulse = 1;
+    TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
+    TIM_OC1Init(TIM3, &TIM_OCInitStructure);
+	TIM_OC1PreloadConfig(TIM3, TIM_OCPreload_Enable);
+
 	#ifdef DMA_ENABLE
 	DMA_InitTypeDef    DMA_InitStructure;
     DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)((uint8_t*)(&GPIOB->IDR)+1);// 设置发送缓冲区首地址
@@ -544,13 +553,6 @@ void BF3003_SetFrequency(uint16_t freqDiv, uint16_t skipDiv)
 void _BF3003_SetFrequency(uint16_t freqDiv)
 {
 	TIM_Cmd(TIM3, DISABLE); 
-	TIM_OCInitTypeDef TIM_OCInitStructure;
-    TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
-    TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
-    TIM_OCInitStructure.TIM_Pulse = 1;
-    TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
-    TIM_OC1Init(TIM3, &TIM_OCInitStructure);
-	TIM_OC1PreloadConfig(TIM3, TIM_OCPreload_Enable);
 
     TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
     TIM_TimeBaseStructure.TIM_Prescaler = freqDiv - 1;
@@ -561,8 +563,8 @@ void _BF3003_SetFrequency(uint16_t freqDiv)
     TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure);
 	TIM_Cmd(TIM3, ENABLE); 
 	#ifdef DMA_ENABLE
-    TIM_TimeBaseStructure.TIM_Prescaler = freqDiv - 1;
-    TIM_TimeBaseStructure.TIM_Period = 18 - 1;
+    TIM_TimeBaseStructure.TIM_Prescaler = freqDiv*8 - 1;
+    TIM_TimeBaseStructure.TIM_Period = 2 - 1;
     TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
     TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
